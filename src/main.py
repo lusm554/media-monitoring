@@ -30,10 +30,12 @@ def from_cache():
   with open('cache.pickle', 'rb') as f:
     return pickle.load(f)
 
-
 for feed, data in read_rss():
   pprint(feed)
   pprint(data.keys())
+  print(data.bozo)
+  if data.bozo:
+    print(data.bozo_exception.getMessage())
   print('\n'*2)
 
 exit()

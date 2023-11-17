@@ -1,0 +1,12 @@
+Modules:
+  1. Input   - rssfeed
+  2. Process - main
+  3. Output  - front
+
+Steps:
+  1. Select all rss links
+  2. Scrap them
+  3. Filter by key words
+  4. Represent
+  5. Sent through telegram
+
