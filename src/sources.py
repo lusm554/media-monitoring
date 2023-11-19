@@ -1,1 +1,0 @@
-srcs = ['ura.news', 'bel.ru', 'life.ru', 'nashgorod.ru', 'karelinform.ru', 'russian.rt.com', '360tv.ru', 'vostokmedia.com', 'udm-info.ru', 'oilcapital.ru', 'mkset.ru', 'lenta.ru', 'd-russia.ru', 'news.ru', 'novostivolgograda.ru', 'tagilcity.ru', 'www.sostav.ru']
