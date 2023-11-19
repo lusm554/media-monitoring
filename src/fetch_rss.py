@@ -24,6 +24,21 @@ RSS_FEEDS = (
   FeedConf(title='Коммерсантъ', rss_url='https://www.kommersant.ru/RSS/news.xml'),
   FeedConf(title='Ведомости', feed_name='Все новости', rss_url='https://www.vedomosti.ru/rss/news.xml'),
   FeedConf(title='Ведомости', feed_name='Все материалы', rss_url='https://www.vedomosti.ru/rss/articles.xml'),
+  FeedConf(title='lenta.ru', rss_url='https://lenta.ru/rss'),
+  FeedConf(title='Московский Комсомолец', feed_name='Все материалы', rss_url='https://www.mk.ru/rss/news/index.xml'),
+  FeedConf(title='Московский Комсомолец', feed_name='Новостная лента', rss_url='https://www.mk.ru/rss/news/index.xml'),
+  FeedConf(title='Газета.ru', rss_url='https://www.gazeta.ru/export/rss/social_more.xml'),
+  FeedConf(title='RT', rss_url='https://russian.rt.com/rss'),
+  FeedConf(title='Финмаркет', rss_url='http://www.finmarket.ru/rss/mainnews.asp'),
+  FeedConf(title='Росбалт', rss_url='https://www.rosbalt.ru/feed/'),
+  FeedConf(title='Прайм', feed_name='Основной поток', rss_url='https://1prime.ru/export/rss2/index.xml'),
+  FeedConf(title='Прайм', feed_name='Финансы', rss_url='https://1prime.ru/export/rss2/finance/index.xml'),
+  FeedConf(title='Прайм', feed_name='Экономика', rss_url='https://1prime.ru/export/rss2/state_regulation/index.xml'),
+  FeedConf(title='Bits.media', rss_url='https://bits.media/rss2/'),
+  FeedConf(title='Indicator', rss_url='https://indicator.ru/exports/rss'),
+  FeedConf(title='Финам', feed_name='Новости компаний', rss_url='https://www.finam.ru/analysis/conews/rsspoint/'),
+  FeedConf(title='Финам', feed_name='Новости мировых рынков', rss_url='https://www.finam.ru/international/advanced/rsspoint/'),
+  FeedConf(title='Comnews', rss_url='https://www.comnews.ru/rss'),
 )
 
 class Feed:
