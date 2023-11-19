@@ -11,7 +11,7 @@ def fetch_data():
 
 def process(feeds):
   def check_kw(text):
-    if isinstance(text, str): return False
+    if not isinstance(text, str): return False
     text = text.lower()
     flag = False
     if 'цфа' in text:
@@ -30,6 +30,8 @@ def process(feeds):
 def main():
   input_data = fetch_data()
   kwfeeds = process(input_data)
+  for _ in kwfeeds:
+    pass
 
 
 if __name__ == '__main__':
