@@ -10,8 +10,7 @@ from telegram.ext import (
   CommandHandler,
   filters
 )
-from rss_parser import last_news_rss, RSS_FEEDS
-
+from rsshandler import rsshandler
 
 logging.basicConfig(
   format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -21,7 +20,6 @@ logging.basicConfig(
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
-
 DEVELOPER_CHAT_ID = os.environ.get('DEVELOPER_CHAT_ID')
 
 async def start(update, context):
@@ -51,7 +49,7 @@ async def help_cmd(update, context):
   )
 
 async def cfa_info(update, context):
-  news = last_news_rss()
+  news = context.bot_data.get('rsshandler').fetch_last_news()
   cfa_msg = [
     'За последнее время были опубликованы следующие новости:',
   ]
@@ -74,7 +72,8 @@ async def media_index(update, context):
   mindex_msg = [
     'Список отслеживаемых СМИ:',
   ]
-  for n, f in enumerate(RSS_FEEDS, start=1):
+  mindex = context.bot_data.get('rsshandler').feeds 
+  for n, f in enumerate(mindex, start=1):
     msg = f'{n}. {f.title} ' + (f.feed_name or '').lower()
     mindex_msg.append(msg)
   mindex_msg = '\n'.join(mindex_msg)
@@ -104,6 +103,9 @@ async def error_handler(update, context):
 def main():
   TOKEN = os.environ.get('TELEGRAM_TOKEN')
   app = ApplicationBuilder().token(TOKEN).build() 
+
+  # Add rss handler
+  app.bot_data['rsshandler'] = rsshandler()
 
   # Register commands 
   app.add_handler(CommandHandler('start', start))
