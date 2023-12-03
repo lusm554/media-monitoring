@@ -6,6 +6,7 @@ from pprint import pprint
 
 def adapt_datetime_epoch(val):
   """Adapt datetime.datetime to Unix timestamp."""
+  _ = val.timestamp()
   return int(val.timestamp())
 sqlite3.register_adapter(datetime.datetime, adapt_datetime_epoch)
 
@@ -22,32 +23,32 @@ def namedtuple_factory(cursor, row):
 con = sqlite3.connect(':memory:', detect_types=sqlite3.PARSE_DECLTYPES)
 con.row_factory = namedtuple_factory
 
-with con:
-  con.execute('''
-    CREATE TABLE rss_sources (
-      id INTEGER PRIMARY KEY,
-      title VARCHAR NOT NULL,
-      rss_url VARCHAR NOT NULL,
-      feed_name VARCHAR DEFAULT NULL,
-      dt TIMESTAMP NOT NULL
+
+def fill_rss_sources():
+  with con:
+    con.execute('''
+      CREATE TABLE rss_sources (
+        id INTEGER PRIMARY KEY,
+        title VARCHAR NOT NULL,
+        start_dt TIMESTAMP NOT NULL,
+        end_dt TIMESTAMP NOT NULL,
+        rss_url VARCHAR NOT NULL,
+        feed_name VARCHAR DEFAULT NULL
+      )
+    ''')
+    
+    start_dt = datetime.datetime.now()
+    end_dt = datetime.datetime.max.replace(year=datetime.datetime.max.year-1)
+    val = ('Comnews', start_dt, end_dt, 'https://www.comnews.ru/rss', None, )
+    con.execute(
+      '''
+        INSERT INTO rss_sources(title, start_dt, end_dt, rss_url, feed_name)
+        VALUES (?, ?, ?, ?, ?)
+      ''',
+      val
     )
-  ''')
-  
-  curr_dt = datetime.datetime.now()
-  val = ('Comnews', 'https://www.comnews.ru/rss', None, curr_dt)
-  con.execute('''
-    INSERT INTO rss_sources(title, rss_url, feed_name, dt)
-    VALUES (?, ?, ?, ?)
-  ''',
-  val
-  )
-  res = con.execute('select * from rss_sources')
-  res = res.fetchone()
-  print('result', res.dt, type(res.dt))
-  pprint(res)
+    res = con.execute('select * from rss_sources')
+    res = res.fetchone()
+    pprint(res)
 
-
-exit()
-res = con.execute('select * from sqlite_master')
-pprint(res.fetchone())
-
+fill_rss_sources()
