@@ -10,7 +10,7 @@ class FeedItem:
     self.feed_name = feed_name
 
   def __repr__(self):
-    return f'{self.__class__.__name__}(title={self.title!r}, feed_name={self.feed_name!r}, rss_url={self.rss_url!r}'
+    return f'{self.__class__.__name__}(title={self.title!r}, feed_name={self.feed_name!r}, rss_url={self.rss_url!r})'
 
 class FeedsList:
   def __init__(self):
@@ -43,6 +43,7 @@ class FeedsList:
       FeedItem(title='Финам', feed_name='Новости компаний', rss_url='https://www.finam.ru/analysis/conews/rsspoint/'),
       FeedItem(title='Финам', feed_name='Новости мировых рынков', rss_url='https://www.finam.ru/international/advanced/rsspoint/'),
       FeedItem(title='Comnews', rss_url='https://www.comnews.ru/rss'),
+      FeedItem(title='tadviser.ru', rss_url='https://www.tadviser.ru/xml/tadviser.xml'),
     )
 
   def __iter__(self):
@@ -52,12 +53,12 @@ class RSSHandler:
   def __init__(self, feeds):
     self.feeds = feeds
 
-  def fetch(self):
+  def __fetch_feeds__(self):
     for feed in self.feeds:
       rss_response = feedparser.parse(feed.rss_url)
-      yield feed, rss_response 
+      yield feed, rss_response
 
-  def process(self, feeds):
+  def __filter_rss__(self, feeds):
     def check_kw(text):
       if not isinstance(text, str): return False
       text = text.lower()
@@ -68,17 +69,46 @@ class RSSHandler:
         flag = True
       return flag
 
-    for fobj, f in feeds:
-      for entry in f.entries:
-        title = entry.get('title')
-        if check_kw(title):
-          yield fobj, entry
+    def check_for_rss_content(article):
+      title = article.get('title')
+      return check_kw(title)
+
+    def check_for_article_content(article):
+      try:
+        import requests
+        from fake_headers import Headers
+        url = article.link
+        #print(url)
+        #headers = {"User-Agent": "Mozilla/5.0", "accept-language": "en-US,en"}
+        headers = Headers(headers=False).generate()
+        res = requests.get(url, headers=headers)
+        html = res.text
+        kwverify = check_kw(html)  
+        if kwverify:
+          print(url, res.status_code, kwverify)
+        return kwverify
+      except Exception as e:
+        print(e)
+
+    for feeditem, feed in feeds:
+      for article in feed.entries:
+        if check_for_rss_content(article):
+          yield feeditem, article
+        elif check_for_article_content(article):
+          yield feeditem, article
 
   def fetch_last_news(self):
-    input_data = self.fetch()
-    kwfeeds = self.process(input_data)
-    result = list(kwfeeds)
-    return result   
+    feeds_rss = self.__fetch_feeds__()
+    key_words_filtered = self.__filter_rss__(feeds_rss)
+    result = list(key_words_filtered)
+    return result
 
 def rsshandler():
-  return RSSHandler(feeds=FeedsList())
+  feedslist = list(FeedsList())
+  #feedslist = feedslist[3:6]
+  return RSSHandler(feeds=feedslist)
+
+if __name__ == '__main__':
+  from pprint import pprint
+  sd = rsshandler().fetch_last_news()
+  #pprint(sd)
