@@ -73,28 +73,9 @@ class RSSHandler:
       title = article.get('title')
       return check_kw(title)
 
-    def check_for_article_content(article):
-      try:
-        import requests
-        from fake_headers import Headers
-        url = article.link
-        #print(url)
-        #headers = {"User-Agent": "Mozilla/5.0", "accept-language": "en-US,en"}
-        headers = Headers(headers=False).generate()
-        res = requests.get(url, headers=headers)
-        html = res.text
-        kwverify = check_kw(html)  
-        if kwverify:
-          print(url, res.status_code, kwverify)
-        return kwverify
-      except Exception as e:
-        print(e)
-
     for feeditem, feed in feeds:
       for article in feed.entries:
         if check_for_rss_content(article):
-          yield feeditem, article
-        elif check_for_article_content(article):
           yield feeditem, article
 
   def fetch_last_news(self):
