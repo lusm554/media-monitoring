@@ -1,7 +1,13 @@
 import feedparser
-import pickle
+from article import Article
+import datetime
+from time import mktime
 
 __all__ = ['rsshandler']
+
+def _structdt2datetime(struct_time):
+  dt = datetime.datetime.fromtimestamp(mktime(struct_time))
+  return dt
 
 class FeedItem:
   def __init__(self, title, rss_url, feed_name=None):
@@ -49,7 +55,7 @@ class FeedsList:
   def __iter__(self):
     return iter(self.RSS_FEEDS)
 
-class RSSHandler:
+class RssScraper:
   def __init__(self, feeds):
     self.feeds = feeds
 
@@ -76,7 +82,13 @@ class RSSHandler:
     for feeditem, feed in feeds:
       for article in feed.entries:
         if check_for_rss_content(article):
-          yield feeditem, article
+          _article = Article(
+            title=article.title,
+            url=article.link,
+            publish_time=_structdt2datetime(article.published_parsed),
+            publisher_name=feeditem.title,
+          )
+          yield _article
 
   def fetch_last_news(self):
     feeds_rss = self.__fetch_feeds__()
@@ -84,12 +96,7 @@ class RSSHandler:
     result = list(key_words_filtered)
     return result
 
-def rsshandler():
+def rss_scraper():
   feedslist = list(FeedsList())
-  #feedslist = feedslist[3:6]
-  return RSSHandler(feeds=feedslist)
+  return RssScraper(feeds=feedslist)
 
-if __name__ == '__main__':
-  from pprint import pprint
-  sd = rsshandler().fetch_last_news()
-  #pprint(sd)

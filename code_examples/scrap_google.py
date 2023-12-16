@@ -41,13 +41,15 @@ def parse_page(html):
     article_link = link.get('href')
     title = link.find(attrs={'role': 'heading'}).string
     source_name = link.find('span').string
+    publish_time = link.find_all('span')[-1].string
     print(article_link)
     print(title)
     print(source_name)
+    print(publish_time)
     print('\n' * 2)
-    #print(link.prettify())
+    print(link.prettify())
     result.append( (title, article_link) )
-    #break
+    break
   return result
 
 '''
