@@ -1,9 +1,11 @@
 import feedparser
-from article import Article
 import datetime
-from time import mktime
+import concurrent.futures
 import time
 import logging
+from time import mktime
+from article import Article
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -61,12 +63,11 @@ class RssScraper:
   def __init__(self, feeds):
     self.feeds = feeds
 
-  def __fetch_feeds__(self):
-    for feed in self.feeds:
-      rss_response = feedparser.parse(feed.rss_url)
-      yield feed, rss_response
+  def __fetch_feed__(self, feed):
+    rss_response = feedparser.parse(feed.rss_url)
+    return feed, rss_response
 
-  def __filter_rss__(self, feeds):
+  def __check_kw__(self, article):
     def check_kw(text):
       if not isinstance(text, str): return False
       text = text.lower()
@@ -80,32 +81,37 @@ class RssScraper:
     def check_for_rss_content(article):
       title = article.get('title')
       return check_kw(title)
+    return check_for_rss_content(article)
 
-    _err_cnt = 0
-    for feeditem, feed in feeds:
-      for article in feed.entries:
-        try:
-          if check_for_rss_content(article):
-            _article = Article(
-              title=article.title,
-              url=article.link,
-              publish_time=_structdt2datetime(article.published_parsed),
-              publisher_name=feeditem.title,
-              scraper='rss',
-            )
-            yield _article
-        except Exception as error:
-          logger.error(f'Error while fetching rss {feeditem.title!r}, try num {_err_cnt}: {error!r}')  
-          if _err_cnt == 1:
-            break
-          _err_cnt += 1
-          time.sleep(3)
+  def proc_feed(self, feed):
+    feeditem, rss_res = self.__fetch_feed__(feed)
+    cfa_arts = []
+    for article in rss_res.entries:
+      if not self.__check_kw__(article):
+        continue
+      _article = Article(
+        title=article.title,
+        url=article.link,
+        publish_time=_structdt2datetime(article.published_parsed),
+        publisher_name=feeditem.title,
+        scraper='rss',
+      )
+      cfa_arts.append(_article)
+    return cfa_arts
 
   def fetch_last_news(self):
-    logger.info(f'Fetching rss articles')
-    feeds_rss = self.__fetch_feeds__()
-    key_words_filtered = self.__filter_rss__(feeds_rss)
-    result = list(key_words_filtered)
+    result = []
+    workers_cnt = min(32, (os.cpu_count() or 1) + 6)
+    logger.info(f'Fetching rss articles with {workers_cnt} workers')
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers_cnt) as executor:
+      future_to_proc_feed = { executor.submit(self.proc_feed, feed): feed for feed in self.feeds }
+      for future in concurrent.futures.as_completed(future_to_proc_feed):
+        feed = future_to_proc_feed[future]
+        try:
+          arts = future.result()
+          result.extend(arts)
+        except Exception as exc:
+          logger.error(f'Exception while fetching rss: {exc!r}') 
     logger.info(f'Found {len(result)} articles in {len(self.feeds)} sources')
     return result
 
