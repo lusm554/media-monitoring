@@ -83,13 +83,20 @@ class GoogleScraper:
   
   def fetch_articles(self):
     articles = []
+    _err_cnt = 0
     for page_num in range(0, 500, 10):
-      html = self.fetch_page(page_num)
-      _arts = self.parse_page(html)
-      if len(_arts) == 0:
-        return articles
-      articles.extend(_arts)
-      time.sleep(.5)
+      try:
+        html = self.fetch_page(page_num)
+        _arts = self.parse_page(html)
+        if len(_arts) == 0:
+          return articles
+        articles.extend(_arts)
+        time.sleep(.5)
+      except:
+        if _err_cnt == 1:
+          break
+        _err_cnt += 1
+        time.sleep(3)
     return articles
 
 if __name__ == '__main__':

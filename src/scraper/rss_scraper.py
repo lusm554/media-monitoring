@@ -2,6 +2,7 @@ import feedparser
 from article import Article
 import datetime
 from time import mktime
+import time
 
 __all__ = ['rsshandler']
 
@@ -79,17 +80,25 @@ class RssScraper:
       title = article.get('title')
       return check_kw(title)
 
+    _err_cnt = 0
     for feeditem, feed in feeds:
       for article in feed.entries:
-        if check_for_rss_content(article):
-          _article = Article(
-            title=article.title,
-            url=article.link,
-            publish_time=_structdt2datetime(article.published_parsed),
-            publisher_name=feeditem.title,
-            scraper='rss',
-          )
-          yield _article
+        try:
+          if check_for_rss_content(article):
+            _article = Article(
+              title=article.title,
+              url=article.link,
+              publish_time=_structdt2datetime(article.published_parsed),
+              publisher_name=feeditem.title,
+              scraper='rss',
+            )
+            yield _article
+        except:
+          if _err_cnt == 1:
+            break
+          _err_cnt += 1
+          time.sleep(3)
+          
 
   def fetch_last_news(self):
     feeds_rss = self.__fetch_feeds__()
@@ -101,3 +110,7 @@ def rss_scraper():
   feedslist = list(FeedsList())
   return RssScraper(feeds=feedslist)
 
+if __name__ == '__main__':
+  s = rss_scraper()
+  r = s.fetch_last_news()
+  print(r)

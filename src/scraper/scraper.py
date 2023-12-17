@@ -29,5 +29,6 @@ class Scraper:
 if __name__ == '__main__':
   scrp = Scraper(from_rss=rss_scraper, from_google=GoogleScraper)
   arts = scrp.get_articles()
-  pprint(arts)
+  for i in arts:
+    print(i)
 
