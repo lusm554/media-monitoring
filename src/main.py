@@ -9,7 +9,8 @@ from telegram.ext import (
   MessageHandler,
   ContextTypes,
   CommandHandler,
-  filters
+  TypeHandler,
+  filters,
 )
 import scraper
 
@@ -110,6 +111,16 @@ async def error_handler(update, context):
     chat_id=DEVELOPER_CHAT_ID, text=message, parse_mode=ParseMode.HTML
   )
 
+async def callback(update, context):
+  try:
+    show_obj = {
+      'user': update.message.from_user,
+      'chat': update.message.chat,
+      'text': update.message.text,
+    }
+    logger.info(f'Update: {show_obj!r}')
+  except:
+    logger.info(f'Update: {update!r}')
 
 def main():
   TOKEN = os.environ.get('TELEGRAM_TOKEN')
@@ -122,12 +133,16 @@ def main():
     article_wrp=scraper.WrappedArticle
   )
 
+  # Logger
+  app.add_handler(TypeHandler(Update, callback), -1)
+
   # Register commands 
   app.add_handler(CommandHandler('start', start))
   app.add_handler(CommandHandler('help', help_cmd))
   app.add_handler(CommandHandler('last_news', cfa_info))
   app.add_handler(CommandHandler('media_index', media_index))
 
+  # Unknown cmd handler
   unknown_handler = MessageHandler(filters.COMMAND, unknown)
   app.add_handler(unknown_handler)
 
