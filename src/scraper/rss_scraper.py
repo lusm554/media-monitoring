@@ -3,8 +3,9 @@ from article import Article
 import datetime
 from time import mktime
 import time
+import logging
 
-__all__ = ['rsshandler']
+logger = logging.getLogger(__name__)
 
 def _structdt2datetime(struct_time):
   dt = datetime.datetime.fromtimestamp(mktime(struct_time))
@@ -93,17 +94,19 @@ class RssScraper:
               scraper='rss',
             )
             yield _article
-        except:
+        except Exception as error:
+          logger.error(f'Error while fetching rss {feeditem.title!r}, try num {_err_cnt}: {error!r}')  
           if _err_cnt == 1:
             break
           _err_cnt += 1
           time.sleep(3)
-          
 
   def fetch_last_news(self):
+    logger.info(f'Fetching rss articles')
     feeds_rss = self.__fetch_feeds__()
     key_words_filtered = self.__filter_rss__(feeds_rss)
     result = list(key_words_filtered)
+    logger.info(f'Found {len(result)} articles in {len(self.feeds)} sources')
     return result
 
 def rss_scraper():
@@ -111,6 +114,11 @@ def rss_scraper():
   return RssScraper(feeds=feedslist)
 
 if __name__ == '__main__':
+  logging.basicConfig(
+    format='[%(asctime)s] %(levelname)s [%(name)s] %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    level=logging.INFO,
+  )
   s = rss_scraper()
   r = s.fetch_last_news()
   print(r)

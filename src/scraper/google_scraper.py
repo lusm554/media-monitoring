@@ -4,6 +4,9 @@ from pprint import pprint
 import requests
 import datetime
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 class GoogleScraper:
   def __init__(self):
@@ -20,11 +23,13 @@ class GoogleScraper:
     return publish_time
    
   def parse_page(self, html):
+    logger.info(f'Parsing html page with size {len(html)} bytes')
     only_tags_with_id_search = SoupStrainer(id='search')
     soup = BeautifulSoup(html, 'lxml', parse_only=only_tags_with_id_search)
     search_links = soup.find_all('a')
     result = []
     if len(search_links) == 0:
+      logger.info(f'Found {len(result)} articles')
       return result
     for element_a in search_links:
       link = element_a.get('href')
@@ -39,6 +44,7 @@ class GoogleScraper:
         scraper='google',
       )
       result.append(article)
+    logger.info(f'Found {len(result)} articles')
     return result
 
   def fetch_page(self, page_num):
@@ -77,7 +83,7 @@ class GoogleScraper:
         params=params,
         headers=headers,
     )
-    print(response.url)
+    logger.info(f'Fetching google {response.url}')
     html = response.text
     return html
   
@@ -92,7 +98,8 @@ class GoogleScraper:
           return articles
         articles.extend(_arts)
         time.sleep(.5)
-      except:
+      except Exception as error:
+        logger.error(f'Error while fetching google article, try num {_err_cnt}: {error!r}')  
         if _err_cnt == 1:
           break
         _err_cnt += 1
@@ -100,7 +107,13 @@ class GoogleScraper:
     return articles
 
 if __name__ == '__main__':
+  logging.basicConfig(
+    format='[%(asctime)s] %(levelname)s [%(name)s] %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    level=logging.INFO,
+  )
   scrp = GoogleScraper()
   arts = scrp.fetch_articles()
+  print('\n'*4)
   for i in arts:
     print(i) 
