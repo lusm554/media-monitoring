@@ -1,4 +1,5 @@
 import os; from env import set_env_vars; set_env_vars(filepath='.env')
+import datetime
 import logging
 import traceback, json, html
 from telegram import Update
@@ -13,9 +14,13 @@ from telegram.ext import (
 import scraper
 
 logging.basicConfig(
-  format='[%(asctime)s] %(levelname)s [%(name)22s] %(message)s',
-  datefmt='%Y-%m-%d %H:%M:%S',
   level=logging.INFO,
+  format='[%(asctime)s] %(levelname)s [%(name)-22s] %(message)s',
+  datefmt='%Y-%m-%d %H:%M:%S',
+  handlers=[
+    logging.FileHandler(datetime.datetime.now().strftime('logs/log_%Y-%m-%d_%H-%M-%S.log')),
+    logging.StreamHandler(),
+  ]
 )
 # set higher logging level for httpx to avoid all GET and POST requests being logged
 logging.getLogger("httpx").setLevel(logging.WARNING)
