@@ -4,7 +4,7 @@ import concurrent.futures
 import time
 import logging
 from time import mktime
-from article import Article
+from .article import Article
 import os
 
 logger = logging.getLogger(__name__)
@@ -115,9 +115,10 @@ class RssScraper:
     logger.info(f'Found {len(result)} articles in {len(self.feeds)} sources')
     return result
 
-def rss_scraper():
-  feedslist = list(FeedsList())
-  return RssScraper(feeds=feedslist)
+class RSS:
+  def __init__(self, scraper=RssScraper, feed_list=FeedsList):
+    self.feed_list = list(feed_list())
+    self.scraper = scraper(feeds=self.feed_list)
 
 if __name__ == '__main__':
   logging.basicConfig(

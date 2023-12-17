@@ -10,10 +10,11 @@ from telegram.ext import (
   CommandHandler,
   filters
 )
-from rsshandler import rsshandler
+import scraper
 
 logging.basicConfig(
-  format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+  format='[%(asctime)s] %(levelname)s [%(name)22s] %(message)s',
+  datefmt='%Y-%m-%d %H:%M:%S',
   level=logging.INFO,
 )
 # set higher logging level for httpx to avoid all GET and POST requests being logged
@@ -32,7 +33,7 @@ async def start(update, context):
 async def unknown(update, context):
   await context.bot.send_message(
     chat_id=update.effective_chat.id,
-    text='Эта команда мне не знакома :/'
+    text='Эта команда мне не знакома'
   )
 
 async def help_cmd(update, context):
@@ -49,18 +50,23 @@ async def help_cmd(update, context):
   )
 
 async def cfa_info(update, context):
-  news = context.bot_data.get('rsshandler').fetch_last_news()
   cfa_msg = [
     'За последнее время были опубликованы следующие новости:',
   ]
-  for n, (arc_src, article) in enumerate(news, start=1):
-    src_title = arc_src.title
+  news = context.bot_data.get('scraper').get_articles()
+  for n, article in enumerate(news, start=1):
+    publisher = article.publisher_name
     title = article.title
-    link = article.link
-    pub_time = article.published
-    msg = f'{n}. <a href="{link}"> {title} </a>\n<b>Источник:</b> {src_title}.\n<b>Опубликовано:</b> {pub_time}.'
-    cfa_msg.append(msg)
-  
+    url = article.url
+    publish_time = article.publish_time.strftime('%Y-%m-%d %H:%M:%S')
+    scraper_type = article.scraper
+    article_markup = (
+      f'{n}. <a href="{url}"> {title} </a>\n'
+      f'<b>Источник:</b> {publisher}.\n'
+      f'<b>Опубликовано:</b> {publish_time}.\n'
+      f'<b>Взято из:</b> {scraper_type}.'
+    )
+    cfa_msg.append(article_markup)
   cfa_msg = '\n\n'.join(cfa_msg)
   await context.bot.send_message(
     chat_id=update.effective_chat.id,
@@ -70,9 +76,9 @@ async def cfa_info(update, context):
 
 async def media_index(update, context):
   mindex_msg = [
-    'Список отслеживаемых СМИ:',
+    'Список отслеживаемых СМИ через RSS:',
   ]
-  mindex = context.bot_data.get('rsshandler').feeds 
+  mindex = context.bot_data.get('scraper').get_rss_media_index() 
   for n, f in enumerate(mindex, start=1):
     msg = f'{n}. {f.title} ' + (f.feed_name or '').lower()
     mindex_msg.append(msg)
@@ -104,8 +110,12 @@ def main():
   TOKEN = os.environ.get('TELEGRAM_TOKEN')
   app = ApplicationBuilder().token(TOKEN).build() 
 
-  # Add rss handler
-  app.bot_data['rsshandler'] = rsshandler()
+  # Add news scraper
+  app.bot_data['scraper'] = scraper.get_scraper_instance(
+    rss_scrp=scraper.RSS,
+    go_scrp=scraper.GoogleScraper,
+    article_wrp=scraper.WrappedArticle
+  )
 
   # Register commands 
   app.add_handler(CommandHandler('start', start))

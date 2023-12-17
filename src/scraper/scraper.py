@@ -1,27 +1,28 @@
-from rss_scraper import rss_scraper
-from google_scraper import GoogleScraper
 from pprint import pprint
-from article import WrappedArticle
 import datetime
 import logging
 
 logger = logging.getLogger(__name__)
 
 class Scraper:
-  def __init__(self, from_rss, from_google):  
-    self.from_rss = from_rss
-    self.from_google = from_google 
+  def __init__(self, from_rss, from_google, article_wrp):  
+    self.from_rss = from_rss()
+    self.from_google = from_google()
+    self.article_wrp = article_wrp
+  
+  def get_rss_media_index(self):
+    return self.from_rss.feed_list
 
   def get_articles_from_rss(self):
-    rss_articles = self.from_rss().fetch_last_news()
+    rss_articles = self.from_rss.scraper.fetch_last_news()
     return rss_articles
 
   def get_articles_from_google(self):
-    go_articles = self.from_google().fetch_articles()
+    go_articles = self.from_google.fetch_articles()
     return go_articles
 
   def get_distinct_arts(self, arts):
-    wrapped_arts_set = set(WrappedArticle(art) for art in arts) # custom class for comprasion by article link
+    wrapped_arts_set = set(self.article_wrp(art) for art in arts) # custom class for comprasion by article link
     arts = [wrp.article for wrp in wrapped_arts_set]
     return arts
 
@@ -39,14 +40,19 @@ class Scraper:
     logger.info(f'Found {len(period_articles)} articles by period {time_period!r} in rss and google')
     return period_articles
 
+def get_scraper_instance(rss_scrp, go_scrp, article_wrp):
+  scraper = Scraper(from_rss=rss_scrp, from_google=go_scrp, article_wrp=article_wrp)
+  return scraper
+
 if __name__ == '__main__':
   logging.basicConfig(
     format='[%(asctime)s] %(levelname)s [%(name)s] %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
     level=logging.INFO,
   )
-  scrp = Scraper(from_rss=rss_scraper, from_google=GoogleScraper)
+  scrp = Scraper(from_rss=RSS, from_google=GoogleScraper)
   arts = scrp.get_articles()
   for i in arts:
     print(i.publish_time, (datetime.datetime.now() - i.publish_time), i.title)
 
+  print(scrp.get_rss_media_index())

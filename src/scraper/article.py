@@ -1,4 +1,5 @@
 class Article:
+  __slots__ = ('title', 'url', 'publish_time', 'publisher_name', 'scraper')
   def __init__(self, title, url, publish_time, publisher_name, scraper):
     self.title = title
     self.url = url
@@ -23,6 +24,7 @@ class Article:
     return f'{self.__class__.__name__}({", ".join(f"{k}={v!r}"  for k,v in self.__dict__.items())})'
 
 class WrappedArticle:
+  __slots__ = ('article', 'comparison_key')
   def __init__(self, article):
     self.comparison_key = 'url'
     self.article = article

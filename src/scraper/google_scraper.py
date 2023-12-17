@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup, SoupStrainer
-from article import Article
+from .article import Article
 from pprint import pprint
 import requests
 import datetime
@@ -84,6 +84,7 @@ class GoogleScraper:
         headers=headers,
     )
     logger.info(f'Fetching google {response.url}')
+    assert response.status_code == 200
     html = response.text
     return html
   
