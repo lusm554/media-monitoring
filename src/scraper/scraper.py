@@ -2,6 +2,7 @@ from rss_scraper import rss_scraper
 from google_scraper import GoogleScraper
 from pprint import pprint
 from article import WrappedArticle
+import datetime
 import logging
 
 logger = logging.getLogger(__name__)
@@ -24,13 +25,19 @@ class Scraper:
     arts = [wrp.article for wrp in wrapped_arts_set]
     return arts
 
-  def get_articles(self):
-    from_rss = self.get_articles_from_rss()
-    from_google = self.get_articles_from_google()
-    articles = [*from_rss, *from_google]
-    articles = self.get_distinct_arts(articles)
-    logger.info(f'Found {len(articles)} articles in rss and google')
-    return articles
+  def filter_by_period(self, arts, time_period):
+    assert time_period in ('24h', 'all_available'), f'Parameter time_period {time_period!r} not found, try 24h'
+    if time_period == '24h':
+      arts = [ art for art in arts if (datetime.datetime.now() - art.publish_time).days == 0 ]
+    return arts
+
+  def get_articles(self, time_period='24h'):
+    assert time_period in ('24h', 'all_available'), f'Parameter time_period {time_period!r} not found, try 24h'
+    union_articles = [*self.get_articles_from_rss(), *self.get_articles_from_google()]
+    set_articles = self.get_distinct_arts(union_articles)
+    period_articles = self.filter_by_period(set_articles, time_period) 
+    logger.info(f'Found {len(period_articles)} articles by period {time_period!r} in rss and google')
+    return period_articles
 
 if __name__ == '__main__':
   logging.basicConfig(
@@ -41,5 +48,5 @@ if __name__ == '__main__':
   scrp = Scraper(from_rss=rss_scraper, from_google=GoogleScraper)
   arts = scrp.get_articles()
   for i in arts:
-    print(i)
+    print(i.publish_time, (datetime.datetime.now() - i.publish_time), i.title)
 
