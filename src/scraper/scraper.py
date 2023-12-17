@@ -1,6 +1,7 @@
 from rss_scraper import rss_scraper
 from google_scraper import GoogleScraper
 from pprint import pprint
+from article import WrappedArticle
 import logging
 
 logger = logging.getLogger(__name__)
@@ -19,7 +20,8 @@ class Scraper:
     return go_articles
 
   def get_distinct_arts(self, arts):
-    arts = set(arts)
+    wrapped_arts_set = set(WrappedArticle(art) for art in arts) # custom class for comprasion by article link
+    arts = [wrp.article for wrp in wrapped_arts_set]
     return arts
 
   def get_articles(self):
