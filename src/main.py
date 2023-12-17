@@ -55,25 +55,40 @@ async def help_cmd(update, context):
     text=help_msg
   )
 
+def is_cache_expire(context):
+  if (datetime.datetime.now() - context.bot_data['news_cache']['timestamp']).seconds // 60 > 10:
+    logger.info(f"Cache date {context.bot_data['news_cache']['timestamp']} expire")
+    return True
+  return False
+
 async def cfa_info(update, context):
-  cfa_msg = [
-    'За последнее время были опубликованы следующие новости:',
-  ]
-  news = context.bot_data.get('scraper').get_articles()
-  for n, article in enumerate(news, start=1):
-    publisher = article.publisher_name
-    title = article.title
-    url = article.url
-    publish_time = article.publish_time.strftime('%Y-%m-%d %H:%M:%S')
-    scraper_type = article.scraper
-    article_markup = (
-      f'{n}. <a href="{url}"> {title} </a>\n'
-      f'<b>Источник:</b> {publisher}.\n'
-      f'<b>Опубликовано:</b> {publish_time}.\n'
-      f'<b>Взято из:</b> {scraper_type}.'
-    )
-    cfa_msg.append(article_markup)
-  cfa_msg = '\n\n'.join(cfa_msg)
+  if context.bot_data['news_cache'] is None or is_cache_expire(context):
+    cfa_msg = [
+      'За последнее время были опубликованы следующие новости:',
+    ]
+    news = context.bot_data.get('scraper').get_articles()
+    for n, article in enumerate(news, start=1):
+      publisher = article.publisher_name
+      title = article.title
+      url = article.url
+      publish_time = article.publish_time.strftime('%Y-%m-%d %H:%M:%S')
+      scraper_type = article.scraper
+      article_markup = (
+        f'{n}. <a href="{url}"> {title} </a>\n'
+        f'<b>Источник:</b> {publisher}.\n'
+        f'<b>Опубликовано:</b> {publish_time}.\n'
+        f'<b>Взято из:</b> {scraper_type}.'
+      )
+      cfa_msg.append(article_markup)
+    cfa_msg = '\n\n'.join(cfa_msg)
+    logger.info(f'Updating cache')
+    context.bot_data['news_cache'] = {
+      'markup': cfa_msg,
+      'timestamp': datetime.datetime.now(),
+    }
+  else:
+    logger.info(f"Return message from cache on {context.bot_data['news_cache']['timestamp']}")
+    cfa_msg = context.bot_data.get('news_cache')['markup']
   await context.bot.send_message(
     chat_id=update.effective_chat.id,
     text=cfa_msg,
@@ -132,6 +147,8 @@ def main():
     go_scrp=scraper.GoogleScraper,
     article_wrp=scraper.WrappedArticle
   )
+  # Add cache
+  app.bot_data['news_cache'] = None
 
   # Logger
   app.add_handler(TypeHandler(Update, callback), -1)
