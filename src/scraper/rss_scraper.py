@@ -87,6 +87,7 @@ class RssScraper:
             url=article.link,
             publish_time=_structdt2datetime(article.published_parsed),
             publisher_name=feeditem.title,
+            scraper='rss',
           )
           yield _article
 

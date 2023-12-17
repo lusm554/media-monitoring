@@ -36,6 +36,7 @@ class GoogleScraper:
         url=link,
         publish_time=self.convert_publish_to_datetime(publish_time),
         publisher_name=source_name,
+        scraper='google',
       )
       result.append(article)
     return result

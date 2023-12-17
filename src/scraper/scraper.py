@@ -15,11 +15,19 @@ class Scraper:
     go_articles = self.from_google().fetch_articles()
     return go_articles
 
+  def get_distinct_arts(self, arts):
+    arts = set(arts)
+    return arts
+
+  def get_articles(self):
+    from_rss = self.get_articles_from_rss()
+    from_google = self.get_articles_from_google()
+    articles = [*from_rss, *from_google]
+    articles = self.get_distinct_arts(articles)
+    return articles
+
 if __name__ == '__main__':
   scrp = Scraper(from_rss=rss_scraper, from_google=GoogleScraper)
-  _1 = scrp.get_articles_from_rss()
-  _2 = scrp.get_articles_from_google()
-  pprint(_1)
-  print('\n'*3)
-  pprint(_2)
+  arts = scrp.get_articles()
+  pprint(arts)
 
