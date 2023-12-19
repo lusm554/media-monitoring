@@ -1,5 +1,8 @@
 import os
+import logging
 __all__ = ['set_env_vars']
+
+logger = logging.getLogger(__name__)
 
 def set_env_vars(filepath):
   try:
@@ -9,5 +12,4 @@ def set_env_vars(filepath):
         key, value = tuple(map(str.strip, line.split('=')))
         os.environ[key] = value
   except Exception as error:
-    print('Cannot parse .env file.')
-    raise error
+    logger.info('Cannot parse .env file. Env vars will be read from environ.')
