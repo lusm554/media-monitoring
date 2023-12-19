@@ -1,5 +1,6 @@
 from pprint import pprint
 import datetime
+from urllib.parse import urlparse
 import logging
 
 logger = logging.getLogger(__name__)
@@ -26,6 +27,14 @@ class Scraper:
     arts = [wrp.article for wrp in wrapped_arts_set]
     return arts
 
+  def filter_by_urls_blacklist(self, arts):
+    publishers_blacklist = (
+      'echomsk.spb.ru',
+      'forpost-sevastopol.ru',
+    )
+    arts = [art for art in arts if urlparse(art.url).netloc not in publishers_blacklist]
+    return arts
+
   def filter_by_period(self, arts, time_period):
     assert time_period in ('24h', 'all_available'), f'Parameter time_period {time_period!r} not found, try 24h'
     if time_period == '24h':
@@ -36,7 +45,8 @@ class Scraper:
     assert time_period in ('24h', 'all_available'), f'Parameter time_period {time_period!r} not found, try 24h'
     union_articles = [*self.get_articles_from_rss(), *self.get_articles_from_google()]
     set_articles = self.get_distinct_arts(union_articles)
-    period_articles = self.filter_by_period(set_articles, time_period) 
+    allowed_publishers_articles = self.filter_by_urls_blacklist(set_articles)
+    period_articles = self.filter_by_period(allowed_publishers_articles, time_period) 
     logger.info(f'Found {len(period_articles)} articles by period {time_period!r} in rss and google')
     return period_articles
 

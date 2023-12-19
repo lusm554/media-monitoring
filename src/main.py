@@ -63,7 +63,7 @@ def is_cache_expire(context):
 
 async def cfa_info(update, context):
   if context.bot_data['news_cache'] is None or is_cache_expire(context):
-    cfa_msg = [
+    cfa_markup = [
       'За последнее время были опубликованы следующие новости:',
     ]
     news = context.bot_data.get('scraper').get_articles()
@@ -79,21 +79,24 @@ async def cfa_info(update, context):
         f'<b>Опубликовано:</b> {publish_time}.\n'
         f'<b>Взято из:</b> {scraper_type}.'
       )
-      cfa_msg.append(article_markup)
-    cfa_msg = '\n\n'.join(cfa_msg)
+      cfa_markup.append(article_markup)
     logger.info(f'Updating cache')
     context.bot_data['news_cache'] = {
-      'markup': cfa_msg,
+      'markup': cfa_markup,
       'timestamp': datetime.datetime.now(),
     }
   else:
     logger.info(f"Return message from cache on {context.bot_data['news_cache']['timestamp']}")
-    cfa_msg = context.bot_data.get('news_cache')['markup']
-  await context.bot.send_message(
-    chat_id=update.effective_chat.id,
-    text=cfa_msg,
-    parse_mode=ParseMode.HTML
-  )
+    cfa_markup = context.bot_data.get('news_cache')['markup']
+
+  batched_markup = [cfa_markup[i:i + 15] for i in range(0, len(cfa_markup), 15)]
+  for msg_markup in batched_markup:
+    _makrup = '\n\n'.join(msg_markup)
+    await context.bot.send_message(
+      chat_id=update.effective_chat.id,
+      text=_makrup,
+      parse_mode=ParseMode.HTML
+    )
 
 async def media_index(update, context):
   mindex_msg = [
