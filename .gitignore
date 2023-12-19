@@ -5,3 +5,4 @@ __pycache__
 notes.txt
 *.db
 logs
+.DS_Store
