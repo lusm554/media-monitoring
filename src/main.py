@@ -49,6 +49,7 @@ async def help_cmd(update, context):
     '/help - получить инфо по командам',
     '/last_news - посмотреть новости по ключевым словам',
     '/media_index - посмотреть список отслеживаемых СМИ',
+    '/media_blacklist - посмотреть blacklist СМИ',
   ])
   await context.bot.send_message(
     chat_id=update.effective_chat.id,
@@ -117,6 +118,24 @@ async def media_index(update, context):
     parse_mode=ParseMode.HTML
   )
 
+async def media_blacklist(update, context):
+  msg = [
+    'Список СМИ, которые входят в blacklist:',
+  ]
+  blacklist = context.bot_data.get('scraper').get_media_blacklist() 
+  for n, i in enumerate(blacklist, start=1):
+    _msg = f'{n}. {i} '
+    msg.append(_msg)
+  msg.append(
+    '\n<b>Список распространяется на все способы получения новостей (rss, google).</b>',
+  )
+  markup = '\n'.join(msg)
+  await context.bot.send_message(
+    chat_id=update.effective_chat.id,
+    text=markup,
+    parse_mode=ParseMode.HTML
+  )
+
 async def error_handler(update, context):
   logger.error("Exception while handling an update:", exc_info=context.error)
   tb_list = traceback.format_exception(None, context.error, context.error.__traceback__)
@@ -166,6 +185,7 @@ def main():
   app.add_handler(CommandHandler('help', help_cmd))
   app.add_handler(CommandHandler('last_news', cfa_info))
   app.add_handler(CommandHandler('media_index', media_index))
+  app.add_handler(CommandHandler('media_blacklist', media_blacklist))
 
   # Unknown cmd handler
   unknown_handler = MessageHandler(filters.COMMAND, unknown)

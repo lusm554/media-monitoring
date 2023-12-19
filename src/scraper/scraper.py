@@ -16,7 +16,11 @@ class Scraper:
     )
   
   def get_rss_media_index(self):
-    return self.from_rss.feed_list
+    filtered_blacklist = [f for f in self.from_rss.feed_list if urlparse(f.rss_url).netloc not in self.publishers_blacklist]
+    return filtered_blacklist
+
+  def get_media_blacklist(self):
+    return self.publishers_blacklist
 
   def get_articles_from_rss(self):
     rss_articles = self.from_rss.scraper.fetch_last_news()
