@@ -106,10 +106,15 @@ async def media_index(update, context):
   for n, f in enumerate(mindex, start=1):
     msg = f'{n}. {f.title} ' + (f.feed_name or '').lower()
     mindex_msg.append(msg)
+  mindex_msg.extend((
+    '\n<b>Список источников google не определен. Цель этого метода - максимизировать покрытие медиапространства ботом.</b>',
+    '\nДля фильтрации источников используется blacklist - /media_blacklist.',
+  ))
   mindex_msg = '\n'.join(mindex_msg)
   await context.bot.send_message(
     chat_id=update.effective_chat.id,
-    text=mindex_msg
+    text=mindex_msg,
+    parse_mode=ParseMode.HTML
   )
 
 async def error_handler(update, context):

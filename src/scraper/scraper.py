@@ -10,6 +10,10 @@ class Scraper:
     self.from_rss = from_rss()
     self.from_google = from_google()
     self.article_wrp = article_wrp
+    self.publishers_blacklist = (
+      'echomsk.spb.ru',
+      'forpost-sevastopol.ru',
+    )
   
   def get_rss_media_index(self):
     return self.from_rss.feed_list
@@ -28,11 +32,7 @@ class Scraper:
     return arts
 
   def filter_by_urls_blacklist(self, arts):
-    publishers_blacklist = (
-      'echomsk.spb.ru',
-      'forpost-sevastopol.ru',
-    )
-    arts = [art for art in arts if urlparse(art.url).netloc not in publishers_blacklist]
+    arts = [art for art in arts if urlparse(art.url).netloc not in self.publishers_blacklist]
     return arts
 
   def filter_by_period(self, arts, time_period):
