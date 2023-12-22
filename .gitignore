@@ -7,3 +7,4 @@ notes.txt
 logs
 .DS_Store
 .venv
+api-gw.yaml

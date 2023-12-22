@@ -10,6 +10,7 @@ def set_env_vars(filepath):
       for line in file:
         if not '=' in line: continue
         key, value = tuple(map(str.strip, line.split('=')))
+        logger.info(f'{key} {value}')
         os.environ[key] = value
   except Exception as error:
     logger.info('Cannot parse .env file. Env vars will be read from environ.')
