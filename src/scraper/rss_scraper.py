@@ -101,7 +101,7 @@ class RssScraper:
 
   def fetch_last_news(self):
     result = []
-    workers_cnt = min(32, (os.cpu_count() or 1) + 6)
+    workers_cnt = min(32, (os.cpu_count() or 1) + 4)
     logger.info(f'Fetching rss articles with {workers_cnt} workers')
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers_cnt) as executor:
       future_to_proc_feed = { executor.submit(self.proc_feed, feed): feed for feed in self.feeds }

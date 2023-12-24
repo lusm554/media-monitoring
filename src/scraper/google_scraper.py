@@ -78,12 +78,13 @@ class GoogleScraper:
       'lr': 'lang_ru',
       'start': page_num 
     }
+    logger.info(f'Fetching google')
     response = requests.get(
         f'https://www.google.com/search',
         params=params,
         headers=headers,
     )
-    logger.info(f'Fetching google {response.url}')
+    logger.info(f'Fetched google {response.url}')
     assert response.status_code == 200
     html = response.text
     return html

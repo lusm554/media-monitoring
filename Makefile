@@ -23,7 +23,16 @@ push: build
 	docker push cr.yandex/$(YC_IMAGE_REGISTRY_ID)/$(SERVERLESS_CONTAINER_NAME)
 deploy: push
 	$(shell sed 's/=.*/=/' .env > .env.example)
-	yc serverless container revision deploy --container-name $(SERVERLESS_CONTAINER_NAME) --image 'cr.yandex/$(YC_IMAGE_REGISTRY_ID)/$(SERVERLESS_CONTAINER_NAME):latest' --service-account-id $(SERVICE_ACCOUNT_ID)  --environment="$(shell xargs < .env)" --core-fraction 5 --execution-timeout $(SERVERLESS_CONTAINER_EXEC_TIMEOUT)
+	yc serverless container revision deploy \
+		--container-name $(SERVERLESS_CONTAINER_NAME) \
+		--image 'cr.yandex/$(YC_IMAGE_REGISTRY_ID)/$(SERVERLESS_CONTAINER_NAME):latest' \
+		--service-account-id $(SERVICE_ACCOUNT_ID) \
+	  --environment='$(shell awk '{q=p;p=$$0}NR>1{print q}END{ORS = ""; print p}' .env | tr '\n' ',')' \
+		--execution-timeout $(SERVERLESS_CONTAINER_EXEC_TIMEOUT) \
+		--core-fraction 100 \
+		--memory 256MB \
+		--concurrency 3 \
+		--cores 4
 
 all: deploy
 
