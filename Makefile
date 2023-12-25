@@ -32,7 +32,7 @@ deploy: push
 		--core-fraction 100 \
 		--memory 256MB \
 		--concurrency 3 \
-		--cores 4
+		--cores 2
 
 all: deploy
 
