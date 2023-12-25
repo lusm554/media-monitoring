@@ -83,8 +83,10 @@ class GoogleScraper:
         f'https://www.google.com/search',
         params=params,
         headers=headers,
+        timeout=5, # seconds
     )
     logger.info(f'Fetched google {response.url}')
+    logger.info(f'Fetched status {response.status_code}')
     assert response.status_code == 200
     html = response.text
     return html
