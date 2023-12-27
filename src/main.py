@@ -62,7 +62,7 @@ def is_cache_expire(context):
     return True
   return False
 
-async def cfa_info(update, context):
+async def _cfa_info(update, context, target_user_id=False):
   if context.bot_data['news_cache'] is None or is_cache_expire(context):
     cfa_markup = [
       'За последнее время были опубликованы следующие новости:',
@@ -91,13 +91,17 @@ async def cfa_info(update, context):
     cfa_markup = context.bot_data.get('news_cache')['markup']
 
   batched_markup = [cfa_markup[i:i + 15] for i in range(0, len(cfa_markup), 15)]
+  user_id = target_user_id or update.effective_chat.id
   for msg_markup in batched_markup:
     _makrup = '\n\n'.join(msg_markup)
     await context.bot.send_message(
-      chat_id=update.effective_chat.id,
+      chat_id=user_id,
       text=_makrup,
       parse_mode=ParseMode.HTML
     )
+
+async def cfa_info(update, context):
+  await _cfa_info(update, context)
 
 async def media_index(update, context):
   mindex_msg = [
@@ -166,6 +170,8 @@ async def callback(update, context):
 
 def main():
   TOKEN = os.environ.get('TELEGRAM_TOKEN')
+  NEWS_SCHEDULED_USERS = set(x for x in os.environ.get('NEWS_SCHEDULED_USERS').split(',') if x != '')
+  logger.info(f'News scheduler init for {NEWS_SCHEDULED_USERS}')
   app = ApplicationBuilder().token(TOKEN).build() 
 
   # Add news scraper
