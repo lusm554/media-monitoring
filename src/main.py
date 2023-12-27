@@ -166,10 +166,6 @@ async def callback(update, context):
 
 def main():
   TOKEN = os.environ.get('TELEGRAM_TOKEN')
-  PORT = os.environ.get('PORT', '8080')
-  WEBHOOK_URL = os.environ.get('SERVERLESS_APIGW_URL')
-  logger.info(f'PORT {PORT}')
-  logger.info(f'WEBHOOK_URL {WEBHOOK_URL}')
   app = ApplicationBuilder().token(TOKEN).build() 
 
   # Add news scraper
@@ -200,14 +196,6 @@ def main():
 
   # Run until Ctrl-C
   app.run_polling()
-  '''
-  app.run_webhook(
-    listen='0.0.0.0',
-    port=PORT,
-    secret_token='23421343',
-    webhook_url=WEBHOOK_URL,
-  )
-  '''
 
 
 if __name__ == '__main__':
