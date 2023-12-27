@@ -1,6 +1,8 @@
 include .env
 
-pull:
+gitpull:
+	git pull 
+pull: gitpull
 	docker pull $(DOCKER_USER_NAME)/$(CONTAINER_NAME):latest
 run: pull
 	docker run -d --env-file .env $(DOCKER_USER_NAME)/$(CONTAINER_NAME):latest
