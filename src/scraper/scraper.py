@@ -27,7 +27,8 @@ class Scraper:
     return rss_articles
 
   def get_articles_from_google(self):
-    go_articles = self.from_google.fetch_articles()
+    #go_articles = self.from_google.fetch_articles()
+    go_articles = self.from_google.async_fetch_articles()
     return go_articles
 
   def get_distinct_arts(self, arts):

@@ -1,4 +1,6 @@
 from bs4 import BeautifulSoup, SoupStrainer
+import concurrent.futures
+import os
 from .article import Article
 from pprint import pprint
 import requests
@@ -78,7 +80,6 @@ class GoogleScraper:
       'lr': 'lang_ru',
       'start': page_num 
     }
-    logger.info(f'Fetching google')
     response = requests.get(
         f'https://www.google.com/search',
         params=params,
@@ -90,14 +91,54 @@ class GoogleScraper:
     assert response.status_code == 200
     html = response.text
     return html
-  
+
+  def fetch_page_articles(self, page_num): 
+    html = self.fetch_page(page_num)
+    _arts = self.parse_page(html)
+    return _arts
+
+  def async_fetch_articles(self):
+    def async_fetch_batch(page_num_range):
+      result = []
+      empty_page_flag = False
+      with concurrent.futures.ThreadPoolExecutor(max_workers=workers_cnt) as executor:
+        future_to_proc_page = { executor.submit(self.fetch_page_articles, page_num): page_num for page_num in page_num_range }
+        for future in concurrent.futures.as_completed(future_to_proc_page):
+          page_num = future_to_proc_page[future]
+          try:
+            arts = future.result()
+            if len(arts) == 0:
+              empty_page_flag = True
+            logger.info(f'Page {page_num} arts len {len(arts)}')
+            result.extend(arts)
+          except Exception as exc:
+            logger.error(f'Exception while fetching google page num {page_num} {exc!r}') 
+      return result, empty_page_flag
+    result = []
+    workers_cnt = min(32, (os.cpu_count() or 1) + 4)
+    logger.info(f'Fetching google articles with {workers_cnt} workers')
+    batch_size = 14
+    prev_offset = 0
+    page_step = 10
+    batch_cnt = 5
+    for offset in range(batch_size*page_step, batch_size*page_step*batch_cnt, batch_size*page_step):
+      _pages_range = range(prev_offset, offset, page_step)
+      logger.info(f'Fetching batch {_pages_range}')
+      batch_result, empty_page_flag = async_fetch_batch(_pages_range)
+      result.extend(batch_result)
+      prev_offset = offset
+      logger.info(f'Done fetching batch {_pages_range}')
+      if empty_page_flag:
+        break
+    logger.info(f'Found {len(result)} articles in google')
+    return result
+
   def fetch_articles(self):
     articles = []
     _err_cnt = 0
     for page_num in range(0, 500, 10):
       try:
-        html = self.fetch_page(page_num)
-        _arts = self.parse_page(html)
+        _arts = self.fetch_page_articles(page_num)
         if len(_arts) == 0:
           return articles
         articles.extend(_arts)
@@ -117,7 +158,10 @@ if __name__ == '__main__':
     level=logging.INFO,
   )
   scrp = GoogleScraper()
-  arts = scrp.fetch_articles()
-  print('\n'*4)
+  #arts = scrp.fetch_articles()
+  arts = scrp.async_fetch_articles()
+  print('len arts', len(arts))
+  '''
   for i in arts:
     print(i) 
+  '''
