@@ -21,7 +21,8 @@ class Article:
     return hash(id(self))
 
   def __repr__(self):
-    return f'{self.__class__.__name__}({", ".join(f"{k}={v!r}"  for k,v in self.__dict__.items())})'
+    items = [ (attr, getattr(self, attr)) for attr in self.__slots__ ]
+    return f'{self.__class__.__name__}({", ".join(f"{k}={v!r}"  for k,v in items)})'
 
 class WrappedArticle:
   __slots__ = ('article', 'comparison_key')
