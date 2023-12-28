@@ -2,7 +2,7 @@ import logging
 import datetime
 logging.basicConfig(
   level=logging.INFO,
-  format='[%(asctime)s] %(levelname)s [%(name)-22s] %(message)s',
+  format='[%(asctime)s] %(levelname)s [%(name)-24s] %(message)s',
   datefmt='%Y-%m-%d %H:%M:%S',
   handlers=[
     logging.FileHandler(datetime.datetime.now().strftime('logs/log_%Y-%m-%d_%H-%M-%S.log')),
@@ -34,8 +34,8 @@ DEVELOPER_CHAT_ID = os.environ.get('DEVELOPER_CHAT_ID')
 async def start(update, context):
   await context.bot.send_message(
     chat_id=update.effective_chat.id,
-    text='Привет! Этот бот собирает публикации СМИ по ЦФА.\n'
-         'Более подробно через команду /help.',
+    text=f'Привет! Этот бот собирает публикации СМИ по ЦФА.\n'
+         f'Более подробно через команду {context.bot_data.get("cmd").help.cmd}.',
   )
 
 async def unknown(update, context):
@@ -46,8 +46,11 @@ async def unknown(update, context):
 
 async def help_cmd(update, context):
   help_msg = '\n'.join(
-    f'{cmd["cmd"]} - {cmd["desc"]}'
-    for cmd in sorted(context.bot_data.get("cmd").values(), key=lambda x: x['ord'])
+    f'{c.cmd} - {c.desc}'
+    for c in sorted(
+      [getattr(context.bot_data.get("cmd"), field) for field in context.bot_data.get("cmd")._fields],
+      key=lambda x: x.ord
+    )
   )
   await context.bot.send_message(
     chat_id=update.effective_chat.id,
@@ -120,7 +123,7 @@ async def set_sheduler_cfa_info(update, context):
     schedule_time_str = context.bot_data.get('news_scheduled_time').strftime(f'%H:%M {time_zone_msk}')
     msg = (
       f'Новости будут приходить в {schedule_time_str} каждый день.\n'
-      f'Чтобы отменить - {context.bot_data.get("cmd").get("unset_news_schedule").get("cmd")}.'
+      f'Чтобы отменить - {context.bot_data.get("cmd").unset_news_schedule.cmd}.'
     )
     await update.effective_message.reply_text(msg)
   except Exception as error:
@@ -137,7 +140,7 @@ async def unset_sheduler_cfa_info(update, context):
   except KeyError:
     error_msg = (
       f'Похоже ранее новости не планировались.\n'
-      f'Воспользуйтесь {context.bot_data.get("cmd").get("set_news_schedule").get("cmd")}.'
+      f'Воспользуйтесь {context.bot_data.get("cmd").set_news_schedule.cmd}.'
     )
     await update.effective_message.reply_text(error_msg)
 
@@ -160,7 +163,7 @@ async def media_index(update, context):
     mindex_msg.append(msg)
   mindex_msg.extend((
     f'\n<b>Список источников google не определен. Цель этого метода - максимизировать покрытие медиапространства ботом.</b>',
-    f'\nДля фильтрации источников используется черный список - {context.bot_data.get("cmd").get("media_blacklist").get("cmd")}.',
+    f'\nДля фильтрации источников используется черный список - {context.bot_data.get("cmd").media_blacklist.cmd}.',
   ))
   mindex_msg = '\n'.join(mindex_msg)
   await context.bot.send_message(
@@ -216,50 +219,18 @@ async def updates_logger(update, context):
     logger.info(f'Update: {update!r}')
 
 def main():
-  COMMANDS = {
-    'help': {
-      'cmd': '/help',
-      'desc': 'получить инфо по командам',
-      'name': 'help',
-      'ord': 1,
-    },
-    'last_news': {
-      'cmd': '/last_news',
-      'desc': 'посмотреть последние новости ЦФА',
-      'name': 'last_news',
-      'ord': 3,
-    },
-    'media_blacklist': {
-      'cmd': '/media_blacklist',
-      'desc': 'посмотреть blacklist СМИ',
-      'name': 'media_blacklist',
-      'ord': 5,
-    },
-    'media_index': {
-      'cmd': '/media_index',
-      'desc': 'посмотреть список отслеживаемых СМИ',
-      'name': 'media_index',
-      'ord': 4,
-    },
-    'set_news_schedule': {
-      'cmd': '/set_news_schedule',
-      'desc': 'запланировать регулярные новости каждое утро',
-      'name': 'set_news_schedule',
-      'ord': 6,
-    },
-    'start': {
-      'cmd': '/start',
-      'desc': 'начать работу',
-      'name': 'start',
-      'ord': 2,
-    },
-    'unset_news_schedule': {
-      'cmd': '/unset_news_schedule',
-      'desc': 'отменить запланированные новости',
-      'name': 'unset_news_schedule',
-      'ord': 7,
-    }
-  }
+  from collections import namedtuple
+  Cmd = namedtuple('Cmd', ['cmd', 'desc', 'name', 'ord'])
+  _cmds = ( 
+    Cmd(cmd='/help', desc='получить инфо по командам', name='help', ord=1),
+    Cmd(cmd='/start', desc='начать работу', name='start', ord=2),
+    Cmd(cmd='/last_news', desc='посмотреть последние новости ЦФА', name='last_news', ord=3),
+    Cmd(cmd='/media_index', desc='посмотреть список отслеживаемых СМИ', name='media_index', ord=4),
+    Cmd(cmd='/media_blacklist', desc='посмотреть blacklist СМИ', name='media_blacklist', ord=5),
+    Cmd(cmd='/set_news_schedule', desc='запланировать регулярные новости каждое утро', name='set_news_schedule', ord=6),
+    Cmd(cmd='/unset_news_schedule', desc='отменить запланированные новости', name='unset_news_schedule', ord=7),
+  )
+  COMMANDS = namedtuple('Commands', [x.name for x in _cmds])(**{ c.name: c for c in _cmds })
   TOKEN = os.environ.get('TELEGRAM_TOKEN')
   NEWS_SCHEDULED_CHATS = set(str(x) for x in os.environ.get('NEWS_SCHEDULED_CHATS').split(',') if x != '')
   logger.info(f'News scheduler init for {NEWS_SCHEDULED_CHATS}')
@@ -280,7 +251,7 @@ def main():
   # Add chat ids for scheduled news
   app.bot_data['news_scheduled_chats'] = NEWS_SCHEDULED_CHATS
   app.bot_data['news_scheduled_time'] = datetime.time(hour=9, tzinfo=time_zone_msk)
-  #app.bot_data['news_scheduled_time'] = datetime.time(hour=11, minute=10, tzinfo=time_zone_msk) # remove
+  app.bot_data['news_scheduled_time'] = datetime.time(hour=16, minute=56, tzinfo=time_zone_msk) # remove
 
   # Add job of sending news into sheduler
   #app.job_queue.run_repeating(callback_cfa_info_scheduler, interval=60, first=60)
@@ -290,13 +261,13 @@ def main():
   app.add_handler(TypeHandler(Update, updates_logger), -1)
 
   # Register commands
-  app.add_handler(CommandHandler(COMMANDS.get('start').get('name'), start))
-  app.add_handler(CommandHandler(COMMANDS.get('help').get('name'), help_cmd))
-  app.add_handler(CommandHandler(COMMANDS.get('last_news').get('name'), cfa_info))
-  app.add_handler(CommandHandler(COMMANDS.get('media_index').get('name'), media_index))
-  app.add_handler(CommandHandler(COMMANDS.get('media_blacklist').get('name'), media_blacklist))
-  app.add_handler(CommandHandler(COMMANDS.get('set_news_schedule').get('name'), set_sheduler_cfa_info))
-  app.add_handler(CommandHandler(COMMANDS.get('unset_news_schedule').get('name'), unset_sheduler_cfa_info))
+  app.add_handler(CommandHandler(COMMANDS.start.name, start))
+  app.add_handler(CommandHandler(COMMANDS.help.name, help_cmd))
+  app.add_handler(CommandHandler(COMMANDS.last_news.name, cfa_info))
+  app.add_handler(CommandHandler(COMMANDS.media_index.name, media_index))
+  app.add_handler(CommandHandler(COMMANDS.media_blacklist.name, media_blacklist))
+  app.add_handler(CommandHandler(COMMANDS.set_news_schedule.name, set_sheduler_cfa_info))
+  app.add_handler(CommandHandler(COMMANDS.unset_news_schedule.name, unset_sheduler_cfa_info))
 
   # Unknown cmd handler
   app.add_handler(MessageHandler(filters.COMMAND, unknown))
