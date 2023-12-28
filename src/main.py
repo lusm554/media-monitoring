@@ -2,6 +2,7 @@ import os; from env import set_env_vars; set_env_vars(filepath='.env')
 import datetime
 import logging
 import traceback, json, html
+import functools
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import (
@@ -13,6 +14,7 @@ from telegram.ext import (
   filters,
 )
 import scraper
+from timezone import time_zone_msk
 
 logging.basicConfig(
   level=logging.INFO,
@@ -62,7 +64,7 @@ def is_cache_expire(context):
     return True
   return False
 
-async def _cfa_info(update, context, target_user_id=False):
+async def _cfa_info(context, target_chat_id):
   if context.bot_data['news_cache'] is None or is_cache_expire(context):
     cfa_markup = [
       'За последнее время были опубликованы следующие новости:',
@@ -91,17 +93,66 @@ async def _cfa_info(update, context, target_user_id=False):
     cfa_markup = context.bot_data.get('news_cache')['markup']
 
   batched_markup = [cfa_markup[i:i + 15] for i in range(0, len(cfa_markup), 15)]
-  user_id = target_user_id or update.effective_chat.id
   for msg_markup in batched_markup:
     _makrup = '\n\n'.join(msg_markup)
     await context.bot.send_message(
-      chat_id=user_id,
+      chat_id=target_chat_id,
       text=_makrup,
       parse_mode=ParseMode.HTML
     )
 
+def notify_about_chat_updates(func):
+  @functools.wraps(func)
+  async def wrapper(update, context):
+    result = await func(update, context)
+    logger.info('Sending last version of chats to dev chat')
+    _chats = ','.join(context.bot_data.get("news_scheduled_chats"))
+    message = f'Last version of chats {_chats!r}'
+    await context.bot.send_message(
+      chat_id=DEVELOPER_CHAT_ID, text=message
+    )
+    return result
+  return wrapper
+
+@notify_about_chat_updates
+async def set_sheduler_cfa_info(update, context):
+  chat_id = str(update.effective_message.chat_id)
+  try:
+    # add chat id to chats set
+    context.bot_data.get('news_scheduled_chats').add(chat_id)
+    logger.info(f'News scheduler chats after added new chat {context.bot_data.get("news_scheduled_chats")}')
+    schedule_time_str = context.bot_data.get('news_scheduled_time').strftime(f'%H:%M {time_zone_msk}')
+    msg = (
+      f'Новости будут приходить в {schedule_time_str} каждый день.\n'
+      f'Чтобы отменить - /unset_news_schedule.'
+    )
+    await update.effective_message.reply_text(msg)
+  except Exception as error:
+    raise error
+
+@notify_about_chat_updates
+async def unset_sheduler_cfa_info(update, context):
+  chat_id = str(update.effective_message.chat_id)
+  try:
+    context.bot_data.get('news_scheduled_chats').remove(chat_id)
+    logger.info(f'News scheduler chats after removed chat {context.bot_data.get("news_scheduled_chats")}')
+    msg = 'Запланированные новости выключены.'
+    await update.effective_message.reply_text(msg)
+  except KeyError:
+    error_msg = (
+      f'Похоже ранее новости не планировались.\n'
+      f'Воспользуйтесь /set_news_schedule.'
+    )
+    await update.effective_message.reply_text(error_msg)
+
 async def cfa_info(update, context):
-  await _cfa_info(update, context)
+  target_chat_id = update.effective_chat.id
+  await _cfa_info(context, target_chat_id=target_chat_id)
+
+async def callback_cfa_info_scheduler(context):
+  for chat_id in context.bot_data.get('news_scheduled_chats'):
+    logger.info(f'Sending scheduled news for {chat_id}')
+    await _cfa_info(context, target_chat_id=chat_id)
 
 async def media_index(update, context):
   mindex_msg = [
@@ -170,8 +221,8 @@ async def callback(update, context):
 
 def main():
   TOKEN = os.environ.get('TELEGRAM_TOKEN')
-  NEWS_SCHEDULED_USERS = set(x for x in os.environ.get('NEWS_SCHEDULED_USERS').split(',') if x != '')
-  logger.info(f'News scheduler init for {NEWS_SCHEDULED_USERS}')
+  NEWS_SCHEDULED_CHATS = set(str(x) for x in os.environ.get('NEWS_SCHEDULED_CHATS').split(',') if x != '')
+  logger.info(f'News scheduler init for {NEWS_SCHEDULED_CHATS}')
   app = ApplicationBuilder().token(TOKEN).build() 
 
   # Add news scraper
@@ -182,6 +233,14 @@ def main():
   )
   # Add cache
   app.bot_data['news_cache'] = None
+  # Add chat ids for scheduled news
+  app.bot_data['news_scheduled_chats'] = NEWS_SCHEDULED_CHATS
+  app.bot_data['news_scheduled_time'] = datetime.time(hour=9, tzinfo=time_zone_msk)
+  #app.bot_data['news_scheduled_time'] = datetime.time(hour=11, minute=10, tzinfo=time_zone_msk) # remove
+
+  # Add job of sending news into sheduler
+  #app.job_queue.run_repeating(callback_cfa_info_scheduler, interval=60, first=60)
+  app.job_queue.run_daily(callback=callback_cfa_info_scheduler, time=app.bot_data.get('news_scheduled_time'))
 
   # Logger
   app.add_handler(TypeHandler(Update, callback), -1)
@@ -192,6 +251,8 @@ def main():
   app.add_handler(CommandHandler('last_news', cfa_info))
   app.add_handler(CommandHandler('media_index', media_index))
   app.add_handler(CommandHandler('media_blacklist', media_blacklist))
+  app.add_handler(CommandHandler('set_news_schedule', set_sheduler_cfa_info))
+  app.add_handler(CommandHandler('unset_news_schedule', unset_sheduler_cfa_info))
 
   # Unknown cmd handler
   unknown_handler = MessageHandler(filters.COMMAND, unknown)
@@ -202,7 +263,6 @@ def main():
 
   # Run until Ctrl-C
   app.run_polling()
-
 
 if __name__ == '__main__':
   main()
