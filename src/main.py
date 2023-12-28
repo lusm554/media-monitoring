@@ -251,10 +251,9 @@ def main():
   # Add chat ids for scheduled news
   app.bot_data['news_scheduled_chats'] = NEWS_SCHEDULED_CHATS
   app.bot_data['news_scheduled_time'] = datetime.time(hour=9, tzinfo=time_zone_msk)
-  app.bot_data['news_scheduled_time'] = datetime.time(hour=16, minute=56, tzinfo=time_zone_msk) # remove
 
   # Add job of sending news into sheduler
-  #app.job_queue.run_repeating(callback_cfa_info_scheduler, interval=60, first=60)
+  #app.job_queue.run_repeating(callback_cfa_info_scheduler, interval=60, first=60) # for test command
   app.job_queue.run_daily(callback=callback_cfa_info_scheduler, time=app.bot_data.get('news_scheduled_time'))
 
   # Logger
