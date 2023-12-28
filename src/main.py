@@ -1,6 +1,19 @@
-import os; from env import set_env_vars; set_env_vars(filepath='.env')
-import datetime
 import logging
+import datetime
+logging.basicConfig(
+  level=logging.INFO,
+  format='[%(asctime)s] %(levelname)s [%(name)-22s] %(message)s',
+  datefmt='%Y-%m-%d %H:%M:%S',
+  handlers=[
+    logging.FileHandler(datetime.datetime.now().strftime('logs/log_%Y-%m-%d_%H-%M-%S.log')),
+    logging.StreamHandler(),
+  ]
+)
+# set higher logging level for httpx to avoid all GET and POST requests being logged
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logger = logging.getLogger(__name__)
+
+import os; from env import set_env_vars; set_env_vars(filepath='.env')
 import traceback, json, html
 import functools
 from telegram import Update
@@ -16,26 +29,13 @@ from telegram.ext import (
 import scraper
 from timezone import time_zone_msk
 
-logging.basicConfig(
-  level=logging.INFO,
-  format='[%(asctime)s] %(levelname)s [%(name)-22s] %(message)s',
-  datefmt='%Y-%m-%d %H:%M:%S',
-  handlers=[
-    logging.FileHandler(datetime.datetime.now().strftime('logs/log_%Y-%m-%d_%H-%M-%S.log')),
-    logging.StreamHandler(),
-  ]
-)
-# set higher logging level for httpx to avoid all GET and POST requests being logged
-logging.getLogger("httpx").setLevel(logging.WARNING)
-
-logger = logging.getLogger(__name__)
 DEVELOPER_CHAT_ID = os.environ.get('DEVELOPER_CHAT_ID')
 
 async def start(update, context):
   await context.bot.send_message(
     chat_id=update.effective_chat.id,
-    text='Привет! Этот бот собирает публикации СМИ по ЦФА.'
-         '\nБолее подробно через команду /help.',
+    text='Привет! Этот бот собирает публикации СМИ по ЦФА.\n'
+         'Более подробно через команду /help.',
   )
 
 async def unknown(update, context):
@@ -109,7 +109,8 @@ def notify_about_chat_updates(func):
     _chats = ','.join(context.bot_data.get("news_scheduled_chats"))
     message = f'Last version of chats {_chats!r}'
     await context.bot.send_message(
-      chat_id=DEVELOPER_CHAT_ID, text=message
+      chat_id=DEVELOPER_CHAT_ID,
+      text=message
     )
     return result
   return wrapper
@@ -118,7 +119,6 @@ def notify_about_chat_updates(func):
 async def set_sheduler_cfa_info(update, context):
   chat_id = str(update.effective_message.chat_id)
   try:
-    # add chat id to chats set
     context.bot_data.get('news_scheduled_chats').add(chat_id)
     logger.info(f'News scheduler chats after added new chat {context.bot_data.get("news_scheduled_chats")}')
     schedule_time_str = context.bot_data.get('news_scheduled_time').strftime(f'%H:%M {time_zone_msk}')
@@ -208,7 +208,7 @@ async def error_handler(update, context):
     chat_id=DEVELOPER_CHAT_ID, text=message, parse_mode=ParseMode.HTML
   )
 
-async def callback(update, context):
+async def updates_logger(update, context):
   try:
     show_obj = {
       'user': update.message.from_user,
@@ -243,7 +243,7 @@ def main():
   app.job_queue.run_daily(callback=callback_cfa_info_scheduler, time=app.bot_data.get('news_scheduled_time'))
 
   # Logger
-  app.add_handler(TypeHandler(Update, callback), -1)
+  app.add_handler(TypeHandler(Update, updates_logger), -1)
 
   # Register commands 
   app.add_handler(CommandHandler('start', start))
@@ -255,8 +255,7 @@ def main():
   app.add_handler(CommandHandler('unset_news_schedule', unset_sheduler_cfa_info))
 
   # Unknown cmd handler
-  unknown_handler = MessageHandler(filters.COMMAND, unknown)
-  app.add_handler(unknown_handler)
+  app.add_handler(MessageHandler(filters.COMMAND, unknown))
 
   # Error handler
   app.add_error_handler(error_handler)
