@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 import os; from env import set_env_vars; set_env_vars(filepath='.env')
 import traceback, json, html
 import functools
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 from telegram.ext import (
   ApplicationBuilder,
@@ -24,10 +24,13 @@ from telegram.ext import (
   ContextTypes,
   CommandHandler,
   TypeHandler,
+  CallbackQueryHandler,
   filters,
 )
 import scraper
 from timezone import time_zone_msk
+from uuid import uuid4
+from collections import namedtuple
 
 DEVELOPER_CHAT_ID = os.environ.get('DEVELOPER_CHAT_ID')
 
@@ -64,11 +67,17 @@ def is_cache_expire(context):
   return False
 
 async def _cfa_info(context, target_chat_id):
-  if context.bot_data['news_cache'] is None or is_cache_expire(context):
+  target_msg = await context.bot.send_message(
+    chat_id=target_chat_id,
+    text='Ищем новости, это займет немного времени...',
+    disable_web_page_preview=True,
+  )
+  if context.bot_data.get('news_cache', None) is None or is_cache_expire(context):
     cfa_markup = [
       'За последнее время были опубликованы следующие новости:',
     ]
     news = context.bot_data.get('scraper').get_articles()
+    news = news * 6 # REMOVE REMOVE REMOVE REMOVE REMOVE
     for n, article in enumerate(news, start=1):
       publisher = article.publisher_name
       title = article.title
@@ -91,14 +100,43 @@ async def _cfa_info(context, target_chat_id):
     logger.info(f"Return message from cache on {context.bot_data['news_cache']['timestamp']}")
     cfa_markup = context.bot_data.get('news_cache')['markup']
 
+  '''
+  pagination_keyboard = [
+    [
+      InlineKeyboardButton('prev', callback_data='backward'),
+      InlineKeyboardButton('1/2', callback_data='counter'),
+      InlineKeyboardButton('next', callback_data='forward')
+    ],
+  ]
+  keyboard_markup = InlineKeyboardMarkup(pagination_keyboard)
+  '''
+
   batched_markup = [cfa_markup[i:i + 15] for i in range(0, len(cfa_markup), 15)]
   for msg_markup in batched_markup:
     _makrup = '\n\n'.join(msg_markup)
     await context.bot.send_message(
       chat_id=target_chat_id,
       text=_makrup,
-      parse_mode=ParseMode.HTML
+      parse_mode=ParseMode.HTML,
+      disable_web_page_preview=True,
     )
+    '''
+    await context.bot.edit_message_text(
+      message_id=target_msg.message_id,
+      chat_id=target_chat_id,
+      text=_makrup,
+      parse_mode=ParseMode.HTML,
+      disable_web_page_preview=True,
+      reply_markup=keyboard_markup,
+    )
+    '''
+    #break # REMOVE REMOVE REMOVE REMOVE REMOVE REMOVE
+
+async def button(update, context):
+  query = update.callback_query
+  await query.answer()
+  selected_button = query.data
+  await query.edit_message_text(text=f"Selected option: {query.data}")
 
 def notify_about_chat_updates(func):
   @functools.wraps(func)
@@ -219,9 +257,8 @@ async def updates_logger(update, context):
     logger.info(f'Update: {update!r}')
 
 def main():
-  from collections import namedtuple
   Cmd = namedtuple('Cmd', ['cmd', 'desc', 'name', 'ord'])
-  _cmds = ( 
+  _cmds = (
     Cmd(cmd='/help', desc='получить инфо по командам', name='help', ord=1),
     Cmd(cmd='/start', desc='начать работу', name='start', ord=2),
     Cmd(cmd='/last_news', desc='посмотреть последние новости ЦФА', name='last_news', ord=3),
@@ -231,7 +268,13 @@ def main():
     Cmd(cmd='/unset_news_schedule', desc='отменить запланированные новости', name='unset_news_schedule', ord=7),
   )
   COMMANDS = namedtuple('Commands', [x.name for x in _cmds])(**{ c.name: c for c in _cmds })
-  TOKEN = os.environ.get('TELEGRAM_TOKEN')
+
+  if os.environ.get('dev'):
+    logger.info('Running from dev token TELEGRAM_TOKEN_DEV')
+    TOKEN = os.environ.get('TELEGRAM_TOKEN_DEV')
+  else:
+    TOKEN = os.environ.get('TELEGRAM_TOKEN')
+    logger.info('Running from prom token TELEGRAM_TOKEN')
   NEWS_SCHEDULED_CHATS = set(str(x) for x in os.environ.get('NEWS_SCHEDULED_CHATS').split(',') if x != '')
   logger.info(f'News scheduler init for {NEWS_SCHEDULED_CHATS}')
 
@@ -267,6 +310,7 @@ def main():
   app.add_handler(CommandHandler(COMMANDS.media_blacklist.name, media_blacklist))
   app.add_handler(CommandHandler(COMMANDS.set_news_schedule.name, set_sheduler_cfa_info))
   app.add_handler(CommandHandler(COMMANDS.unset_news_schedule.name, unset_sheduler_cfa_info))
+  app.add_handler(CallbackQueryHandler(button)) # handler for paggination buttons 
 
   # Unknown cmd handler
   app.add_handler(MessageHandler(filters.COMMAND, unknown))
