@@ -60,7 +60,7 @@ async def help_cmd(update, context):
     text=help_msg
   )
 
-def is_cache_expire(context):
+def is_news_cache_expire(context):
   if (datetime.datetime.now() - context.bot_data['news_cache']['timestamp']).seconds // 60 > 10:
     logger.info(f"Cache date {context.bot_data['news_cache']['timestamp']} expire")
     return True
@@ -72,7 +72,7 @@ async def _cfa_info(context, target_chat_id):
     text='Ищем новости, это займет немного времени...',
     disable_web_page_preview=True,
   )
-  if context.bot_data.get('news_cache', None) is None or is_cache_expire(context):
+  if context.bot_data.get('news_cache', None) is None or is_news_cache_expire(context):
     cfa_markup = [
       'За последнее время были опубликованы следующие новости:',
     ]
@@ -100,7 +100,6 @@ async def _cfa_info(context, target_chat_id):
     logger.info(f"Return message from cache on {context.bot_data['news_cache']['timestamp']}")
     cfa_markup = context.bot_data.get('news_cache')['markup']
 
-  '''
   pagination_keyboard = [
     [
       InlineKeyboardButton('prev', callback_data='backward'),
@@ -109,11 +108,11 @@ async def _cfa_info(context, target_chat_id):
     ],
   ]
   keyboard_markup = InlineKeyboardMarkup(pagination_keyboard)
-  '''
 
   batched_markup = [cfa_markup[i:i + 15] for i in range(0, len(cfa_markup), 15)]
   for msg_markup in batched_markup:
     _makrup = '\n\n'.join(msg_markup)
+    '''
     await context.bot.send_message(
       chat_id=target_chat_id,
       text=_makrup,
@@ -129,8 +128,7 @@ async def _cfa_info(context, target_chat_id):
       disable_web_page_preview=True,
       reply_markup=keyboard_markup,
     )
-    '''
-    #break # REMOVE REMOVE REMOVE REMOVE REMOVE REMOVE
+    break # REMOVE REMOVE REMOVE REMOVE REMOVE REMOVE
 
 async def button(update, context):
   query = update.callback_query
