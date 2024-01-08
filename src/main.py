@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 import os; from env import set_env_vars; set_env_vars(filepath='.env')
 import traceback, json, html
 import functools
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
   ApplicationBuilder,
   MessageHandler,
@@ -35,31 +35,13 @@ from pagination_pointer import PaginationPointer
 
 DEVELOPER_CHAT_ID = os.environ.get('DEVELOPER_CHAT_ID')
 
-async def start(update, context):
-  await context.bot.send_message(
-    chat_id=update.effective_chat.id,
-    text=f'Привет! Этот бот собирает публикации СМИ по ЦФА.\n'
-         f'Более подробно через команду {context.bot_data.get("cmd").help.cmd}.',
-  )
-
-async def unknown(update, context):
-  await context.bot.send_message(
-    chat_id=update.effective_chat.id,
-    text='Эта команда мне не знакома'
-  )
-
-async def help_cmd(update, context):
-  help_msg = '\n'.join(
-    f'{c.cmd} - {c.desc}'
-    for c in sorted(
-      [getattr(context.bot_data.get("cmd"), field) for field in context.bot_data.get("cmd")._fields],
-      key=lambda x: x.ord
-    )
-  )
-  await context.bot.send_message(
-    chat_id=update.effective_chat.id,
-    text=help_msg
-  )
+from commands import (
+  start,
+  unknown,
+  help_cmd,
+  media_blacklist,
+  media_index,
+)
 
 def is_news_cache_expire(context):
   if (datetime.datetime.now() - context.bot_data['news_cache']['timestamp']).seconds // 60 > 10:
@@ -236,43 +218,6 @@ async def callback_cfa_info_scheduler(context):
   for chat_id in context.bot_data.get('news_scheduled_chats'):
     logger.info(f'Sending scheduled news for {chat_id}')
     await _cfa_info(context, target_chat_id=chat_id)
-
-async def media_index(update, context):
-  mindex_msg = [
-    'Список отслеживаемых СМИ через RSS:',
-  ]
-  mindex = context.bot_data.get('scraper').get_rss_media_index() 
-  for n, f in enumerate(mindex, start=1):
-    msg = f'{n}. {f.title} ' + (f.feed_name or '').lower()
-    mindex_msg.append(msg)
-  mindex_msg.extend((
-    f'\n<b>Список источников google не определен. Цель этого метода - максимизировать покрытие медиапространства ботом.</b>',
-    f'\nДля фильтрации источников используется черный список - {context.bot_data.get("cmd").media_blacklist.cmd}.',
-  ))
-  mindex_msg = '\n'.join(mindex_msg)
-  await context.bot.send_message(
-    chat_id=update.effective_chat.id,
-    text=mindex_msg,
-    parse_mode=ParseMode.HTML
-  )
-
-async def media_blacklist(update, context):
-  msg = [
-    'Список СМИ, которые входят в blacklist:',
-  ]
-  blacklist = context.bot_data.get('scraper').get_media_blacklist() 
-  for n, i in enumerate(blacklist, start=1):
-    _msg = f'{n}. {i} '
-    msg.append(_msg)
-  msg.append(
-    '\n<b>Список распространяется на все способы получения новостей (rss, google).</b>',
-  )
-  markup = '\n'.join(msg)
-  await context.bot.send_message(
-    chat_id=update.effective_chat.id,
-    text=markup,
-    parse_mode=ParseMode.HTML
-  )
 
 async def error_handler(update, context):
   logger.error("Exception while handling an update:", exc_info=context.error)
