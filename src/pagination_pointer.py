@@ -18,6 +18,10 @@ class PaginationPointer:
       self.current -= 1
     return self.current
 
+  @property
+  def state(self):
+    return f'{self.current+1}/{self.size+1}'
+
   def __repr__(self):
     return f'{self.__class__.__name__}({", ".join(f"{k}={v!r}" for k,v in self.__dict__.items())})'
 
@@ -37,6 +41,7 @@ if __name__ == '__main__':
   print()
   ''' 
   p = PaginationPointer(size=0)
+  print(p.state)
   print(p)
   p.forward()
   print(p)

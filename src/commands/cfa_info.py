@@ -7,6 +7,9 @@ from telegram.constants import ParseMode
 
 logger = logging.getLogger(__name__)
 
+RIGHT_ARROW_SYMBOL = chr(8594) # →
+LEFT_ARROW_SYMBOL = chr(8592) # ←
+
 def is_news_cache_expire(context):
   if (datetime.datetime.now() - context.bot_data['news_cache']['timestamp']).seconds // 60 > 10:
     logger.info(f"Cache date {context.bot_data['news_cache']['timestamp']} expire")
@@ -21,9 +24,9 @@ def get_pagination_markup(post_cache, page_num=0):
   current_page = '\n\n'.join(post_markup[page_num])
   pagination_keyboard = [
     [
-      InlineKeyboardButton('prev', callback_data=f'backward_{internal_post_id}'),
-      InlineKeyboardButton(f'{pointer.current+1}/{pointer.size+1}', callback_data=f'counter_{internal_post_id}'),
-      InlineKeyboardButton('next', callback_data=f'forward_{internal_post_id}')
+      InlineKeyboardButton(LEFT_ARROW_SYMBOL, callback_data=f'backward_{internal_post_id}'),
+      InlineKeyboardButton(f'{pointer.state}', callback_data=f'counter_{internal_post_id}'),
+      InlineKeyboardButton(RIGHT_ARROW_SYMBOL, callback_data=f'forward_{internal_post_id}')
     ],
   ]
   keyboard_markup = InlineKeyboardMarkup(pagination_keyboard)
