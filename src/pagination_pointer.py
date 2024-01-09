@@ -22,6 +22,7 @@ class PaginationPointer:
     return f'{self.__class__.__name__}({", ".join(f"{k}={v!r}" for k,v in self.__dict__.items())})'
 
 if __name__ == '__main__':
+  ''' 
   a = list(f'a{i}' for i in range(5))
   p = PaginationPointer(size=len(a)-1)
   print(a)
@@ -32,3 +33,12 @@ if __name__ == '__main__':
   print(a)
   for i in range(10):
     print(i, a[p.backward()], p)
+
+  print()
+  ''' 
+  p = PaginationPointer(size=0)
+  print(p)
+  p.forward()
+  print(p)
+  p.backward()
+  print(p)
