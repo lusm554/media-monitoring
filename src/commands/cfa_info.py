@@ -42,7 +42,8 @@ async def _cfa_info(context, target_chat_id):
     post_markup = [
       'За последнее время были опубликованы следующие новости:',
     ]
-    #news = context.bot_data.get('scraper').get_articles()
+    news = context.bot_data.get('scraper').get_articles()
+    '''
     ################ REMOVE ##################
     news = []
     _t = scraper.Article(
@@ -55,6 +56,7 @@ async def _cfa_info(context, target_chat_id):
     news = [_t] # REMOVE REMOVE REMOVE REMOVE REMOVE
     news = news * 13 # REMOVE REMOVE REMOVE REMOVE REMOVE
     ################ REMOVE ##################
+    '''
     for n, article in enumerate(news, start=1):
       publisher = article.publisher_name
       title = article.title
@@ -112,10 +114,19 @@ async def cfa_info_button_callback(update, context):
   query = update.callback_query
   await query.answer()
   btn_data = query.data
-  action, internal_post_id = btn_data.split('_')
+  try:
+    action, internal_post_id = btn_data.split('_')
+  except Exception as error:
+    logger.error(f'While unpacking button callback data {error!r}')
+    action, internal_post_id = None, None
   logger.info(f'Button clicked with action {action!r}, id {internal_post_id!r}')
 
   if context.bot_data['post_cache'].get(internal_post_id) is None:
+    await context.bot.send_message(
+      chat_id=query.message.chat.id,
+      reply_to_message_id=query.message.message_id,
+      text='По некоторым причинам кеш этого поста не найден, поэтому действие недоступно.'
+    )
     return
   if context.bot_data['post_cache'].get(internal_post_id)['pointer'].size == 0:
     return

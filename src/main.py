@@ -50,6 +50,13 @@ async def callback_cfa_info_scheduler(context):
     logger.info(f'Sending scheduled news for {chat_id}')
     await _cfa_info(context, target_chat_id=chat_id)
 
+async def callback_cfa_info_cache_collerctor(context):
+  logger.info('Check for expire posts cache')
+  for internal_post_id, post in context.bot_data.get('post_cache').items():
+    if (datetime.datetime.now() - post['timestamp']).seconds // 3600 > 12:
+      logger.info(f'Deleting post: id {internal_post_id!r}, post {post!r}')
+      del context.bot_data['post_cache'][internal_post_id]
+
 async def error_handler(update, context):
   logger.error("Exception while handling an update:", exc_info=context.error)
   tb_list = traceback.format_exception(None, context.error, context.error.__traceback__)
@@ -126,6 +133,9 @@ def main():
   # Add job of sending news into sheduler
   #app.job_queue.run_repeating(callback_cfa_info_scheduler, interval=60, first=60) # for test command
   app.job_queue.run_daily(callback=callback_cfa_info_scheduler, time=app.bot_data.get('news_scheduled_time'))
+
+  # Add job of collecting expired posts cache 
+  app.job_queue.run_repeating(callback_cfa_info_cache_collerctor, interval=60*60*1, first=20)
 
   # Logger
   app.add_handler(TypeHandler(Update, updates_logger), -1)
