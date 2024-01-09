@@ -45,7 +45,6 @@ async def _cfa_info(context, target_chat_id):
     #news = context.bot_data.get('scraper').get_articles()
     ################ REMOVE ##################
     news = []
-
     _t = scraper.Article(
       title='S2',
       url='C',
@@ -116,9 +115,10 @@ async def cfa_info_button_callback(update, context):
   action, internal_post_id = btn_data.split('_')
   logger.info(f'Button clicked with action {action!r}, id {internal_post_id!r}')
 
+  if context.bot_data['post_cache'].get(internal_post_id) is None:
+    return
   if context.bot_data['post_cache'].get(internal_post_id)['pointer'].size == 0:
     return
-
   if action == 'counter':
     return 
   if action == 'backward':

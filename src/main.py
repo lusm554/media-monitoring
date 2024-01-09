@@ -20,6 +20,7 @@ import os; from env import set_env_vars; set_env_vars(filepath='.env')
 from collections import namedtuple
 import traceback, json, html
 from telegram import Update
+from telegram.constants import ParseMode
 from telegram.ext import (
   ApplicationBuilder,
   MessageHandler,
