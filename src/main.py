@@ -1,9 +1,12 @@
+from timezone import time_zone_msk
 import logging
 import datetime
+# setting logger timezone
+logging.Formatter.converter = lambda *args: datetime.datetime.now(tz=time_zone_msk).timetuple()
 logging.basicConfig(
   level=logging.INFO,
   format='[%(asctime)s] %(levelname)s [%(name)-24s] %(message)s',
-  datefmt='%Y-%m-%d %H:%M:%S',
+  datefmt='%Y-%m-%d %H:%M:%S %Z',
   handlers=[
     logging.FileHandler(datetime.datetime.now().strftime('logs/log_%Y-%m-%d_%H-%M-%S.log')),
     logging.StreamHandler(),
@@ -29,7 +32,6 @@ from telegram.ext import (
 from uuid import uuid4
 from collections import namedtuple
 import scraper
-from timezone import time_zone_msk
 from pagination_pointer import PaginationPointer
 
 from commands import (
