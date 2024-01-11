@@ -52,7 +52,7 @@ async def callback_cfa_info_scheduler(context):
 
 async def callback_cfa_info_cache_collerctor(context):
   logger.info('Check for expire posts cache')
-  for internal_post_id, post in context.bot_data.get('post_cache').items():
+  for internal_post_id, post in list(context.bot_data.get('post_cache').items()):
     if (datetime.datetime.now() - post['timestamp']).seconds // 3600 > 12:
       logger.info(f'Deleting post: id {internal_post_id!r}, post {post!r}')
       del context.bot_data['post_cache'][internal_post_id]
@@ -135,7 +135,7 @@ def main():
   app.job_queue.run_daily(callback=callback_cfa_info_scheduler, time=app.bot_data.get('news_scheduled_time'))
 
   # Add job of collecting expired posts cache 
-  app.job_queue.run_repeating(callback_cfa_info_cache_collerctor, interval=60*60*1, first=20)
+  app.job_queue.run_repeating(callback_cfa_info_cache_collerctor, interval=60*60*1, first=40)
 
   # Logger
   app.add_handler(TypeHandler(Update, updates_logger), -1)
