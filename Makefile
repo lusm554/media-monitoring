@@ -1,7 +1,7 @@
 include .env
 
 gitpull:
-	git pull 
+	git pull --rebase
 pull: gitpull
 	docker pull $(DOCKER_USER_NAME)/$(CONTAINER_NAME):latest
 run: pull
