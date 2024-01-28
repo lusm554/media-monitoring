@@ -26,9 +26,9 @@ class Scraper:
     rss_articles = self.from_rss.scraper.fetch_last_news()
     return rss_articles
 
-  def get_articles_from_google(self):
+  def get_articles_from_google(self, time_period):
     #go_articles = self.from_google.fetch_articles()
-    go_articles = self.from_google.async_fetch_articles()
+    go_articles = self.from_google.async_fetch_articles(time_period)
     return go_articles
 
   def get_distinct_arts(self, arts):
@@ -48,7 +48,7 @@ class Scraper:
 
   def get_articles(self, time_period='24h'):
     assert time_period in ('24h', 'all_available'), f'Parameter time_period {time_period!r} not found, try 24h'
-    union_articles = [*self.get_articles_from_rss(), *self.get_articles_from_google()]
+    union_articles = [*self.get_articles_from_rss(), *self.get_articles_from_google(time_period)]
     set_articles = self.get_distinct_arts(union_articles)
     allowed_publishers_articles = self.filter_by_urls_blacklist(set_articles)
     period_articles = self.filter_by_period(allowed_publishers_articles, time_period) 

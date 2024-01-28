@@ -42,6 +42,7 @@ from commands import (
   unset_sheduler_cfa_info,
   cfa_info,
   _cfa_info,
+  cfa_info_all_news,
   cfa_info_button_callback,
 )
 
@@ -83,7 +84,8 @@ async def updates_logger(update, context):
     }
     logger.info(f'Update: {show_obj!r}')
   except:
-    logger.info(f'Update: {update!r}')
+    #logger.info(f'Update: {update!r}')
+    logger.info(f'Update id: {update.update_id!r}')
 
 def main():
   Cmd = namedtuple('Cmd', ['cmd', 'desc', 'name', 'ord'])
@@ -144,6 +146,7 @@ def main():
   app.add_handler(CommandHandler(COMMANDS.start.name, start))
   app.add_handler(CommandHandler(COMMANDS.help.name, help_cmd))
   app.add_handler(CommandHandler(COMMANDS.last_news.name, cfa_info))
+  app.add_handler(CommandHandler('all_news', cfa_info_all_news)) # REMOVE
   app.add_handler(CommandHandler(COMMANDS.media_index.name, media_index))
   app.add_handler(CommandHandler(COMMANDS.media_blacklist.name, media_blacklist))
   app.add_handler(CommandHandler(COMMANDS.set_news_schedule.name, set_sheduler_cfa_info))

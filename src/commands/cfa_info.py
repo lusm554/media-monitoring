@@ -32,6 +32,65 @@ def get_pagination_markup(post_cache, page_num=0):
   keyboard_markup = InlineKeyboardMarkup(pagination_keyboard)
   return current_page, keyboard_markup
 
+async def _cfa_info_all_news(context, target_chat_id):
+  target_msg = await context.bot.send_message(
+    chat_id=target_chat_id,
+    text='Ищем новости, это займет немного времени...',
+    disable_web_page_preview=True,
+  )
+  post_markup = [
+    'За последнее время были опубликованы следующие новости:',
+  ]
+  news = context.bot_data.get('scraper').get_articles(time_period='all_available')
+  for n, article in enumerate(news, start=1):
+    publisher = article.publisher_name
+    title = article.title
+    url = article.url
+    publish_time = article.publish_time.strftime('%Y-%m-%d %H:%M:%S')
+    scraper_type = article.scraper
+    article_markup = (
+      f'{n}. <a href="{url}"> {title} </a>\n'
+      f'<b>Источник:</b> {publisher}.\n'
+      f'<b>Опубликовано:</b> {publish_time}.\n'
+      f'<b>Взято из:</b> {scraper_type}.'
+    )
+    post_markup.append(article_markup)
+ 
+  if len(post_markup) <= 1:
+    await context.bot.edit_message_text(
+      message_id=target_msg.message_id,
+      chat_id=target_chat_id,
+      text='Новости за последнее время не найдены.',
+    )
+    return
+
+  internal_post_id = str(uuid4())
+  post_markup_p = [post_markup[i:i + 4] for i in range(0, len(post_markup), 4)]
+  logger.info(f'Saving post cache with id {internal_post_id!r}')
+  context.bot_data['post_cache'][internal_post_id] = {
+    'markup': post_markup_p,
+    'timestamp': datetime.datetime.now(),
+    'internal_post_id': internal_post_id,
+    'pointer': PaginationPointer(size=len(post_markup_p)-1),
+  }
+
+  post_markup, keyboard_markup = get_pagination_markup(
+    post_cache=context.bot_data['post_cache'].get(internal_post_id),
+    page_num=0,
+  )
+  await context.bot.edit_message_text(
+    message_id=target_msg.message_id,
+    chat_id=target_chat_id,
+    text=post_markup,
+    parse_mode=ParseMode.HTML,
+    disable_web_page_preview=True,
+    reply_markup=keyboard_markup,
+  )
+async def cfa_info_all_news(update, context):
+  target_chat_id = update.effective_chat.id
+  await _cfa_info_all_news(context, target_chat_id=target_chat_id)
+
+
 async def _cfa_info(context, target_chat_id):
   target_msg = await context.bot.send_message(
     chat_id=target_chat_id,

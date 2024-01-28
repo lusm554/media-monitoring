@@ -80,6 +80,8 @@ class GoogleScraper:
       'lr': 'lang_ru', # language
       'start': page_num # page number, because of pagination
     }
+    if self.time_period == 'all_available':
+      del params['tbs']
     response = requests.get(
         f'https://www.google.com/search',
         params=params,
@@ -97,7 +99,8 @@ class GoogleScraper:
     _arts = self.parse_page(html)
     return _arts
 
-  def async_fetch_articles(self):
+  def async_fetch_articles(self, time_period):
+    self.time_period = time_period
     def async_fetch_batch(page_num_range):
       result = []
       empty_page_flag = False
