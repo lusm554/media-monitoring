@@ -73,12 +73,12 @@ class GoogleScraper:
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36',
     }
     params = {
-      'q': 'ЦФА',
-      'tbm': 'nws',
-      'source': 'lnt',
-      'tbs': 'lr:lang_1ru,qdr:d',
-      'lr': 'lang_ru',
-      'start': page_num 
+      'q': 'ЦФА', # query
+      'tbm': 'nws', # page section
+      'source': 'lnt', # idk
+      'tbs': 'lr:lang_1ru,qdr:d', # region and period
+      'lr': 'lang_ru', # language
+      'start': page_num # page number, because of pagination
     }
     response = requests.get(
         f'https://www.google.com/search',
