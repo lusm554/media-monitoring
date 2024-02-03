@@ -1,5 +1,14 @@
 import requests
 
+cookies = {
+  'KIykI': '1',
+  'HgGedof': '1',
+  'zen_sso_checked': '1',
+  'yandex_login': '',
+  'sso_status': 'sso.passport.yandex.ru:synchronized',
+}
+
+
 headers = {
   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
   'Accept-Language': 'en-US,en;q=0.9',
@@ -22,7 +31,7 @@ params = {
   'flat': '1',
 }
 
-res = requests.get('https://dzen.ru/news/search', params=params, headers=headers)
+res = requests.get('https://dzen.ru/news/search', params=params, headers=headers, cookies=cookies)
 print(res.status_code)
 print(res.history)
 print(res.text)
