@@ -1,4 +1,5 @@
 import requests
+import datetime
 
 def get_html():
   cookies = {
@@ -24,10 +25,14 @@ def get_html():
     'sec-ch-ua-platform': '"macOS"',
   }
 
+  _now = datetime.datetime.now()
+  posix_to = int(_now.timestamp()) * 1000 # to ms
+  posix_from = int( (_now - datetime.timedelta(hours=24)).timestamp() ) * 1000 # to ms
+  print(posix_from, posix_to)
   params = {
     'issue_tld': 'ru', # region
     'text': 'ЦФА', # text request
-    'filter_date': '1706821200000,1706907600000', # time perdio in unix seconds since 1970
+    'filter_date': f'{posix_from},{posix_to}',#'1706821200000,1706907600000', # time period in unix seconds since 1970
     'flat': '1', # flag for no aggregation by article theme
   }
 
@@ -51,6 +56,7 @@ def parse_dzen(html):
     print(href)
     print(title)
     print()
+    break
 
 html = get_html()
 res = parse_dzen(html)
