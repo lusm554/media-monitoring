@@ -50,13 +50,15 @@ def parse_dzen(html):
   links = soup.find_all('article')
   for l in links:
     title_a = l.find('a')
-    print(title_a.prettify())
+    #print(title_a.prettify())
     href = title_a.get('href')
     title = title_a.find('span').get_text()
-    print(href)
+    source_name = l.find(attrs={'class': 'mg-snippet-source-info__agency-name'}).get_text()
+    #print(href)
+    print(source_name)
     print(title)
     print()
-    break
+    #break
 
 html = get_html()
 res = parse_dzen(html)
