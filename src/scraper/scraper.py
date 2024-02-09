@@ -13,6 +13,7 @@ class Scraper:
     self.publishers_blacklist = (
       'echomsk.spb.ru',
       'forpost-sevastopol.ru',
+      'adi19.ru',
     )
   
   def get_rss_media_index(self):
