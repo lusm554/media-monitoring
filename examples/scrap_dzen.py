@@ -25,15 +25,14 @@ def get_html():
   }
 
   params = {
-    'issue_tld': 'ru',
-    'text': 'ЦФА',
-    'filter_date': '1706821200000,1706907600000',
-    'flat': '1',
+    'issue_tld': 'ru', # region
+    'text': 'ЦФА', # text request
+    'filter_date': '1706821200000,1706907600000', # time perdio in unix seconds since 1970
+    'flat': '1', # flag for no aggregation by article theme
   }
 
   res = requests.get('https://dzen.ru/news/search', params=params, headers=headers, cookies=cookies)
   print('status code', res.status_code)
-  #print(res.history)
   print('req url', res.url)
   print()
   html = res.text
