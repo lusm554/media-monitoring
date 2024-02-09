@@ -54,9 +54,11 @@ def parse_dzen(html):
     href = title_a.get('href')
     title = title_a.find('span').get_text()
     source_name = l.find(attrs={'class': 'mg-snippet-source-info__agency-name'}).get_text()
-    #print(href)
+    title_publish_time = l.find(attrs={'class': 'mg-snippet-source-info__time'}).get_text()
+    print(href)
     print(source_name)
     print(title)
+    print(title_publish_time)
     print()
     #break
 
