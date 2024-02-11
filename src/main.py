@@ -42,6 +42,7 @@ from commands import (
   unset_sheduler_cfa_info,
   cfa_info,
   _cfa_info,
+  cfa_info_all_news,
   cfa_info_button_callback,
 )
 
@@ -54,7 +55,7 @@ async def callback_cfa_info_cache_collerctor(context):
   logger.info('Check for expire posts cache')
   for internal_post_id, post in list(context.bot_data.get('post_cache').items()):
     if (datetime.datetime.now() - post['timestamp']).seconds // 3600 > 12:
-      logger.info(f'Deleting post: id {internal_post_id!r}, post {post!r}')
+      logger.info(f'Deleting post: id {internal_post_id!r}')
       del context.bot_data['post_cache'][internal_post_id]
 
 async def error_handler(update, context):
@@ -83,7 +84,8 @@ async def updates_logger(update, context):
     }
     logger.info(f'Update: {show_obj!r}')
   except:
-    logger.info(f'Update: {update!r}')
+    #logger.info(f'Update: {update!r}')
+    logger.info(f'Update id: {update.update_id!r}')
 
 def main():
   Cmd = namedtuple('Cmd', ['cmd', 'desc', 'name', 'ord'])
@@ -119,6 +121,7 @@ def main():
   # Add news scraper
   app.bot_data['scraper'] = scraper.get_scraper_instance(
     rss_scrp=scraper.RSS,
+    dzen_scrp=scraper.DzenScraper,
     go_scrp=scraper.GoogleScraper,
     article_wrp=scraper.WrappedArticle
   )
@@ -144,6 +147,7 @@ def main():
   app.add_handler(CommandHandler(COMMANDS.start.name, start))
   app.add_handler(CommandHandler(COMMANDS.help.name, help_cmd))
   app.add_handler(CommandHandler(COMMANDS.last_news.name, cfa_info))
+  app.add_handler(CommandHandler('all_news', cfa_info_all_news)) # REMOVE
   app.add_handler(CommandHandler(COMMANDS.media_index.name, media_index))
   app.add_handler(CommandHandler(COMMANDS.media_blacklist.name, media_blacklist))
   app.add_handler(CommandHandler(COMMANDS.set_news_schedule.name, set_sheduler_cfa_info))
