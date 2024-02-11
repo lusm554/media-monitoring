@@ -11,9 +11,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 class GoogleScraper:
-  def __init__(self):
-    pass
-
   def convert_publish_to_datetime(self, publish_dt):
     time_unit, unit_type, _ = publish_dt.split(maxsplit=2) 
     if 'час' in unit_type:
@@ -25,13 +22,13 @@ class GoogleScraper:
     return publish_time
    
   def parse_page(self, html):
-    logger.info(f'Parsing html page with size {len(html)} bytes')
+    logger.debug(f'Parsing html page with size {len(html)} bytes')
     only_tags_with_id_search = SoupStrainer(id='search')
     soup = BeautifulSoup(html, 'lxml', parse_only=only_tags_with_id_search)
     search_links = soup.find_all('a')
     result = []
     if len(search_links) == 0:
-      logger.info(f'Found {len(result)} articles')
+      logger.debug(f'Found {len(result)} articles')
       return result
     for element_a in search_links:
       link = element_a.get('href')
@@ -46,7 +43,7 @@ class GoogleScraper:
         scraper='google',
       )
       result.append(article)
-    logger.info(f'Found {len(result)} articles')
+    logger.debug(f'Found {len(result)} articles')
     return result
 
   def fetch_page(self, page_num):
@@ -88,8 +85,7 @@ class GoogleScraper:
         headers=headers,
         timeout=5, # seconds
     )
-    logger.info(f'Fetched google {response.url}')
-    logger.info(f'Fetched status {response.status_code}')
+    logger.debug(f'Fetched google {response.status_code}, {response.url}')
     assert response.status_code == 200
     html = response.text
     return html
@@ -112,14 +108,14 @@ class GoogleScraper:
             arts = future.result()
             if len(arts) == 0:
               empty_page_flag = True
-            logger.info(f'Page {page_num} arts len {len(arts)}')
+            logger.debug(f'Page {page_num} articles count {len(arts)}')
             result.extend(arts)
           except Exception as exc:
             logger.error(f'Exception while fetching google page num {page_num} {exc!r}') 
       return result, empty_page_flag
     result = []
     workers_cnt = min(32, (os.cpu_count() or 1) + 4)
-    logger.info(f'Fetching google articles with {workers_cnt} workers')
+    logger.debug(f'Fetching google articles with {workers_cnt} workers')
     batch_size = 14
     prev_offset = 0
     page_step = 10
