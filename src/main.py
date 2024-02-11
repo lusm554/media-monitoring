@@ -55,7 +55,7 @@ async def callback_cfa_info_cache_collerctor(context):
   logger.info('Check for expire posts cache')
   for internal_post_id, post in list(context.bot_data.get('post_cache').items()):
     if (datetime.datetime.now() - post['timestamp']).seconds // 3600 > 12:
-      logger.info(f'Deleting post: id {internal_post_id!r}, post {post!r}')
+      logger.info(f'Deleting post: id {internal_post_id!r}')
       del context.bot_data['post_cache'][internal_post_id]
 
 async def error_handler(update, context):
