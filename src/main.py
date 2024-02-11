@@ -121,6 +121,7 @@ def main():
   # Add news scraper
   app.bot_data['scraper'] = scraper.get_scraper_instance(
     rss_scrp=scraper.RSS,
+    dzen_scrp=scraper.DzenScraper,
     go_scrp=scraper.GoogleScraper,
     article_wrp=scraper.WrappedArticle
   )

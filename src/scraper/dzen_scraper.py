@@ -1,8 +1,5 @@
 from bs4 import BeautifulSoup, SoupStrainer
-if __name__ == '__main__':
-  from article import Article
-else:
-  from .article import Article
+from .article import Article
 import requests
 import datetime
 import logging
