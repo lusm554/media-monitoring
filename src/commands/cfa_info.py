@@ -121,6 +121,8 @@ async def _cfa_info(context, target_chat_id):
       title = article.title
       url = article.url
       publish_time = article.publish_time.strftime('%Y-%m-%d %H:%M:%S')
+      if article.scraper == 'dzen':
+        publish_time = 'Будет доступно позже'
       scraper_type = article.scraper
       article_markup = (
         f'{n}. <a href="{url}"> {title} </a>\n'
