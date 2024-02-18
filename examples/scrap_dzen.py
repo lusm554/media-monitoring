@@ -31,8 +31,13 @@ def get_html():
   print(posix_from, posix_to)
   params = {
     'issue_tld': 'ru', # region
-    'text': 'ЦФА', # text request
-    'filter_date': f'{posix_from},{posix_to}',#'1706821200000,1706907600000', # time period in unix seconds since 1970
+
+    #'text': 'ЦФА', # text request # period
+    'text': f'ЦФА date:{datetime.datetime.now().strftime("%Y%m%d")}', # text request # only current date
+
+    #'filter_date': f'{posix_from},{posix_to}'# time period in unix seconds since 1970 # period
+    'filter_date': f'1708264185000', # time period in unix seconds since 1970 # only current date
+
     'flat': '1', # flag for no aggregation by article theme
   }
 
@@ -60,7 +65,6 @@ def parse_dzen(html):
     print(title)
     print(title_publish_time)
     print()
-    #break
 
 html = get_html()
 res = parse_dzen(html)
