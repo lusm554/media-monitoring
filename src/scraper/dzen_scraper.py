@@ -63,8 +63,10 @@ class DzenScraper:
     posix_from = int( (_now - datetime.timedelta(hours=24)).timestamp() ) * 1000 # to ms
     params = {
       'issue_tld': 'ru', # region
-      'text': 'ЦФА', # text request
-      'filter_date': f'{posix_from},{posix_to}', # time period in unix seconds since 1970
+      #'text': 'ЦФА', # text request
+      'text': f'ЦФА date:{datetime.datetime.now().strftime("%Y%m%d")}', # text request # only current date
+      #'filter_date': f'{posix_from},{posix_to}', # time period in unix seconds since 1970
+      'filter_date': f'{posix_to}', # time period in unix seconds since 1970 # only current date
       'flat': '1', # flag for no aggregation by article theme
     }
     response = requests.get('https://dzen.ru/news/search', params=params, headers=headers, cookies=cookies)
