@@ -37,9 +37,17 @@ def parse_cfaru(html):
     'lxml',
     parse_only=only_tags_with_id_imcontent,
   )
-  return soup.prettify()
+  #print(soup)
+  #return soup.prettify()
+  platform_headings = soup.find_all('h3', {'class': 'imHeading3'})
+  from pprint import pprint
+  pprint(platform_headings)
+  emits_by_platform = [heading.parent for heading in platform_headings]
+  pprint(emits_by_platform)
+
+  
+
   return
-  links = soup.find_all('article')
   for l in links:
     title_a = l.find('a')
     #print(title_a.prettify())
@@ -54,6 +62,6 @@ def parse_cfaru(html):
     print()
 
 html = get_html()
-print(html)
+#print(html)
 parsed = parse_cfaru(html)
-print(parsed)
+#print(parsed)
