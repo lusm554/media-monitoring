@@ -37,29 +37,40 @@ def parse_cfaru(html):
     'lxml',
     parse_only=only_tags_with_id_imcontent,
   )
-  #print(soup)
-  #return soup.prettify()
   platform_headings = soup.find_all('h3', {'class': 'imHeading3'})
+  
   from pprint import pprint
   pprint(platform_headings)
-  emits_by_platform = [heading.parent for heading in platform_headings]
-  pprint(emits_by_platform)
+  print()
+  print()
 
-  
+  emits_by_platform = { heading.get_text(): heading.parent for heading in platform_headings }
 
-  return
-  for l in links:
-    title_a = l.find('a')
-    #print(title_a.prettify())
-    href = title_a.get('href')
-    title = title_a.find('span').get_text()
-    source_name = l.find(attrs={'class': 'mg-snippet-source-info__agency-name'}).get_text()
-    title_publish_time = l.find(attrs={'class': 'mg-snippet-source-info__time'}).get_text()
-    print(href)
-    print(source_name)
-    print(title)
-    print(title_publish_time)
+  def parse_platform(_):
+    import re
+    date_patter = re.compile(r'^(3[01]|[12][0-9]|0[1-9]).(1[0-2]|0[1-9]).[0-9]{4}$')
+    from collections import defaultdict
+    last_day = None 
+    day_emits = defaultdict(set)
+    for ch in _.find_all('span'):
+      ch = ch.get_text()
+      ch = ch.strip()
+      #is_date = datetime.strptime(ch, '%d.%m.%Y')
+      is_date = date_patter.match(ch)
+      if is_date:
+        last_day = ch
+      else:
+        if ch != '':
+          day_emits[last_day].add(ch)
+    pprint(day_emits)
+
+  for name, _ in emits_by_platform.items():
+    print(name)
+    parse_platform(_)
     print()
+    print()
+    print()
+
 
 html = get_html()
 #print(html)
