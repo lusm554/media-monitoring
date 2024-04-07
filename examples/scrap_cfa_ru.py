@@ -28,6 +28,28 @@ def parse_cfaru(html):
   platform_headings = soup.find_all('h3', {'class': 'imHeading3'})
   emits_by_platform = { heading.get_text(): heading.parent for heading in platform_headings }
 
+  def _parse_platform(platform_div):
+    site_url = 'https://цфа.рф/'
+    date_pattern = re.compile(r'^(3[01]|[12][0-9]|0[1-9]).(1[0-2]|0[1-9]).[0-9]{4}$')
+    last_date = None
+    for nxt in platform_div.descendants:
+      if nxt.name not in ('span', 'li'): continue
+      span_text = nxt.get_text()
+      span_text = span_text.strip()
+      if span_text == '':
+        continue
+      is_date = date_pattern.match(span_text)       
+      if is_date:
+        print(span_text)
+        last_date = span_text
+      else:
+        tag_a = nxt.find('a')
+        if tag_a is None:
+          continue
+        emit_name = tag_a.get_text()
+        emit_href = tag_a.get('href')
+        print('\t', emit_name, emit_href)
+
   def parse_platform(div):
     site_url = 'https://цфа.рф/'
     date_pattern = re.compile(r'^(3[01]|[12][0-9]|0[1-9]).(1[0-2]|0[1-9]).[0-9]{4}$')
@@ -44,18 +66,17 @@ def parse_cfaru(html):
         last_date = text
         last_span_header = None
       else:
-        if last_date == '12.10.2023':
-          print(text)
         is_span_header = not any(parent.name == 'li' for n, parent in zip(range(3), span.parents))
         if is_span_header:
-          #print(is_span_header, text)
           last_span_header = text
         else: 
           if span.find('a') is None:
             continue
-          href = span.find('a').get('href')
+          tag_a = span.find('a')
+          text = tag_a.string
+          href = tag_a.get('href')
           href = urllib.parse.urljoin(site_url, href)
-          #print(text, href)
+          print(text, href)
           if last_span_header:
             date_emits[last_date][(last_span_header, text)].add(href)
           else:
@@ -67,7 +88,8 @@ def parse_cfaru(html):
     if platform_name != 'На платформе А-Токен':
       continue
     print(platform_name)
-    platform_emits = parse_platform(platform_emits_div)
+    #platform_emits = parse_platform(platform_emits_div)
+    platform_emits = _parse_platform(platform_emits_div)
     break
     #pprint(platform_emits)
     for k,v in sorted(platform_emits.items(), key=lambda x: datetime.datetime.strptime(x[0], '%d.%m.%Y'), reverse=True):
