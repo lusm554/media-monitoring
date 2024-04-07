@@ -44,6 +44,8 @@ def parse_cfaru(html):
         last_date = text
         last_span_header = None
       else:
+        if last_date == '12.10.2023':
+          print(text)
         is_span_header = not any(parent.name == 'li' for n, parent in zip(range(3), span.parents))
         if is_span_header:
           #print(is_span_header, text)
@@ -62,11 +64,17 @@ def parse_cfaru(html):
 
   
   for platform_name, platform_emits_div in emits_by_platform.items():
+    if platform_name != 'На платформе А-Токен':
+      continue
     print(platform_name)
     platform_emits = parse_platform(platform_emits_div)
+    break
     #pprint(platform_emits)
-    for k,v in sorted(platform_emits.items(), key=lambda x: datetime.datetime.strptime(x[0], '%d.%m.%Y')):
-      print(k,v)
+    for k,v in sorted(platform_emits.items(), key=lambda x: datetime.datetime.strptime(x[0], '%d.%m.%Y'), reverse=True):
+      print(k)
+      for kk, vv in v.items():
+        print('\t', kk, vv)
+      print()
     print()
     print()
     print()
