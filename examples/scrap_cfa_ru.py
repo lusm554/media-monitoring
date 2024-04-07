@@ -112,24 +112,18 @@ def parse_cfaru(html):
 
   
   for platform_name, platform_emits_div in emits_by_platform.items():
-    '''
-    if platform_name = 'На платформе А-Токен':
-      print(platform_name)
-      platform_emits = parse_platform_method2(platform_emits_div)
-    else:
-      break
-    '''
+    if platform_name != 'На платформе Мосбиржа/НРД': continue
+    print(platform_name)
     if True:
-      print(platform_name)
       platform_emits = parse_platform_method2(platform_emits_div)     
     if False:
       platform_emits = parse_platform_method1(platform_emits_div)
-      #pprint(platform_emits)
-      for k,v in sorted(platform_emits.items(), key=lambda x: datetime.datetime.strptime(x[0], '%d.%m.%Y'), reverse=True):
-        print(k)
-        for kk, vv in v.items():
-          print('\t', kk, vv)
-        print()
+
+    for k,v in sorted(platform_emits.items(), key=lambda x: datetime.datetime.strptime(x[0], '%d.%m.%Y'), reverse=True):
+      print(k)
+      for kk, vv in v.items():
+        print('\t', kk, vv)
+      print()
     print()
     print()
     print()
