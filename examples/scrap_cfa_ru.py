@@ -34,12 +34,16 @@ def parse_cfaru(html):
   
   def parse_platform_method2(platform_div):
     '''
-    
+    Вариант с перебором всех дочерних элементов div'a платформы.
+    Чтобы не упустить часть выпусков, как в первом варианте, проверяем элементы span и li.
+    Имя выпуска и ссылка на pdf определяются через тег а.
+    Пока что ошибок не заметил, этот вариант работает на текущей структуре.
     '''
     site_url = 'https://цфа.рф/'
     date_pattern = re.compile(r'^(3[01]|[12][0-9]|0[1-9]).(1[0-2]|0[1-9]).[0-9]{4}$')
     last_date = None
     last_span_header = None
+    date_emits = defaultdict(lambda: defaultdict(set))
     for nxt in platform_div.descendants:
       if nxt.name not in ('span', 'li'): continue
       span_text = nxt.get_text()
@@ -53,14 +57,19 @@ def parse_cfaru(html):
       else:
         is_span_header = not any(parent.name == 'li' for n, parent in zip(range(3), nxt.parents))
         if is_span_header and nxt.name =='span':
-          print(is_span_header, span_text) 
+          last_span_header = span_text
         else:
           tag_a = nxt.find('a')
           if tag_a is None:
             continue
           emit_name = tag_a.get_text()
           emit_href = tag_a.get('href')
-          #print('\t', emit_name, emit_href)
+          emit_href = urllib.parse.urljoin(site_url, emit_href)
+          if last_span_header:
+            date_emits[last_date][(last_span_header, emit_name)].add(emit_href)
+          else:
+            date_emits[last_date][emit_name].add(emit_href)
+    return date_emits
 
   def parse_platform_method1(div):
     '''
