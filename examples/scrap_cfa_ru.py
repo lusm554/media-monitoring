@@ -44,8 +44,7 @@ def parse_cfaru(html):
     last_date = None
     last_span_header = None
     date_emits = defaultdict(lambda: defaultdict(set))
-    for nxt in platform_div.descendants:
-      if nxt.name not in ('span', 'li'): continue
+    for nxt in platform_div.find_all(['span', 'li']):
       span_text = nxt.get_text()
       span_text = span_text.strip()
       if span_text == '':
