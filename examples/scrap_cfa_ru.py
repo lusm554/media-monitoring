@@ -111,7 +111,7 @@ def parse_cfaru(html):
 
   
   for platform_name, platform_emits_div in emits_by_platform.items():
-    if platform_name != 'На платформе Мосбиржа/НРД': continue
+    #if platform_name != 'На платформе Мосбиржа/НРД': continue
     print(platform_name)
     if True:
       platform_emits = parse_platform_method2(platform_emits_div)     
