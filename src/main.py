@@ -44,6 +44,8 @@ from commands import (
   _cfa_info,
   cfa_info_all_news,
   cfa_info_button_callback,
+  cfa_emits,
+  cfa_emits_button_callback
 )
 
 async def callback_cfa_info_scheduler(context):
@@ -87,12 +89,22 @@ async def updates_logger(update, context):
     #logger.info(f'Update: {update!r}')
     logger.info(f'Update id: {update.update_id!r}')
 
+async def button_callback_gateway(update, context):
+  query = update.callback_query
+  await query.answer()
+  btn_data = query.data
+  if btn_data.startswith('forward') or btn_data.startswith('backward') or btn_data.startswith('counter'):
+    await cfa_info_button_callback(update, context, query, btn_data)
+  if btn_data.startswith('emits'):
+    await cfa_emits_button_callback(update, context, query, btn_data)
+ 
 def main():
   Cmd = namedtuple('Cmd', ['cmd', 'desc', 'name', 'ord'])
   _cmds = (
     Cmd(cmd='/help', desc='получить инфо по командам', name='help', ord=1),
     Cmd(cmd='/start', desc='начать работу', name='start', ord=2),
     Cmd(cmd='/last_news', desc='посмотреть последние новости ЦФА', name='last_news', ord=3),
+    Cmd(cmd='/emits', desc='посмотреть выпуски ЦФА', name='emits', ord=3),
     Cmd(cmd='/media_index', desc='посмотреть список отслеживаемых СМИ', name='media_index', ord=4),
     Cmd(cmd='/media_blacklist', desc='посмотреть blacklist СМИ', name='media_blacklist', ord=5),
     Cmd(cmd='/set_news_schedule', desc='запланировать регулярные новости каждое утро', name='set_news_schedule', ord=6),
@@ -129,6 +141,7 @@ def main():
   app.bot_data['news_cache'] = None
   # Add cache for news post/msg 
   app.bot_data['post_cache'] = dict()
+  app.bot_data['emits_cache'] = None
   # Add chat ids for scheduled news
   app.bot_data['news_scheduled_chats'] = NEWS_SCHEDULED_CHATS
   app.bot_data['news_scheduled_time'] = datetime.time(hour=9, tzinfo=app.bot_data.get('timezone'))
@@ -152,7 +165,8 @@ def main():
   app.add_handler(CommandHandler(COMMANDS.media_blacklist.name, media_blacklist))
   app.add_handler(CommandHandler(COMMANDS.set_news_schedule.name, set_sheduler_cfa_info))
   app.add_handler(CommandHandler(COMMANDS.unset_news_schedule.name, unset_sheduler_cfa_info))
-  app.add_handler(CallbackQueryHandler(cfa_info_button_callback)) # handler for paggination buttons 
+  app.add_handler(CallbackQueryHandler(button_callback_gateway)) # handler for paggination buttons 
+  app.add_handler(CommandHandler(COMMANDS.emits.name, cfa_emits))
 
   # Unknown cmd handler
   app.add_handler(MessageHandler(filters.COMMAND, unknown))

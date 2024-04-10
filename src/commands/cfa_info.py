@@ -171,10 +171,10 @@ async def _cfa_info(context, target_chat_id):
     reply_markup=keyboard_markup,
   )
 
-async def cfa_info_button_callback(update, context):
-  query = update.callback_query
-  await query.answer()
-  btn_data = query.data
+async def cfa_info_button_callback(update, context, query, btn_data):
+  # query = update.callback_query
+  # await query.answer()
+  # btn_data = query.data
   try:
     action, internal_post_id = btn_data.split('_')
   except Exception as error:
