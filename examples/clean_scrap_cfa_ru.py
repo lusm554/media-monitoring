@@ -80,12 +80,15 @@ def parse_emits_page(html):
 def emits_to_telegram_format(emits):
   msg = ''
   for platform_name, emits in emits.items():
+    if platform_name != 'На платформе А-Токен':
+      continue
     msg += f'{platform_name}\n'
     for emit_date, date_emits in emits.items():
       msg += f'\t{emit_date}\n' 
       for emit_name, emit_href in date_emits.items():
         if isinstance(emit_name, tuple):
           emit_name = ', '.join(emit_name)
+        emit_href = list(emit_href)[0]
         msg += f'\t\t{emit_name} - {emit_href}\n' 
   print(msg)
   print(len(msg))
@@ -95,7 +98,11 @@ def main():
   cfa_emits_page_html = fetch_cfa_ru_html()
   emits = parse_emits_page(cfa_emits_page_html)
   print(f'{len(emits)=}')
-  #emits_to_telegram_format(emits)
+  print(emits.keys())
+  print()
+  print()
+  print()
+  emits_to_telegram_format(emits)
 
 if __name__ == '__main__':
   main()
