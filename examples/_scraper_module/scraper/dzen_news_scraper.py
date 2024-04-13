@@ -36,12 +36,12 @@ class CfaDzenNewsScraper(NewsBaseScraper):
     _now = datetime.datetime.now()
     posix_to = int(_now.timestamp()) * 1000 # to ms
     posix_from = int( (_now - datetime.timedelta(hours=24)).timestamp() ) * 1000 # to ms
-    params = {
-      'issue_tld': 'ru', # region
-      'text': f'ЦФА date:{datetime.datetime.now().strftime("%Y%m%d")}', # text request # only current date
-      'filter_date': f'{posix_to}', # time period in unix seconds since 1970 # only current date
-      'flat': '1', # flag for no aggregation by article theme
-    }
+    params = dict(
+      issue_tld='ru', # region
+      text=f'ЦФА date:{datetime.datetime.now().strftime("%Y%m%d")}', # text request # only current date
+      filter_date=f'{posix_to}', # time period in unix seconds since 1970 # only current date
+      flat=f'1', # flag for no aggregation by article theme
+    )
     response = requests.get(
       url=self.DZEN_URL, headers=self.HEADERS,
       cookies=self.COOKIES,
