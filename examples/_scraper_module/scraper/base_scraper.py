@@ -1,3 +1,5 @@
+from abc import abstractmethod
+
 class Periods:
   '''
   Класс периодов для фильтрации новостей и выпусков.
@@ -15,8 +17,9 @@ class BaseScraper:
     # check for instance of Periods or datetime
     pass
   
+  @abstractmethod
   def fetch_and_parse(self):
-    pass
+    raise NotImplemented()
 
 class NewsBaseScraper(BaseScraper):
   '''
