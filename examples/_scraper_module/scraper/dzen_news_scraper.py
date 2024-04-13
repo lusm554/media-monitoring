@@ -39,8 +39,9 @@ class CfaDzenNewsScraper(NewsBaseScraper):
     params = dict(
       issue_tld='ru', # region
       text=f'ЦФА date:{current_time.strftime("%Y%m%d")}', # text request, only current date
+      # text=f'ЦФА', # for period more than 24 hours 
       filter_date=f'{news_end_time_ms}', # time period in unix seconds since 1970 # only current date
-      #filter_date=f'{news_start_time_ms},{news_end_time_ms}', # time period in unix seconds since 1970 # only current date
+      # filter_date=f'{news_start_time_ms},{news_end_time_ms}', # for period more than 24 hours
       flat=f'1', # flag for no aggregation by article theme
     )
     response = requests.get(
@@ -55,6 +56,36 @@ class CfaDzenNewsScraper(NewsBaseScraper):
     assert response.status_code == 200
     html = response.text
     return html
-  
+
+  def parse_page(self, html):
+    logger.info(f'Parsing html page with size {len(html)} bytes')
+    only_tags_with_role_main = SoupStrainer(role='main')
+    soup = BeautifulSoup(html, 'lxml', parse_only=only_tags_with_role_main)
+    search_articles = soup.find_all('article')
+    result = []
+    if len(search_articles) == 0:
+      logger.info(f'Found {len(result)} articles')
+      return result
+    for element_article in search_articles:
+      element_article_a = element_article.find('a')
+      link = element_article_a.get('href')
+      title = element_article_a.find('span').get_text()
+      source_name = element_article.find(attrs={'class': 'mg-snippet-source-info__agency-name'}).get_text()
+      #publish_time = element_article.find(attrs={'class': 'mg-snippet-source-info__time'}).get_text()
+      publish_time = datetime.datetime.now()
+      article = Article(
+        title=title,
+        url=link,
+        publish_time=publish_time,
+        publisher_name=source_name,
+        scraper='dzen',
+      )
+      result.append(article)
+    logger.info(f'Found {len(result)} articles')
+    return result 
+
   def fetch_and_parse(self, period):
     dzen_html_page = self.fetch_page()
+    dzen_articles = self.parse_page(dzen_html_page)
+    for art in dzen_articles:
+      print(art.title)
