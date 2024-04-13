@@ -1,5 +1,4 @@
 import logging
-from scraper import Scraper
 
 logging.basicConfig(
   format='[%(asctime)s] %(levelname)s [%(name)s] %(message)s',
@@ -17,11 +16,35 @@ Scraper:
 
 Module public classes:
   CfaAllNewsScraper
+    - join_articles
+    - fetch_and_parse
+      1. fetch_and_parse from CfaGoogleNewsScraper, CfaDzenNewsScraper, CfaRssNewsScraper, CfaReleasesScraper
+      2. join_articles
   CfaGoogleNewsScraper
+    - fetch_and_parse
+      1. filter_by_period
+      2. filter_by_blacklist
   CfaDzenNewsScraper
+    - fetch_and_parse
+      1. filter_by_period
+      2. filter_by_blacklist
   CfaRssNewsScraper
+    - fetch_and_parse
+      1. filter_by_period
+      2. filter_by_blacklist
   CfaReleasesScraper
+    - fetch_and_parse
+      1. filter_by_period
+      2. filter_by_blacklist
 
+Common things among classes:
+  BaseScraper:
+    - news url blacklist
+    - filter_by_blacklist
+    - __repr__ method
+    - filter_by_period method
+
+Periods:
   Periods.LAST_24_HOURS
   Periods.LAST_WEEK
   Periods.ALL_AVAILABLE_TIME
