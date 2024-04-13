@@ -16,9 +16,15 @@ Scraper:
     - cfa_ru
 
 Module public classes:
-  CfaNewsScraper
+  CfaAllNewsScraper
   CfaGoogleNewsScraper
   CfaDzenNewsScraper
   CfaRssNewsScraper
   CfaReleasesScraper
 
+  Periods.LAST_24_HOURS
+  Periods.LAST_WEEK
+  Periods.ALL_AVAILABLE_TIME
+
+CfaAllNewsScraper.fetch_and_parse(period=Periods.LAST_24_HOURS)
+CfaReleasesScraper.fetch_and_parse(period=Periods.LAST_WEEK)
