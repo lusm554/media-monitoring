@@ -1,10 +1,12 @@
+from scraper import CfaDzenNewsScraper, Periods
 import logging
-
 logging.basicConfig(
   format='[%(asctime)s] %(levelname)s [%(name)s] %(message)s',
   datefmt='%Y-%m-%d %H:%M:%S',
   level=logging.INFO,
 )
+
+dzen_news = CfaDzenNewsScraper().fetch_and_parse(period=Periods.LAST_24_HOURS)
 
 '''
 Scraper:
