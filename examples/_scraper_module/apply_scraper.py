@@ -6,6 +6,7 @@ logging.basicConfig(
   level=logging.INFO,
 )
 
+'''
 Scraper:
   News:
     - rss
@@ -51,3 +52,4 @@ Periods:
 
 CfaAllNewsScraper.fetch_and_parse(period=Periods.LAST_24_HOURS)
 CfaReleasesScraper.fetch_and_parse(period=Periods.LAST_WEEK)
+'''
