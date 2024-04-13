@@ -18,7 +18,7 @@ class BaseScraper:
     pass
   
   @abstractmethod
-  def fetch_and_parse(self):
+  def fetch_and_parse(self, period):
     raise NotImplemented()
 
 class NewsBaseScraper(BaseScraper):
