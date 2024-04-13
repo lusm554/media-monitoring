@@ -38,30 +38,3 @@ class WrappedArticle:
 
   def __repr__(self):
     return self.article.__repr__()
-
-if __name__ == '__main__':
-  from pprint import pprint
-  art = Article(
-    title='S',
-    url='C',
-    publish_time='R',
-    publisher_name='AA:/',
-    scraper='go'
-  )
-  art2 = Article(
-    title='S2',
-    url='C',
-    publish_time='R',
-    publisher_name='AA:/',
-    scraper='rss'
-  )
-  print('repr:')
-  print(art)
-  print(repr(art))
-  print()
-  l = [art]*5 + [art2]*2
-  l = [WrappedArticle(art) for art in l]
-  print('list')
-  pprint(l)
-  print('set')
-  pprint(set(l))
