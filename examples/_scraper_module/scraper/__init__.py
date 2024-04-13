@@ -4,3 +4,6 @@
 # from .dzen_scraper import DzenScraper
 # from .article import WrappedArticle, Article
 # from .scraper import Scraper
+
+from .base_scraper import Periods
+from .dzen_news_scraper import CfaDzenNewsScraper
