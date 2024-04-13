@@ -61,31 +61,28 @@ class CfaDzenNewsScraper(NewsBaseScraper):
     logger.info(f'Parsing html page with size {len(html)} bytes')
     only_tags_with_role_main = SoupStrainer(role='main')
     soup = BeautifulSoup(html, 'lxml', parse_only=only_tags_with_role_main)
-    search_articles = soup.find_all('article')
-    result = []
-    if len(search_articles) == 0:
-      logger.info(f'Found {len(result)} articles')
-      return result
-    for element_article in search_articles:
-      element_article_a = element_article.find('a')
-      link = element_article_a.get('href')
-      title = element_article_a.find('span').get_text()
-      source_name = element_article.find(attrs={'class': 'mg-snippet-source-info__agency-name'}).get_text()
-      #publish_time = element_article.find(attrs={'class': 'mg-snippet-source-info__time'}).get_text()
-      publish_time = datetime.datetime.now()
+    articles_from_page = soup.find_all('article')
+    articles_parsed = []
+    for page_article in articles_from_page:
+      _article_link = page_article.find('a')
+      article_href = _article_link.get('href')
+      article_title = _article_link.find('span').get_text()
+      article_source_name = page_article.find(attrs={'class': 'mg-snippet-source-info__agency-name'}).get_text()
+      article_publish_time = page_article.find(attrs={'class': 'mg-snippet-source-info__time'}).get_text()
       article = Article(
-        title=title,
-        url=link,
-        publish_time=publish_time,
-        publisher_name=source_name,
+        title=article_title,
+        url=article_href,
+        publish_time=article_publish_time,
+        publisher_name=article_source_name,
         scraper='dzen',
       )
-      result.append(article)
-    logger.info(f'Found {len(result)} articles')
-    return result 
+      articles_parsed.append(article)
+    logger.info(f'Found {len(articles_parsed)} articles')
+    return articles_parsed 
 
   def fetch_and_parse(self, period):
     dzen_html_page = self.fetch_page()
     dzen_articles = self.parse_page(dzen_html_page)
     for art in dzen_articles:
-      print(art.title)
+      print(art)
+      print()
