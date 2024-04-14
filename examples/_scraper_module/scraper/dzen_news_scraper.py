@@ -8,6 +8,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 class CfaDzenNewsScraper(NewsBaseScraper):
+  '''
+  Парсер новоей ЦФА из Дзена.
+  '''
   def __init__(self):
     '''
     Устанавливает параметры HTTP запроса к Дзену.
