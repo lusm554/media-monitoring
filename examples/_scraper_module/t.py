@@ -32,11 +32,10 @@ for i in range(12):
     cookies=COOKIES,
   )
   print(res.status_code)
-  data = res.text
-  #data = res.json()
-  #print(data.keys())
-  print(data)
+  print(res.url)
+  #data = res.text
+  data = res.json()
+  print(data.keys())
+  print(len(data.get('data').get('stories', [])))
   print()
-  print()
-  break
-  time.sleep(.5)
+  time.sleep(1)
