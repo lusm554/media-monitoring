@@ -1,12 +1,13 @@
 from abc import abstractmethod
+import datetime
 
 class Periods:
   '''
   Класс периодов для фильтрации новостей и выпусков.
   '''
-  LAST_24_HOURS = 1
-  LAST_WEEK = 2
-  ALL_AVAILABLE_TIME = 3
+  LAST_24_HOURS = datetime.timedelta(hours=24)
+  LAST_WEEK = datetime.timedelta(weeks=1)
+  ALL_AVAILABLE_TIME = datetime.timedelta(weeks=8)
 
 class BaseScraper:
   '''
