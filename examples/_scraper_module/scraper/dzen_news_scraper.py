@@ -9,6 +9,9 @@ logger = logging.getLogger(__name__)
 
 class CfaDzenNewsScraper(NewsBaseScraper):
   def __init__(self):
+    '''
+    Устанавливает параметры HTTP запроса к Дзену.
+    '''
     self.DZEN_URL = 'https://dzen.ru/news/search'
     self.COOKIES = {
       'KIykI': '1',
@@ -33,6 +36,10 @@ class CfaDzenNewsScraper(NewsBaseScraper):
     }
 
   def fetch_page(self):
+    '''
+    Запрашивает HTML страницу новостей по теме 'ЦФА' из Дзенa.
+    Запрос передается с фильтром на период новостей.
+    '''
     current_time = datetime.datetime.now()
     news_start_time_ms = int( (current_time - datetime.timedelta(hours=24)).timestamp() ) * 1000
     news_end_time_ms = int(current_time.timestamp()) * 1000
@@ -58,6 +65,10 @@ class CfaDzenNewsScraper(NewsBaseScraper):
     return html
 
   def parse_page(self, html):
+    '''
+    Парсит статьи из HTML страницы новостей Дзенa.
+    Формирует объект статьи в формате Article.
+    '''
     logger.info(f'Parsing html page with size {len(html)} bytes')
     only_tags_with_role_main = SoupStrainer(role='main')
     soup = BeautifulSoup(html, 'lxml', parse_only=only_tags_with_role_main)
@@ -81,6 +92,9 @@ class CfaDzenNewsScraper(NewsBaseScraper):
     return articles_parsed 
 
   def fetch_and_parse(self, period):
+    '''
+    Основная функция класса, запрашивает HTML новостей Дзена и парсит их в общий формат данных.
+    '''
     dzen_html_page = self.fetch_page()
     dzen_articles = self.parse_page(dzen_html_page)
     for art in dzen_articles:
