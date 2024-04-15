@@ -33,7 +33,7 @@ for i in range(12):
   )
   print(res.status_code)
   print(res.url)
-  #data = res.text
+  #data = res.text # get json
   data = res.json()
   print(data.keys())
   print(len(data.get('data').get('stories', [])))
