@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup, SoupStrainer
 import requests
 import datetime
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -136,8 +137,11 @@ class CfaDzenNewsScraper(NewsBaseScraper):
     '''
     Основная функция класса, запрашивает HTML новостей Дзена и парсит их в общий формат данных.
     '''
-    dzen_html_page = self.fetch_page()
-    dzen_articles = self.parse_page(dzen_html_page)
-    for art in dzen_articles:
-      print(art)
-      print()
+    final_articles = list()
+    _format = self.DZEN_JSON_PARSER
+    parser = self.get_page_parser(_format)
+    for dzen_page_data in self.page_fetcher(for_period=period, content_type=_format):
+      page_articles = parser(dzen_page_data)
+      print(len(page_articles))
+      if len(page_articles) == 0:
+        break
