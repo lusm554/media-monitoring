@@ -71,9 +71,9 @@ class CfaDzenNewsScraper(NewsBaseScraper):
         cookies=self.COOKIES,
         params=params,
       )
-      logger.info(f'Fetched dzen {response.url}')
-      logger.info(f'Fetched status {response.status_code}')
-      logger.info(f'Fetched in {response.elapsed.total_seconds()} seconds')
+      logger.info(f'DZEN fetched url {response.url}')
+      logger.debug(f'Fetched status {response.status_code}')
+      logger.info(f'DZEN fetched in {response.elapsed.total_seconds()} seconds')
       assert response.status_code == 200
       if content_type == self.DZEN_JSON_PARSER:
         page_data = response.json()
