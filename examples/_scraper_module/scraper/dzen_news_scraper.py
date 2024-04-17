@@ -15,6 +15,8 @@ class CfaDzenNewsScraper(NewsBaseScraper):
     '''
     Устанавливает параметры HTTP запроса к Дзену.
     '''
+    self.DZEN_HTML_PARSER = 1
+    self.DZEN_JSON_PARSER = 2
     self.DZEN_URL = 'https://dzen.ru/news/search'
     self.COOKIES = {
       'KIykI': '1',
@@ -121,6 +123,15 @@ class CfaDzenNewsScraper(NewsBaseScraper):
         )
         articles.append(article)
     return articles
+
+  def get_page_parser(self, format):
+    if format == self.DZEN_HTML_PARSER:
+      return self.html_page_parser
+    elif format == self.DZEN_JSON_PARSER:
+      return self.json_page_parser
+    else:
+      raise ValueError(f'Dzen parser type {format!r} not found.')
+
   def fetch_and_parse(self, period):
     '''
     Основная функция класса, запрашивает HTML новостей Дзена и парсит их в общий формат данных.
