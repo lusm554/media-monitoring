@@ -48,13 +48,16 @@ class CfaDzenNewsScraper(NewsBaseScraper):
     '''
     current_time = datetime.datetime.now()
     #current_time = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    #news_start_time = current_time - datetime.timedelta(hours=24)
-    news_start_time_ms = int((current_time - datetime.timedelta(hours=24)).timestamp()) * 1000
+    if for_period <= datetime.timedelta(hours=24): # особенность дзена, для новостей за сутки нужно указывать один день
+      news_start_time = current_time
+    else:
+      news_start_time = current_time - for_period + datetime.timedelta(days=1)
+    news_start_time_ms = int((current_time - for_period).timestamp()) * 1000
     news_end_time_ms = int(current_time.timestamp()) * 1000
     for page_num in range(10):
       params = dict(
         issue_tld='ru', # region
-        text=f'ЦФА date:{current_time.strftime("%Y%m%d")}..{current_time.strftime("%Y%m%d")}', # text request, only current date
+        text=f'ЦФА date:{news_start_time.strftime("%Y%m%d")}..{current_time.strftime("%Y%m%d")}', # text request, only current date
         filter_date=f'{news_start_time_ms},{news_end_time_ms}', # for period more than 24 hours
         flat=1, # flag for no aggregation by article theme
         p=page_num,
