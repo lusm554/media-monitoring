@@ -150,9 +150,10 @@ class CfaDzenNewsScraper(NewsBaseScraper):
     final_articles = list()
     _format = self.DZEN_JSON_PARSER
     parser = self.get_page_parser(_format)
+    parsed_articles = list()
     for dzen_page_data in self.page_fetcher(for_period=period, content_type=_format):
       page_articles = parser(dzen_page_data)
       if len(page_articles) == 0:
         break
-      for art in page_articles:
-        print(art.title)
+      parsed_articles.extend(page_articles)
+    return parsed_articles
