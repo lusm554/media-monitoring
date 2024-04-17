@@ -67,7 +67,7 @@ class CfaDzenNewsScraper(NewsBaseScraper):
     html = response.text
     return html
 
-  def parse_page(self, html):
+  def html_page_parser(self, html):
     '''
     Парсит статьи из HTML страницы новостей Дзенa.
     Формирует объект статьи в формате Article.
