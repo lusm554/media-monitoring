@@ -38,34 +38,43 @@ class CfaDzenNewsScraper(NewsBaseScraper):
       'sec-ch-ua-platform': '"macOS"',
     }
 
-  def fetch_page(self):
+  def page_fetcher(self, for_period, content_type):
     '''
-    Запрашивает HTML страницу новостей по теме 'ЦФА' из Дзенa.
+    Запрашивает HTML или json страницу новостей по теме 'ЦФА' из Дзенa.
     Запрос передается с фильтром на период новостей.
     '''
     current_time = datetime.datetime.now()
-    news_start_time_ms = int( (current_time - datetime.timedelta(hours=24)).timestamp() ) * 1000
+    #current_time = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    #news_start_time = current_time - datetime.timedelta(hours=24)
+    news_start_time_ms = int((current_time - datetime.timedelta(hours=24)).timestamp()) * 1000
     news_end_time_ms = int(current_time.timestamp()) * 1000
-    params = dict(
-      issue_tld='ru', # region
-      text=f'ЦФА date:{current_time.strftime("%Y%m%d")}', # text request, only current date
-      # text=f'ЦФА', # for period more than 24 hours 
-      filter_date=f'{news_end_time_ms}', # time period in unix seconds since 1970 # only current date
-      # filter_date=f'{news_start_time_ms},{news_end_time_ms}', # for period more than 24 hours
-      flat=f'1', # flag for no aggregation by article theme
-    )
-    response = requests.get(
-      url=self.DZEN_URL,
-      headers=self.HEADERS,
-      cookies=self.COOKIES,
-      params=params,
-    )
-    logger.info(f'Fetched dzen {response.url}')
-    logger.info(f'Fetched status {response.status_code}')
-    logger.info(f'Fetched in {response.elapsed.total_seconds()} seconds')
-    assert response.status_code == 200
-    html = response.text
-    return html
+    for page_num in range(10):
+      params = dict(
+        issue_tld='ru', # region
+        text=f'ЦФА date:{current_time.strftime("%Y%m%d")}..{current_time.strftime("%Y%m%d")}', # text request, only current date
+        filter_date=f'{news_start_time_ms},{news_end_time_ms}', # for period more than 24 hours
+        flat=1, # flag for no aggregation by article theme
+        p=page_num,
+        sortby='date', # news sort key
+      )
+      if content_type == self.DZEN_JSON_PARSER:
+        params['ajax'] = 1 # flag for json response
+      response = requests.get(
+        url=self.DZEN_URL,
+        headers=self.HEADERS,
+        cookies=self.COOKIES,
+        params=params,
+      )
+      logger.info(f'Fetched dzen {response.url}')
+      logger.info(f'Fetched status {response.status_code}')
+      logger.info(f'Fetched in {response.elapsed.total_seconds()} seconds')
+      assert response.status_code == 200
+      if content_type == self.DZEN_JSON_PARSER:
+        page_data = response.json()
+      else:
+        page_data = response.text
+      yield page_data 
+      time.sleep(.1)
 
   def html_page_parser(self, html):
     '''
