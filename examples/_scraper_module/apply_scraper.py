@@ -6,7 +6,8 @@ logging.basicConfig(
   level=logging.INFO,
 )
 
-dzen_news = CfaDzenNewsScraper().fetch_and_parse(period=Periods.LAST_24_HOURS)
+#dzen_news = CfaDzenNewsScraper().fetch_and_parse(period=Periods.LAST_24_HOURS)
+dzen_news = CfaDzenNewsScraper().fetch_and_parse(period=Periods.LAST_WEEK)
 
 '''
 Scraper:

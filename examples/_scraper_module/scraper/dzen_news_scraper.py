@@ -145,6 +145,7 @@ class CfaDzenNewsScraper(NewsBaseScraper):
     parser = self.get_page_parser(_format)
     for dzen_page_data in self.page_fetcher(for_period=period, content_type=_format):
       page_articles = parser(dzen_page_data)
-      print(len(page_articles))
       if len(page_articles) == 0:
         break
+      for art in page_articles:
+        print(art.title)
