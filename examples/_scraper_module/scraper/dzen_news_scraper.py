@@ -94,6 +94,24 @@ class CfaDzenNewsScraper(NewsBaseScraper):
     logger.info(f'Found {len(articles_parsed)} articles')
     return articles_parsed 
 
+  def json_page_parser(self, json):
+    json = json['data']
+    articles = list()
+    for story in json.get('stories', []):
+      for doc in story.get('docs', []):
+        article_url = doc.get('url')
+        article_title = ''.join(x.get('text') for x in doc.get('title'))
+        article_source_name = doc.get('sourceName')
+        article_publish_time = doc.get('time')
+        article = Article(
+          title=article_title,
+          url=article_url,
+          publish_time=article_publish_time,
+          publisher_name=article_source_name,
+          scraper='dzen',
+        )
+        articles.append(article)
+    return articles
   def fetch_and_parse(self, period):
     '''
     Основная функция класса, запрашивает HTML новостей Дзена и парсит их в общий формат данных.
