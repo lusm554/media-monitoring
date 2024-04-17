@@ -43,7 +43,7 @@ class CfaDzenNewsScraper(NewsBaseScraper):
 
   def page_fetcher(self, for_period, content_type):
     '''
-    Запрашивает HTML или json страницу новостей по теме 'ЦФА' из Дзенa.
+    Запрашивает HTML или JSON страницу новостей по теме 'ЦФА' из Дзенa.
     Запрос передается с фильтром на период новостей.
     '''
     current_time = datetime.datetime.now()
@@ -110,6 +110,10 @@ class CfaDzenNewsScraper(NewsBaseScraper):
     return articles_parsed 
 
   def json_page_parser(self, json):
+    '''
+    Парсит статьи из JSON страницы новостей Дзенa.
+    Формирует объект статьи в формате Article.
+    '''
     json = json['data']
     articles = list()
     for story in json.get('stories', []):
@@ -129,6 +133,9 @@ class CfaDzenNewsScraper(NewsBaseScraper):
     return articles
 
   def get_page_parser(self, format):
+    '''
+    Возвращает парсер по формату.
+    '''
     if format == self.DZEN_HTML_PARSER:
       return self.html_page_parser
     elif format == self.DZEN_JSON_PARSER:
@@ -138,7 +145,7 @@ class CfaDzenNewsScraper(NewsBaseScraper):
 
   def fetch_and_parse(self, period):
     '''
-    Основная функция класса, запрашивает HTML новостей Дзена и парсит их в общий формат данных.
+    Основная функция класса, запрашивает HTML или JSON новостей Дзена и парсит их в общий формат данных.
     '''
     final_articles = list()
     _format = self.DZEN_JSON_PARSER
