@@ -8,6 +8,11 @@ class RssFeed:
     self.publisher_name = publisher_name
     self.url = url
     self.feed_name = feed_name
+  
+  def __repr__(self):
+    cls_name = self.__class__.__name__
+    args = ', '.join(f'{k}={v!r}' for k,v in self.__dict__.items())
+    return f'{cls_name}({args})'
 
 class CfaRssNewsScraper(NewsBaseScraper):
   def __init__(self):
