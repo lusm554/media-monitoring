@@ -11,6 +11,9 @@ logging.basicConfig(
 #dzen_news = CfaDzenNewsScraper().fetch_and_parse(period=Periods.LAST_WEEK)
 #pprint(dzen_news)
 
+from scraper import CfaRssNewsScraper, Periods
+rss_news = CfaRssNewsScraper().fetch_and_parse(period=Periods.LAST_24_HOURS)
+
 '''
 Scraper:
   News:
