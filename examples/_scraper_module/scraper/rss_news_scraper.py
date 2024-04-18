@@ -1,4 +1,6 @@
 from .base_scraper import NewsBaseScraper
+from .article import Article
+import feedparser
 import logging
 
 logger = logging.getLogger(__name__)
@@ -48,3 +50,32 @@ class CfaRssNewsScraper(NewsBaseScraper):
       RssFeed(publisher_name='tadviser.ru', url='https://www.tadviser.ru/xml/tadviser.xml'),
     )
 
+  def feed_fetcher(self, url):
+    feed_data = feedparser.parse(url)
+    return feed_data
+
+  def feed_parser(self, feed_data, article_publisher_name='Не определен'):
+    articles = list()
+    for entry in feed_data.entries:
+      article_title = entry.get('title', '')      
+      if not ('цфа' in article_title.lower() or 'цифровые финансовые активы' in article_title.lower()):
+        continue
+      article_url = entry.get('link')
+      article_publish_time = entry.get('published_parsed')
+      article = Article(
+        title=article_title,
+        url=article_url,
+        publish_time=article_publish_time,
+        publisher_name=article_publisher_name,
+        scraper='rss',
+      )
+      articles.append(article)
+    return articles
+
+  def fetch_and_parse(self, period):
+    articles
+    for feed in self.RSS_FEEDS:
+      print(feed)
+      feed_data = self.feed_fetcher(feed.url)
+      cfa_articles = self.feed_parser(feed_data, feed.publisher_name)
+      print(len(cfa_articles))

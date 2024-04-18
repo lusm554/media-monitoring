@@ -13,6 +13,7 @@ logging.basicConfig(
 
 from scraper import CfaRssNewsScraper, Periods
 rss_news = CfaRssNewsScraper().fetch_and_parse(period=Periods.LAST_24_HOURS)
+pprint(rss_news)
 
 '''
 Scraper:
