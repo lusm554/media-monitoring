@@ -1,4 +1,3 @@
-from scraper import CfaDzenNewsScraper, Periods
 import logging
 from pprint import pprint
 logging.basicConfig(
@@ -7,9 +6,10 @@ logging.basicConfig(
   level=logging.INFO,
 )
 
-dzen_news = CfaDzenNewsScraper().fetch_and_parse(period=Periods.LAST_24_HOURS)
-# dzen_news = CfaDzenNewsScraper().fetch_and_parse(period=Periods.LAST_WEEK)
-pprint(dzen_news)
+#from scraper import CfaDzenNewsScraper, Periods
+#dzen_news = CfaDzenNewsScraper().fetch_and_parse(period=Periods.LAST_24_HOURS)
+#dzen_news = CfaDzenNewsScraper().fetch_and_parse(period=Periods.LAST_WEEK)
+#pprint(dzen_news)
 
 '''
 Scraper:
