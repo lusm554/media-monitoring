@@ -41,7 +41,7 @@ class CfaGoogleNewsScraper(NewsBaseScraper):
         q='ЦФА', # query
         tbm='nws', # page section
         source='lnt', # idk
-        tbs=f'lr:lang_1ru,qdr:{_ggle_fmt_period}', # region and period # d - day , w - week
+        tbs=f'lr:lang_1ru,qdr:{_ggle_fmt_period},sbd:1', # region and period # d - day , w - week
         lr='lang_ru', # language
         start=page_num, # page number, because of pagination
       )
@@ -79,3 +79,11 @@ class CfaGoogleNewsScraper(NewsBaseScraper):
       articles_parsed.append(article)
     return articles_parsed
 
+  def fetch_and_parse(self, period):
+    final_articles = list()
+    for page_html in self.page_fetcher(for_period=period):
+      page_articles = self.page_parser(page_html)
+      if len(page_articles) == 0:
+        break
+      final_articles.extend(page_articles)
+    return final_articles
