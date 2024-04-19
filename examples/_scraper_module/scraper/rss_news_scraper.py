@@ -92,4 +92,13 @@ class CfaRssNewsScraper(NewsBaseScraper):
       for done_job in concurrent.futures.as_completed(process_feed_jobs):
         cfa_articles = done_job.result()
         result_cfa_articles.extend(cfa_articles)
-    print(len(result_cfa_articles))
+    print(f'Rss dt filter {period}') 
+    print(f'before dt filter {len(result_cfa_articles)=}')
+    news_start_time = datetime.datetime.now() - period
+    result_cfa_articles = [
+      article
+      for article in result_cfa_articles
+      if article.publish_time >= news_start_time
+    ]
+    print(f'before dt filter {len(result_cfa_articles)=}')
+    return result_cfa_articles
