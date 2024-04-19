@@ -73,7 +73,7 @@ class CfaRssNewsScraper(NewsBaseScraper):
     return articles
 
   def fetch_and_parse(self, period):
-    articles
+    articles = list()
     for feed in self.RSS_FEEDS:
       print(feed)
       feed_data = self.feed_fetcher(feed.url)
