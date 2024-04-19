@@ -11,10 +11,15 @@ logging.basicConfig(
 #dzen_news = CfaDzenNewsScraper().fetch_and_parse(period=Periods.LAST_WEEK)
 #pprint(dzen_news)
 
-from scraper import CfaRssNewsScraper, Periods
-rss_news = CfaRssNewsScraper().fetch_and_parse(period=Periods.LAST_24_HOURS)
+# from scraper import CfaRssNewsScraper, Periods
+# rss_news = CfaRssNewsScraper().fetch_and_parse(period=Periods.LAST_24_HOURS)
 #rss_news = CfaRssNewsScraper().fetch_and_parse(period=Periods.LAST_WEEK)
-pprint(rss_news)
+# pprint(rss_news)
+
+from scraper import CfaGoogleNewsScraper, Periods
+# google_news = CfaGoogleNewsScraper().fetch_and_parse(period=Periods.LAST_24_HOURS)
+google_news = CfaGoogleNewsScraper().fetch_and_parse(period=Periods.LAST_WEEK)
+pprint(google_news)
 
 '''
 Scraper:
