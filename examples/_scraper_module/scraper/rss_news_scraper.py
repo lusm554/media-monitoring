@@ -75,11 +75,6 @@ class CfaRssNewsScraper(NewsBaseScraper):
 
   def fetch_and_parse(self, period):
     result_cfa_articles = list()
-    # for feed in self.RSS_FEEDS:
-    #   print(feed)
-    #   feed_data = self.feed_fetcher(feed.url)
-    #   cfa_articles = self.feed_parser(feed_data, feed.publisher_name)
-    #   print(len(cfa_articles))
     with concurrent.futures.ThreadPoolExecutor() as executor:
       print(executor._max_workers)
       process_feed_jobs = {
