@@ -2,6 +2,8 @@ from .base_scraper import NewsBaseScraper
 from .article import Article
 import concurrent.futures
 import feedparser
+import datetime
+import time
 import logging
 
 logger = logging.getLogger(__name__)
@@ -66,7 +68,7 @@ class CfaRssNewsScraper(NewsBaseScraper):
       article = Article(
         title=article_title,
         url=article_url,
-        publish_time=article_publish_time,
+        publish_time=datetime.datetime.fromtimestamp(time.mktime(article_publish_time)),
         publisher_name=article_publisher_name,
         scraper='rss',
       )
