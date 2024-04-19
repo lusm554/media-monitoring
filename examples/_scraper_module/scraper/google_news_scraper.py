@@ -1,4 +1,6 @@
 from .base_scraper import NewsBaseScraper, Periods
+from .article import Article
+from bs4 import BeautifulSoup, SoupStrainer
 import requests
 import time
 import logging
@@ -57,4 +59,23 @@ class CfaGoogleNewsScraper(NewsBaseScraper):
       yield html
       time.sleep(.05)
 
+  def page_parser(self, page_html):
+    only_tags_with_id_search = SoupStrainer(id='search')
+    soup = BeautifulSoup(page_html, 'lxml', parse_only=only_tags_with_id_search)
+    search_links = soup.find_all('a')
+    articles_parsed = list()
+    for article_link in search_links:
+      article_href = article_link.get('href')
+      article_title = article_link.find(attrs={'role': 'heading'}).string
+      article_source_name = article_link.find('span').string
+      article_publish_time = article_link.find_all('span')[-1].string
+      article = Article(
+        title=article_title,
+        url=article_href,
+        publish_time=article_publish_time,
+        publisher_name=article_source_name,
+        scraper='google',
+      )
+      articles_parsed.append(article)
+    return articles_parsed
 
