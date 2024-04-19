@@ -1,5 +1,6 @@
-from .base_scraper import NewsBaseScraper
+from .base_scraper import NewsBaseScraper, Periods
 import requests
+import time
 import logging
 
 logger = logging.getLogger(__name__)
