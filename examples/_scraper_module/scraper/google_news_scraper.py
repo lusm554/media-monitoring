@@ -1,4 +1,5 @@
 from .base_scraper import NewsBaseScraper
+import requests
 import logging
 
 logger = logging.getLogger(__name__)
@@ -27,5 +28,28 @@ class CfaGoogleNewsScraper(NewsBaseScraper):
       'upgrade-insecure-requests': '1',
       'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36',
     }
+
+  def page_fetcher(self):
+    page_num = 0
+    params = dict(
+      q='ЦФА', # query
+      tbm='nws', # page section
+      source='lnt', # idk
+      tbs='lr:lang_1ru,qdr:d', # region and period # d - day , w - week
+      lr='lang_ru', # language
+      start=page_num, # page number, because of pagination
+    )
+    response = requests.get(
+      f'https://www.google.com/search',
+      params=params,
+      headers=self.HEADERS,
+      timeout=2, # seconds
+    )
+    logger.info(f'Google fetched url {response.url}')
+    logger.debug(f'Fetched status {response.status_code}')
+    logger.info(f'Google fetched in {response.elapsed.total_seconds()} seconds')
+    assert response.status_code == 200
+    html = response.text
+    return html
 
 
