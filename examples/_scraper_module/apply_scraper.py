@@ -17,8 +17,9 @@ logging.basicConfig(
 # pprint(rss_news)
 
 from scraper import CfaGoogleNewsScraper, Periods
-# google_news = CfaGoogleNewsScraper().fetch_and_parse(period=Periods.LAST_24_HOURS)
-google_news = CfaGoogleNewsScraper().fetch_and_parse(period=Periods.LAST_WEEK)
+google_news = CfaGoogleNewsScraper().fetch_and_parse(period=Periods.LAST_24_HOURS)
+# google_news = CfaGoogleNewsScraper().fetch_and_parse(period=Periods.LAST_WEEK)
+print(f'{len(google_news)=}')
 pprint(google_news)
 
 '''
