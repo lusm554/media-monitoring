@@ -2,6 +2,7 @@ from .base_scraper import NewsBaseScraper, Periods
 from .article import Article
 from bs4 import BeautifulSoup, SoupStrainer
 import requests
+import concurrent.futures
 import time
 import logging
 
@@ -78,10 +79,22 @@ class CfaGoogleNewsScraper(NewsBaseScraper):
     return articles_parsed
 
   def fetch_and_parse(self, period):
-    final_articles = list()
-    for page_html in self.page_fetcher(for_period=period):
-      page_articles = self.page_parser(page_html)
-      if len(page_articles) == 0:
-        break
-      final_articles.extend(page_articles)
+    final_articles = set()
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+      print(f'{executor._max_workers=}')
+      fetch_and_parse_jobs = {
+        executor.submit(
+          lambda page_num: self.page_parser(
+            page_html=self.page_fetcher(
+              for_period=period,
+              page_num=page_num,
+            ),
+          ),
+          page_num
+        ): page_num
+        for page_num in range(10) 
+      }
+      for done_job in concurrent.futures.as_completed(fetch_and_parse_jobs):
+        cfa_articles = done_job.result()
+        final_articles.update(cfa_articles)
     return final_articles
