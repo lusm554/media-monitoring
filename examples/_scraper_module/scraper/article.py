@@ -18,7 +18,7 @@ class Article:
     return self.url != other.url
 
   def __hash__(self):
-    return hash(id(self))
+    return hash(self.url)
 
   def __repr__(self):
     items = [ (attr, getattr(self, attr)) for attr in self.__slots__ ]
