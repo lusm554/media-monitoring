@@ -94,15 +94,31 @@ def emits_to_telegram_format(emits):
   print(len(msg))
     
 
+import urllib
+def parse_emit_pdf(pdf):
+  print(pdf)
+  if not '.pdf' in pdf:
+    pdf += '/files/assets/common/downloads/Решение о выпуске ЦФА АО .pdf'
+  print(pdf)
+  res = requests.get(pdf)
+  res.encoding = 'utf-8'
+  print(res.status_code, res.elapsed.total_seconds())
+  print(res.url)
+  print()
+
 def main():
   cfa_emits_page_html = fetch_cfa_ru_html()
   emits = parse_emits_page(cfa_emits_page_html)
   print(f'{len(emits)=}')
-  print(emits.keys())
-  print()
-  print()
-  print()
-  emits_to_telegram_format(emits)
+  cfa_pdf_url = []
+  for platform in emits.values():
+    for dt, emit in platform.items(): 
+      #print(dt, emit)
+      for pdf in emit.values():
+        pdf = list(pdf)[0]
+        cfa_pdf_url.append(pdf)
+  print(cfa_pdf_url)
 
 if __name__ == '__main__':
   main()
+  pass
