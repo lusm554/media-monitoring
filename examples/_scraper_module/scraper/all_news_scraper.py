@@ -18,3 +18,11 @@ class CfaAllNewsScraper(NewsBaseScraper):
       article for article in articles
       if not urlparse(article.url).netloc in self.cfa_news_url_blacklist
     ]
+
+  def fetch_and_parse(self, period):
+    all_scrapers_articles = list()
+    for scraper in self.NEWS_SCRAPERS:
+      scraper_articles = scraper().fetch_and_parse(period=period)
+      all_scrapers_articles.extend(scraper_articles)
+    all_scrapers_articles = self.filter_by_blacklist(all_scrapers_articles)
+    return all_scrapers_articles
