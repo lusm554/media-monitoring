@@ -35,7 +35,7 @@ Module public classes:
   CfaAllNewsScraper
     - join_articles
     - fetch_and_parse
-      1. fetch_and_parse from CfaGoogleNewsScraper, CfaDzenNewsScraper, CfaRssNewsScraper, CfaReleasesScraper
+      1. fetch_and_parse from CfaGoogleNewsScraper, CfaDzenNewsScraper, CfaRssNewsScraper
       2. join_articles
   CfaGoogleNewsScraper
     - fetch_and_parse
