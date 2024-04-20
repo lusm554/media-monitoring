@@ -37,6 +37,8 @@ Scraper:
     - dzen
   Emits:
     - cfa_ru
+  Other info:
+    - conds cfa
 
 Module public classes:
   CfaAllNewsScraper
