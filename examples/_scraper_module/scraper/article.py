@@ -23,18 +23,3 @@ class Article:
   def __repr__(self):
     items = [ (attr, getattr(self, attr)) for attr in self.__slots__ ]
     return f'{self.__class__.__name__}(\n{",\n".join(f"{k}={v!r}"  for k,v in items)}\n)'
-
-class WrappedArticle:
-  __slots__ = ('article', 'comparison_key')
-  def __init__(self, article):
-    self.comparison_key = 'url'
-    self.article = article
-
-  def __eq__(self, other):
-    return self.article == other.article
-
-  def __hash__(self):
-    return hash(getattr(self.article, self.comparison_key))
-
-  def __repr__(self):
-    return self.article.__repr__()
