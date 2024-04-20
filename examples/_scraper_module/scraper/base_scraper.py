@@ -34,5 +34,6 @@ class NewsBaseScraper(BaseScraper):
       'adi19.ru',
     )
   
+  @abstractmethod
   def filter_news_by_blacklist(self):
-    pass
+    raise NotImplemented()
