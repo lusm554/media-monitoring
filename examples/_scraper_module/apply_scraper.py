@@ -16,11 +16,18 @@ logging.basicConfig(
 #rss_news = CfaRssNewsScraper().fetch_and_parse(period=Periods.LAST_WEEK)
 # pprint(rss_news)
 
-from scraper import CfaGoogleNewsScraper, Periods
-google_news = CfaGoogleNewsScraper().fetch_and_parse(period=Periods.LAST_24_HOURS)
-# google_news = CfaGoogleNewsScraper().fetch_and_parse(period=Periods.LAST_WEEK)
-print(f'{len(google_news)=}')
-pprint(google_news)
+# from scraper import CfaGoogleNewsScraper, Periods
+# google_news = CfaGoogleNewsScraper().fetch_and_parse(period=Periods.LAST_24_HOURS)
+# # google_news = CfaGoogleNewsScraper().fetch_and_parse(period=Periods.LAST_WEEK)
+# print(f'{len(google_news)=}')
+# pprint(google_news)
+
+from scraper import CfaAllNewsScraper, Periods
+all_news = CfaAllNewsScraper().fetch_and_parse(period=Periods.LAST_24_HOURS)
+# all_news = CfaAllNewsScraper().fetch_and_parse(period=Periods.LAST_WEEK)
+print(f'{len(all_news)=}')
+print(f'{len(set(all_news))=}')
+pprint(all_news[:5])
 
 '''
 Scraper:
