@@ -3,6 +3,9 @@ from .base_scraper import NewsBaseScraper
 from .dzen_news_scraper import CfaDzenNewsScraper
 from .rss_news_scraper import CfaRssNewsScraper
 from .google_news_scraper import CfaGoogleNewsScraper
+import logging
+
+logger = logging.getLogger(__name__)
 
 class CfaAllNewsScraper(NewsBaseScraper):
   def __init__(self):
