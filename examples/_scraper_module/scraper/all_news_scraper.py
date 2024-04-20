@@ -25,4 +25,5 @@ class CfaAllNewsScraper(NewsBaseScraper):
       scraper_articles = scraper().fetch_and_parse(period=period)
       all_scrapers_articles.extend(scraper_articles)
     all_scrapers_articles = self.filter_by_blacklist(all_scrapers_articles)
+    all_scrapers_articles = list(set(all_scrapers_articles))
     return all_scrapers_articles
