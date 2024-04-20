@@ -1,4 +1,4 @@
-from .base_scraper import NewsBaseScraper
+from .base_scraper import BaseScraper
 import logging
 
 logger = logging.getLogger(__name__)
