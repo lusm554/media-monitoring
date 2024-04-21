@@ -35,4 +35,7 @@ class NewsBaseScraper(BaseScraper):
   
   @abstractmethod
   def filter_news_by_blacklist(self):
+    '''
+    Фильтрует новости по черному списку.
+    '''
     raise NotImplemented()
