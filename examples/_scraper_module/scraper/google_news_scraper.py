@@ -55,9 +55,7 @@ class CfaGoogleNewsScraper(NewsBaseScraper):
       headers=self.HEADERS,
       timeout=2, # seconds
     )
-    logger.info(f'Google fetched url {response.url}')
-    logger.debug(f'Fetched status {response.status_code}')
-    logger.info(f'Google fetched in {response.elapsed.total_seconds()} seconds')
+    logger.info(f'Fetched in {response.elapsed.total_seconds():.2f}, {response.request.method} {response.status_code} {response.url!r}')
     assert response.status_code == 200
     html = response.text
     return html
@@ -94,7 +92,7 @@ class CfaGoogleNewsScraper(NewsBaseScraper):
     '''
     final_articles = set()
     with concurrent.futures.ThreadPoolExecutor() as executor:
-      print(f'{executor._max_workers=}')
+      logger.debug(f'{executor._max_workers=}')
       fetch_and_parse_jobs = {
         executor.submit(
           lambda page_num: self.page_parser(
@@ -110,4 +108,5 @@ class CfaGoogleNewsScraper(NewsBaseScraper):
       for done_job in concurrent.futures.as_completed(fetch_and_parse_jobs):
         cfa_articles = done_job.result()
         final_articles.update(cfa_articles)
+    logger.info(f'Found {len(final_articles)} articles for {period}')
     return final_articles
