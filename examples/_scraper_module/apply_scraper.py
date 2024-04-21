@@ -7,8 +7,17 @@ logging.basicConfig(
 )
 
 def how_to_apply_cfaru_releases_scraper():
-  pass
-# how_to_apply_cfaru_releases_scraper()
+  from scraper import CfaReleasesScraper, Periods
+  cfa_releases = CfaReleasesScraper().fetch_and_parse(period=Periods.LAST_24_HOURS)
+  plt = None
+  for release in sorted(cfa_releases, key=lambda x:x.platform_name):
+    if plt != release.platform_name:
+      plt = release.platform_name
+      print(plt)
+      print('\t', release.release_time, release.title)
+    else:
+      print('\t', release.release_time, release.title)
+how_to_apply_cfaru_releases_scraper()
 
 def how_to_apply_dzen_news_scraper():
   from scraper import CfaDzenNewsScraper, Periods
