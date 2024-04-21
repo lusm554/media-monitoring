@@ -1,6 +1,9 @@
 from .base_scraper import BaseScraper
 import requests
 from bs4 import BeautifulSoup, SoupStrainer
+import re
+from collections import defaultdict
+import urllib
 import logging
 
 logger = logging.getLogger(__name__)
@@ -79,6 +82,21 @@ class CfaReleasesScraper(BaseScraper):
           )
           platform_releases.add(release)
     return platform_releases
+
+  def page_parser(self, page_html):
+    only_tags_with_id_imcontent = SoupStrainer('main', {'id': 'imContent'})
+    soup = BeautifulSoup(
+      markup=page_html,
+      features='lxml',
+      parse_only=only_tags_with_id_imcontent,
+    )
+    platform_headings = soup.find_all('h3', {'class': 'imHeading3'})
+    emits_by_platform = { heading.get_text(): heading.parent for heading in platform_headings }
+    releases = set()
+    for platform_name, platform_html in emits_by_platform.items():
+      platform_releases = self.page_platform_parser(platform_html, platform_name)
+      releases.update(platform_releases)
+    return releases
 
   def fetch_and_parse(self, period):
     pass
