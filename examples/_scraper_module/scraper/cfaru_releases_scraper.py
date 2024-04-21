@@ -78,4 +78,10 @@ class CfaReleasesScraper(BaseScraper):
   def fetch_and_parse(self, period):
     page_html = self.page_fetcher()
     cfa_releases = self.page_parser(page_html)
+    releases_start_time = datetime.datetime.now() - period
+    cfa_releases = [
+      release
+      for release in cfa_releases
+      if release.release_time >= releases_start_time
+    ]
     return cfa_releases
