@@ -39,4 +39,6 @@ class CfaAllNewsScraper(NewsBaseScraper):
       all_scrapers_articles.extend(scraper_articles)
     all_scrapers_articles = self.filter_by_blacklist(all_scrapers_articles)
     all_scrapers_articles = list(set(all_scrapers_articles))
+    logger.info(f'Found {len(all_scrapers_articles)} releases for {period}')
+    logger.info(f'Run {len(self.NEWS_SCRAPERS)} scrapers')
     return all_scrapers_articles
