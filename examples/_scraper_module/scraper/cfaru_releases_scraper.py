@@ -1,9 +1,10 @@
 from .base_scraper import BaseScraper
 from .release import Release
-import requests
-from bs4 import BeautifulSoup, SoupStrainer
-import re
 from collections import defaultdict
+from bs4 import BeautifulSoup, SoupStrainer
+import datetime
+import requests
+import re
 import urllib
 import logging
 
@@ -47,7 +48,7 @@ class CfaReleasesScraper(BaseScraper):
             continue
           emit_name = tag_a.get_text()
           emit_href = urllib.parse.urljoin(site_url, tag_a.get('href'))
-          emit_date = last_date
+          emit_date = datetime.datetime.strptime(last_date, "%d.%m.%Y")
           if last_span_header:
             emit_name = f'{last_span_header} {emit_name}'
           release = Release(
