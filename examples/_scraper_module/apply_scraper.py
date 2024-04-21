@@ -10,6 +10,7 @@ logging.basicConfig(
 TODO:
   1. Doc strings
   2. logging
+  3. Error handling
 '''
 
 def how_to_apply_cfaru_releases_scraper():
