@@ -25,9 +25,7 @@ class CfaReleasesScraper(BaseScraper):
       timeout=2, # seconds
     )
     response.encoding = 'utf-8'
-    logger.info(f'Cfaru fetched url {response.url}')
-    logger.debug(f'Fetched status {response.status_code}')
-    logger.info(f'Cfaru fetched in {response.elapsed.total_seconds()} seconds')
+    logger.info(f'Fetched in {response.elapsed.total_seconds():.2f}, {response.request.method} {response.status_code} {response.url!r}')
     assert response.status_code == 200
     html = response.text
     return html
@@ -75,6 +73,7 @@ class CfaReleasesScraper(BaseScraper):
             title=emit_name,
           )
           platform_releases.add(release)
+    logger.debug(f'For {platform_name!r} parsed {len(platform_releases)} releases')
     return platform_releases
 
   def page_parser(self, page_html):
@@ -90,6 +89,7 @@ class CfaReleasesScraper(BaseScraper):
     )
     platform_headings = soup.find_all('h3', {'class': 'imHeading3'})
     emits_by_platform = { heading.get_text(): heading.parent for heading in platform_headings }
+    logger.info(f'Found {len(emits_by_platform)} platforms')
     releases = set()
     for platform_name, platform_html in emits_by_platform.items():
       platform_releases = self.page_platform_parser(platform_html, platform_name)
@@ -108,4 +108,5 @@ class CfaReleasesScraper(BaseScraper):
       for release in cfa_releases
       if release.release_time >= releases_start_time
     ]
+    logger.info(f'Found {len(cfa_releases)} releases for {period}')
     return cfa_releases
