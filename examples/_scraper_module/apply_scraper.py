@@ -6,6 +6,12 @@ logging.basicConfig(
   level=logging.INFO,
 )
 
+'''
+TODO:
+  1. Doc strings
+  2. logging
+'''
+
 def how_to_apply_cfaru_releases_scraper():
   from scraper import CfaReleasesScraper, Periods
   # cfa_releases = CfaReleasesScraper().fetch_and_parse(period=Periods.LAST_24_HOURS)
