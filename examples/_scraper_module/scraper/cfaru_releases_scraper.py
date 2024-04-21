@@ -12,6 +12,10 @@ logger = logging.getLogger(__name__)
 
 class CfaReleasesScraper(BaseScraper):
   def page_fetcher(self):
+    '''
+    Запрашивает HTML страницы выпусков ЦФА.
+    Проверяет статус ответа.
+    '''
     response = requests.get(
       f'https://цфа.рф/cfa-vypusk.html',
       timeout=2, # seconds
@@ -25,6 +29,15 @@ class CfaReleasesScraper(BaseScraper):
     return html
   
   def page_platform_parser(self, platform_html, platform_name):
+    '''
+    Парсит div платформы и преобразует в экземпляр класса Release.
+    Так как выпуски платформы разбиты на много элементов,
+    но находятся последовательно, их можно парсить проходя по дереву div'а выпуска.
+    Каждый выпуск соонтосится со своей датой.
+    Итеративно проходит по элементам span и li, проверяет элемент на дату и признак нескольких решений в рамках однгого выпуска.
+    Далее находит элемент 'a', формирует эклземпляр Release.
+    Из-за уебанской структуры страницы ссылки дублируются и соответственно результаты. Чтобы это избежать выпуски платформы фильтруются через set().
+    '''
     site_url = 'https://цфа.рф/'
     date_pattern = re.compile(r'^(3[01]|[12][0-9]|0[1-9]).(1[0-2]|0[1-9]).[0-9]{4}$')
     last_date = None
@@ -61,6 +74,10 @@ class CfaReleasesScraper(BaseScraper):
     return platform_releases
 
   def page_parser(self, page_html):
+    '''
+    Находит div'ы выпусков по платформам через заголовки h3 платформ.
+    Затем через парсит каждый div платформы через self.page_platform_parser.
+    '''
     only_tags_with_id_imcontent = SoupStrainer('main', {'id': 'imContent'})
     soup = BeautifulSoup(
       markup=page_html,
@@ -76,6 +93,9 @@ class CfaReleasesScraper(BaseScraper):
     return releases
 
   def fetch_and_parse(self, period):
+    '''
+    Собирает методы вместе, запрашивает код страницы затем парсит ее в экземпляры Release.
+    '''
     page_html = self.page_fetcher()
     cfa_releases = self.page_parser(page_html)
     releases_start_time = datetime.datetime.now() - period
