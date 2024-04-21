@@ -1,4 +1,8 @@
 class Article:
+  '''
+  Класс представление новостной статьи.
+  Описывает характеристики новости - заголовок, ссылка на новость источника, время, источник и парсер статьи.
+  '''
   __slots__ = ('title', 'url', 'publish_time', 'publisher_name', 'scraper')
   def __init__(self, title, url, publish_time, publisher_name, scraper):
     self.title = title
@@ -8,60 +12,33 @@ class Article:
     self.scraper = scraper
 
   def __eq__(self, other):
+    '''
+    Метод сравнения двух экземпляров статьи на равенство. Статьи сравниваются по url'у.
+    Приминяется при вызове оператора сравнения "==".
+    '''
     if not isinstance(other, self.__class__):
       raise ValueError(f'Cannot compare instance {other!r} of different class') 
     return self.url == other.url
 
   def __ne__(self, other):
+    '''
+    Метод сравнения двух экземпляров статьи на неравенство. Статьи сравниваются по url'у.
+    Приминяется при вызове оператора сравнения "!=".
+    '''
     if not isinstance(other, self.__class__):
       raise ValueError(f'Cannot compare instance {other!r} of different class') 
     return self.url != other.url
 
   def __hash__(self):
-    return hash(id(self))
+    '''
+    Метод хеша экземпляра класса. Возвращает хеш url'a статьи.
+    Метод добавлен для удобного фильтра уникальных статей через set().
+    '''
+    return hash(self.url)
 
   def __repr__(self):
+    '''
+    Возвращает текстовое представление объекта, с помошью которого можно воссоздать объект.
+    '''
     items = [ (attr, getattr(self, attr)) for attr in self.__slots__ ]
-    return f'{self.__class__.__name__}({", ".join(f"{k}={v!r}"  for k,v in items)})'
-
-class WrappedArticle:
-  __slots__ = ('article', 'comparison_key')
-  def __init__(self, article):
-    self.comparison_key = 'url'
-    self.article = article
-
-  def __eq__(self, other):
-    return self.article == other.article
-
-  def __hash__(self):
-    return hash(getattr(self.article, self.comparison_key))
-
-  def __repr__(self):
-    return self.article.__repr__()
-
-if __name__ == '__main__':
-  from pprint import pprint
-  art = Article(
-    title='S',
-    url='C',
-    publish_time='R',
-    publisher_name='AA:/',
-    scraper='go'
-  )
-  art2 = Article(
-    title='S2',
-    url='C',
-    publish_time='R',
-    publisher_name='AA:/',
-    scraper='rss'
-  )
-  print('repr:')
-  print(art)
-  print(repr(art))
-  print()
-  l = [art]*5 + [art2]*2
-  l = [WrappedArticle(art) for art in l]
-  print('list')
-  pprint(l)
-  print('set')
-  pprint(set(l))
+    return f'{self.__class__.__name__}(\n{",\n".join(f"{k}={v!r}"  for k,v in items)}\n)'
