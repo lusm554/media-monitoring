@@ -15,8 +15,7 @@ class BaseScraper:
   Содержит общие методы для всех скреперов. 
   '''
   def filter_by_period(self):
-    # check for instance of Periods or datetime
-    pass
+    raise NotImplemented()
   
   @abstractmethod
   def fetch_and_parse(self, period):
