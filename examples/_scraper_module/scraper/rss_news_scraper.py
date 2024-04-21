@@ -9,6 +9,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 class RssFeed:
+  '''
+  Представление rss канала.
+  Описывает характеристики rss канала - название источника, ссылка, название канала, если есть.
+  '''
   def __init__(self, publisher_name, url, feed_name=None):
     self.publisher_name = publisher_name
     self.url = url
@@ -20,7 +24,14 @@ class RssFeed:
     return f'{cls_name}({args})'
 
 class CfaRssNewsScraper(NewsBaseScraper):
+  '''
+  Парсер новоей ЦФА из Rss каналов.
+  Парсит список новостных источников.
+  '''
   def __init__(self):
+    '''
+    Определяет список rss каналов для парсинга.
+    '''
     self.RSS_FEEDS = (
       RssFeed(publisher_name='РИА Новости', url='https://ria.ru/export/rss2/archive/index.xml'),
       RssFeed(publisher_name='Рамблер', url='https://news.rambler.ru/rss/'),
@@ -54,10 +65,16 @@ class CfaRssNewsScraper(NewsBaseScraper):
     )
 
   def feed_fetcher(self, url):
+    '''
+    Запрашивает новости rss канала в формате библиотеки feedparser.
+    '''
     feed_data = feedparser.parse(url)
     return feed_data
 
   def feed_parser(self, feed_data, article_publisher_name='Не определен'):
+    '''
+    Парсит ответ формата библиотеки feedparser в экземпляры класса Article.
+    '''
     articles = list()
     for entry in feed_data.entries:
       article_title = entry.get('title', '')      
@@ -76,6 +93,10 @@ class CfaRssNewsScraper(NewsBaseScraper):
     return articles
 
   def fetch_and_parse(self, period):
+    '''
+    Формирует набор тасков запроса и парсинга на каждый канал.
+    Фильтрует по параметру period.
+    '''
     result_cfa_articles = list()
     with concurrent.futures.ThreadPoolExecutor() as executor:
       print(f'{executor._max_workers=}')
