@@ -34,6 +34,10 @@ class CfaGoogleNewsScraper(NewsBaseScraper):
     }
 
   def page_fetcher(self, for_period, page_num):
+    '''
+    Запрашивает HTML страницу новостей ЦФА гугла за определенный период и номер страницы.
+    Проверяет статус ответа.
+    '''
     _ggle_fmt_period = 'd'
     if for_period == Periods.LAST_WEEK:
       _ggle_fmt_period = 'w'
@@ -59,6 +63,11 @@ class CfaGoogleNewsScraper(NewsBaseScraper):
     return html
 
   def page_parser(self, page_html):
+    '''
+    Парсит страницу новостей. Ищет все ссылки в div'e search.
+    Определяет характеристики новости, формирует экземпляр Article.
+    Собирает список статей.
+    '''
     only_tags_with_id_search = SoupStrainer(id='search')
     soup = BeautifulSoup(page_html, 'lxml', parse_only=only_tags_with_id_search)
     search_links = soup.find_all('a')
@@ -79,6 +88,10 @@ class CfaGoogleNewsScraper(NewsBaseScraper):
     return articles_parsed
 
   def fetch_and_parse(self, period):
+    '''
+    Собирает в себе методы в таски, которые выполняются асинхронно.
+    Асинхронно запрашивается и парсится несколько страниц для эффективности.
+    '''
     final_articles = set()
     with concurrent.futures.ThreadPoolExecutor() as executor:
       print(f'{executor._max_workers=}')
