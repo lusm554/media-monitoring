@@ -11,6 +11,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 class CfaReleasesScraper(BaseScraper):
+  '''
+  Парсер выпусков ЦФА с сайта цфа.рф.
+  Запрашивает HTML страницу, находит платформы и выпуски, парсит в эклземпляры класса Release.
+  '''
   def page_fetcher(self):
     '''
     Запрашивает HTML страницы выпусков ЦФА.
