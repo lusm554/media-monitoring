@@ -99,4 +99,6 @@ class CfaReleasesScraper(BaseScraper):
     return releases
 
   def fetch_and_parse(self, period):
-    pass
+    page_html = self.page_fetcher()
+    cfa_releases = self.page_parser(page_html)
+    return cfa_releases
