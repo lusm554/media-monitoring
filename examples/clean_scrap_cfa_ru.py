@@ -111,13 +111,15 @@ def main():
   emits = parse_emits_page(cfa_emits_page_html)
   print(f'{len(emits)=}')
   cfa_pdf_url = []
-  for platform in emits.values():
+  for name, platform in emits.items():
+    if name != 'На платформе СПБ Биржа':
+      continue
     for dt, emit in platform.items(): 
-      #print(dt, emit)
+      print(dt, emit)
       for pdf in emit.values():
         pdf = list(pdf)[0]
         cfa_pdf_url.append(pdf)
-  print(cfa_pdf_url)
+  #print(cfa_pdf_url)
 
 if __name__ == '__main__':
   main()
