@@ -44,8 +44,41 @@ class CfaReleasesScraper(BaseScraper):
     html = response.text
     return html
   
-  def page_parser(self):
-    pass
-  
+  def page_platform_parser(self, platform_html, platform_name):
+    site_url = 'https://цфа.рф/'
+    date_pattern = re.compile(r'^(3[01]|[12][0-9]|0[1-9]).(1[0-2]|0[1-9]).[0-9]{4}$')
+    last_date = None
+    last_span_header = None
+    platform_releases = set()
+    for nxt in platform_html.find_all(['span', 'li']):
+      span_text = nxt.get_text()
+      span_text = span_text.strip()
+      if span_text == '':
+        continue
+      if date_pattern.match(span_text):
+        last_date = span_text
+        last_span_header = None
+      else:
+        is_span_header = not any(parent.name == 'li' for n, parent in zip(range(3), nxt.parents))
+        if is_span_header and nxt.name =='span':
+          last_span_header = span_text
+        else:
+          tag_a = nxt.find('a')
+          if tag_a is None:
+            continue
+          emit_name = tag_a.get_text()
+          emit_href = urllib.parse.urljoin(site_url, tag_a.get('href'))
+          emit_date = last_date
+          if last_span_header:
+            emit_name = f'{last_span_header} {emit_name}'
+          release = Release(
+            platform_name=platform_name,
+            url=emit_href,
+            release_time=emit_date,
+            title=emit_name,
+          )
+          platform_releases.add(release)
+    return platform_releases
+
   def fetch_and_parse(self, period):
     pass
