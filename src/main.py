@@ -25,4 +25,9 @@ Structure:
   scraper/
   main.py
   ...other.py
+
+Handlers:
+  1. Command
+  2. buttons
+  3. Updates
 '''
