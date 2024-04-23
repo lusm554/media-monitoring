@@ -61,6 +61,7 @@ from telegram.ext import (
   filters,
 )
 import os
+from collections import namedtuple
 from env import set_env_vars
 import bot_commands
 
@@ -72,6 +73,10 @@ def setup_bot_handlers(telegram_app):
 
 def main():
   set_env_vars(filepath='./.env')
+  Command = namedtuple('Cmd', ['callback', 'desc', 'name'])
+  commands = (
+    Command(callback=bot_commands.start, desc='начать работу', name='start'),
+  )
   if os.environ.get('dev'):
     TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN_DEV')
     logger.info(f'Run with DEV token {TELEGRAM_TOKEN!r}')
