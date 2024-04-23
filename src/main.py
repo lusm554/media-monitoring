@@ -82,6 +82,7 @@ def setup_bot_handlers(telegram_app, commands):
         callback=command.callback
       )
     )
+  telegram_app.add_handler(MessageHandler(filters.COMMAND, bot_handlers.unknown))
 
 
 def set_list_of_bot_commands(telegram_app, commands):
