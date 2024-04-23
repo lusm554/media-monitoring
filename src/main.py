@@ -62,8 +62,14 @@ from telegram.ext import (
 )
 import os
 from env import set_env_vars
+import bot_commands
 
 def setup_bot_handlers(telegram_app):
+  # 1. Commands handler
+  # 2. Error handler
+  # 3. Logging handler
+  telegram_app.add_handler(CommandHandler('start', bot_commands.start))
+
 def main():
   set_env_vars(filepath='./.env')
   if os.environ.get('dev'):
