@@ -60,10 +60,18 @@ from telegram.ext import (
   CallbackQueryHandler,
   filters,
 )
+import os
 from env import set_env_vars
 
 def main():
   set_env_vars(filepath='./.env')
+  if os.environ.get('dev'):
+    TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN_DEV')
+    logger.info(f'Run with DEV token {TELEGRAM_TOKEN!r}')
+  else:
+    TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN')
+    logger.info(f'Run with PROM token {TELEGRAM_TOKEN!r}')
+  telegram_app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
 if __name__ == '__main__':
   main()
