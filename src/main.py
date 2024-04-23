@@ -63,7 +63,7 @@ from telegram.ext import (
 import os
 from env import set_env_vars
 
-def main():
+async def main():
   set_env_vars(filepath='./.env')
   if os.environ.get('dev'):
     TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN_DEV')
@@ -74,4 +74,6 @@ def main():
   telegram_app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
 if __name__ == '__main__':
-  main()
+  import asyncio
+  asyncio.run(main())
+  # main()
