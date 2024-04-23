@@ -64,13 +64,7 @@ import os
 from env import set_env_vars
 
 def setup_bot_handlers(telegram_app):
-  async def start(update, context):
-    await context.bot.send_message(
-      chat_id=update.effective_chat.id,
-      text=f'Привет! Этот бот собирает публикации СМИ по ЦФА.\n'
-    )
-  telegram_app.add_handler(CommandHandler('start', start))
-async def main():
+def main():
   set_env_vars(filepath='./.env')
   if os.environ.get('dev'):
     TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN_DEV')
@@ -83,5 +77,6 @@ async def main():
   telegram_app.run_polling()
 
 if __name__ == '__main__':
-  import asyncio
-  asyncio.run(main())
+  main()
+  # import asyncio
+  # asyncio.run(main())
