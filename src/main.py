@@ -65,6 +65,7 @@ from collections import namedtuple
 import asyncio
 from env import set_env_vars
 import bot_commands
+import bot_handlers
 
 def setup_bot_data_variables(telegram_app, commands):
   telegram_app.bot_data['commands'] = commands
@@ -73,6 +74,7 @@ def setup_bot_handlers(telegram_app, commands):
   # 1. Commands handler
   # 2. Error handler
   # 3. Logging handler
+  telegram_app.add_handler(TypeHandler(Update, bot_handlers.updates_logger), -1)
   for command in commands:
     telegram_app.add_handler(
       CommandHandler(
