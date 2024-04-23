@@ -61,3 +61,9 @@ from telegram.ext import (
   filters,
 )
 from env import set_env_vars
+
+def main():
+  set_env_vars(filepath='./.env')
+
+if __name__ == '__main__':
+  main()
