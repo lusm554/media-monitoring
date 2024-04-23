@@ -49,7 +49,7 @@ logging.basicConfig(
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
-from telegram import Update
+from telegram import Update, BotCommand
 from telegram.constants import ParseMode
 from telegram.ext import (
   ApplicationBuilder,
@@ -62,6 +62,7 @@ from telegram.ext import (
 )
 import os
 from collections import namedtuple
+import asyncio
 from env import set_env_vars
 import bot_commands
 
@@ -78,6 +79,14 @@ def setup_bot_handlers(telegram_app, commands):
     )
 
 
+def set_list_of_bot_commands(telegram_app, commands):
+  cmds = [
+    BotCommand(command=cmd.name, description=cmd.desc)
+    for cmd in commands
+  ]
+  loop = asyncio.get_event_loop()
+  loop.run_until_complete(telegram_app.bot.set_my_commands(cmds))
+  
 def main():
   set_env_vars(filepath='./.env')
   Command = namedtuple('Cmd', ['callback', 'desc', 'name'])
@@ -92,6 +101,7 @@ def main():
     logger.info(f'Run with PROM token {TELEGRAM_TOKEN!r}')
   telegram_app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
   setup_bot_handlers(telegram_app, commands)
+  set_list_of_bot_commands(telegram_app, commands)
   telegram_app.run_polling()
 
 if __name__ == '__main__':
