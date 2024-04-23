@@ -63,6 +63,13 @@ from telegram.ext import (
 import os
 from env import set_env_vars
 
+def setup_bot_handlers(telegram_app):
+  async def start(update, context):
+    await context.bot.send_message(
+      chat_id=update.effective_chat.id,
+      text=f'Привет! Этот бот собирает публикации СМИ по ЦФА.\n'
+    )
+  telegram_app.add_handler(CommandHandler('start', start))
 async def main():
   set_env_vars(filepath='./.env')
   if os.environ.get('dev'):
@@ -72,8 +79,9 @@ async def main():
     TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN')
     logger.info(f'Run with PROM token {TELEGRAM_TOKEN!r}')
   telegram_app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
+  setup_bot_handlers(telegram_app)
+  telegram_app.run_polling()
 
 if __name__ == '__main__':
   import asyncio
   asyncio.run(main())
-  # main()
