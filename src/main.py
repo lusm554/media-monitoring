@@ -65,11 +65,18 @@ from collections import namedtuple
 from env import set_env_vars
 import bot_commands
 
-def setup_bot_handlers(telegram_app):
+def setup_bot_handlers(telegram_app, commands):
   # 1. Commands handler
   # 2. Error handler
   # 3. Logging handler
-  telegram_app.add_handler(CommandHandler('start', bot_commands.start))
+  for command in commands:
+    telegram_app.add_handler(
+      CommandHandler(
+        command=command.name,
+        callback=command.callback
+      )
+    )
+
 
 def main():
   set_env_vars(filepath='./.env')
@@ -84,7 +91,7 @@ def main():
     TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN')
     logger.info(f'Run with PROM token {TELEGRAM_TOKEN!r}')
   telegram_app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
-  setup_bot_handlers(telegram_app)
+  setup_bot_handlers(telegram_app, commands)
   telegram_app.run_polling()
 
 if __name__ == '__main__':
