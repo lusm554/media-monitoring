@@ -92,6 +92,7 @@ def main():
   Command = namedtuple('Cmd', ['callback', 'desc', 'name'])
   commands = (
     Command(callback=bot_commands.start, desc='начать работу', name='start'),
+    Command(callback=bot_commands.help_, desc='получить инфо по командам', name='help'),
   )
   if os.environ.get('dev'):
     TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN_DEV')
