@@ -86,7 +86,7 @@ def set_list_of_bot_commands(telegram_app, commands):
   ]
   loop = asyncio.get_event_loop()
   loop.run_until_complete(telegram_app.bot.set_my_commands(cmds))
-  
+
 def main():
   set_env_vars(filepath='./.env')
   Command = namedtuple('Cmd', ['callback', 'desc', 'name'])
