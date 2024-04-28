@@ -82,6 +82,13 @@ def setup_bot_handlers(telegram_app, commands):
         callback=command.callback
       )
     )
+  telegram_app.add_handler(
+    CallbackQueryHandler(
+      bot_handlers.button_dispatcher({
+        'cfa_last_news': bot_commands.cfa_last_news_button_callback,
+      })
+    )
+  )
   telegram_app.add_handler(MessageHandler(filters.COMMAND, bot_handlers.unknown))
   telegram_app.add_error_handler(bot_handlers.error_handler)
 
