@@ -85,4 +85,31 @@ async def cfa_last_news(update, context):
     disable_web_page_preview=True,
   )
 
+async def cfa_last_news_button_callback(update, context):
+  query = update.callback_query
+  btn_name = query.data
+  keyboard_action, post_id = btn_name.replace(CFA_LAST_NEWS_CALLBACK_ID + '_', '').split('_')
+  post = context.bot_data['post_cache'].get(post_id)
+  if post is None:
+    await context.bot.send_message(
+      chat_id=query.message.chat.id,
+      reply_to_message_id=query.message.message_id,
+      text='По некоторым причинам кеш этого поста не найден, поэтому действие недоступно.'
+    )
+    return
+  if post._pages_size == 0:
+    return
+  match keyboard_action:
+    case 'counter':
+      return
+    case 'forward':
+      post.next_page()
+    case 'backward':
+      post.previous_page()
+  msg_text, keyboard = get_cfa_last_news_post_markup(post)
+  await query.edit_message_text(
+    text=msg_text,
+    reply_markup=keyboard,
+    parse_mode=ParseMode.HTML,
+    disable_web_page_preview=True,
   )
