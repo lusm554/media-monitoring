@@ -107,7 +107,8 @@ def main():
   commands = (
     Command(callback=bot_commands.start, desc='начать работу', name='start'),
     Command(callback=bot_commands.help_, desc='инфо по командам', name='help'),
-    Command(callback=bot_commands.cfa_last_news, desc='последние новости ЦФА', name='cfa_last_news'),
+    Command(callback=bot_commands.cfa_last_news, desc='новости ЦФА за сутки', name='last_news_cfa'),
+    Command(callback=bot_commands.cfa_week_news, desc='новости ЦФА за неделю', name='week_news_cfa'),
   )
   if os.environ.get('dev'):
     TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN_DEV')
