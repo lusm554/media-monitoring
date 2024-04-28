@@ -66,6 +66,7 @@ import asyncio
 from env import set_env_vars
 import bot_commands
 import bot_handlers
+import bot_regular_tasks
 import scraper
 
 def setup_bot_data_variables(telegram_app, commands):
@@ -92,6 +93,14 @@ def setup_bot_handlers(telegram_app, commands):
   telegram_app.add_handler(MessageHandler(filters.COMMAND, bot_handlers.unknown))
   telegram_app.add_error_handler(bot_handlers.error_handler)
 
+def shedule_bot_tasks(telegram_app):
+  job_interval = datetime.timedelta(hours=1)
+  job_time_to_first_run = datetime.timedelta(seconds=30)
+  telegram_app.job_queue.run_repeating(
+    callback=bot_regular_tasks.post_cache_cleaner,
+    interval=job_interval,
+    first=job_time_to_first_run,
+  )
 
 def set_list_of_bot_commands(telegram_app, commands):
   cmds = [
@@ -119,6 +128,7 @@ def main():
   telegram_app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
   setup_bot_data_variables(telegram_app, commands)
   setup_bot_handlers(telegram_app, commands)
+  shedule_bot_tasks(telegram_app)
   set_list_of_bot_commands(telegram_app, commands)
   telegram_app.run_polling()
 
