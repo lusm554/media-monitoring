@@ -10,6 +10,6 @@ def button_dispatcher(button_handlers):
     logger.info(f'Clicked button {btn_name!r}')
     for btn_id, btn_callback in button_handlers.items():
       if btn_name.startswith(btn_id):
-        await btn_callback()
+        await btn_callback(update, context)
         break
   return _button_dispatcher
