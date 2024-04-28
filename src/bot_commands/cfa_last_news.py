@@ -70,8 +70,19 @@ def get_cfa_last_news_post_markup(post):
 async def cfa_last_news(update, context):
   scraper = context.bot_data.get("scraper")
   articles = scraper.CfaAllNewsScraper().fetch_and_parse(scraper.Periods.LAST_24_HOURS)
-  help_msg = 'test'
+  # articles = scraper.CfaAllNewsScraper().fetch_and_parse(scraper.Periods.LAST_WEEK)
+  post = Post(
+    post_id=uuid4(),
+    post_articles=articles
+  )
+  context.bot_data['post_cache'][post.post_id] = post
+  msg_text, keyboard = get_cfa_last_news_post_markup(post)
   await context.bot.send_message(
     chat_id=update.effective_chat.id,
-    text=help_msg
+    text=msg_text,
+    reply_markup=keyboard,
+    parse_mode=ParseMode.HTML,
+    disable_web_page_preview=True,
+  )
+
   )
