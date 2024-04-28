@@ -71,6 +71,7 @@ import scraper
 def setup_bot_data_variables(telegram_app, commands):
   telegram_app.bot_data['commands'] = commands
   telegram_app.bot_data['scraper'] = scraper
+  telegram_app.bot_data['post_cache'] = dict()
 
 def setup_bot_handlers(telegram_app, commands):
   telegram_app.add_handler(TypeHandler(Update, bot_handlers.updates_logger), -1)
