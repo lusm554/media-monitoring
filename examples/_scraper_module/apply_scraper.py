@@ -38,9 +38,10 @@ def how_to_apply_dzen_news_scraper():
 def how_to_apply_rss_news_scraper():
   from scraper import CfaRssNewsScraper, Periods
   # rss_news = CfaRssNewsScraper().fetch_and_parse(period=Periods.LAST_24_HOURS)
-  rss_news = CfaRssNewsScraper().fetch_and_parse(period=Periods.LAST_WEEK)
+  rss_news = CfaRssNewsScraper(error='ignore').fetch_and_parse(period=Periods.LAST_WEEK)
+  print(len(rss_news))
   # pprint(rss_news)
-# how_to_apply_rss_news_scraper()
+how_to_apply_rss_news_scraper()
 
 def how_to_apply_google_news_scraper():
   from scraper import CfaGoogleNewsScraper, Periods
@@ -48,7 +49,7 @@ def how_to_apply_google_news_scraper():
   # google_news = CfaGoogleNewsScraper().fetch_and_parse(period=Periods.LAST_WEEK)
   # print(f'{len(google_news)=}')
   pprint(google_news)
-how_to_apply_google_news_scraper()
+# how_to_apply_google_news_scraper()
 
 def how_to_apply_all_news_scraper():
   from scraper import CfaAllNewsScraper, Periods
