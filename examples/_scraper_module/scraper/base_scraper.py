@@ -14,6 +14,11 @@ class BaseScraper:
   Базовый класс для всех скреперов.
   Содержит общие методы для всех скреперов. 
   '''
+  def __init__(self, error='raise'):
+    if not error in ('raise', 'ignore'):
+      raise ValueError(f"error argument should be 'raise' or 'ignore'")
+    self.error = error
+
   def filter_by_period(self):
     raise NotImplemented()
 
@@ -26,7 +31,8 @@ class NewsBaseScraper(BaseScraper):
   Базовый класс для скреперов новостей.
   Содержит общие методы для скреперов новостей. 
   '''
-  def __init__(self):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
     self.cfa_news_url_blacklist = (
       'echomsk.spb.ru',
       'forpost-sevastopol.ru',
