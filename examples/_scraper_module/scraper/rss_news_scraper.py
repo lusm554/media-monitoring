@@ -102,26 +102,32 @@ class CfaRssNewsScraper(NewsBaseScraper):
     '''
     logger.info(f'Fetching {len(self.RSS_FEEDS)} channels')
     result_cfa_articles = list()
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-      logger.debug(f'{executor._max_workers=}')
-      process_feed_jobs = {
-        executor.submit(
-          lambda feed: self.feed_parser(
-            feed_data=self.feed_fetcher(feed.url),
-            article_publisher_name=feed.publisher_name
-          ),
-          feed
-        ): feed
-        for feed in self.RSS_FEEDS
-      }
-      for done_job in concurrent.futures.as_completed(process_feed_jobs):
-        cfa_articles = done_job.result()
-        result_cfa_articles.extend(cfa_articles)
-    news_start_time = datetime.datetime.now() - period
-    result_cfa_articles = [
-      article
-      for article in result_cfa_articles
-      if article.publish_time >= news_start_time
-    ]
-    logger.info(f'Found {len(result_cfa_articles)} articles for {period}')
-    return result_cfa_articles
+    try:
+      with concurrent.futures.ThreadPoolExecutor() as executor:
+        logger.debug(f'{executor._max_workers=}')
+        process_feed_jobs = {
+          executor.submit(
+            lambda feed: self.feed_parser(
+              feed_data=self.feed_fetcher(feed.url),
+              article_publisher_name=feed.publisher_name
+            ),
+            feed
+          ): feed
+          for feed in self.RSS_FEEDS
+        }
+        for done_job in concurrent.futures.as_completed(process_feed_jobs):
+          cfa_articles = done_job.result()
+          result_cfa_articles.extend(cfa_articles)
+      news_start_time = datetime.datetime.now() - period
+      result_cfa_articles = [
+        article
+        for article in result_cfa_articles
+        if article.publish_time >= news_start_time
+      ]
+      logger.info(f'Found {len(result_cfa_articles)} articles for {period}')
+      return result_cfa_articles
+    except Exception as error:
+      if self.error == 'raise':
+        raise error
+      logger.error(error)
+      return result_cfa_articles
