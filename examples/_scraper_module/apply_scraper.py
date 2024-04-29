@@ -17,7 +17,8 @@ TODO:
 def how_to_apply_cfaru_releases_scraper():
   from scraper import CfaReleasesScraper, Periods
   # cfa_releases = CfaReleasesScraper().fetch_and_parse(period=Periods.LAST_24_HOURS)
-  cfa_releases = CfaReleasesScraper().fetch_and_parse(period=Periods.LAST_WEEK)
+  cfa_releases = CfaReleasesScraper(error='ignore').fetch_and_parse(period=Periods.LAST_WEEK)
+  print(len(cfa_releases))
   plt = None
   # for release in sorted(cfa_releases, key=lambda x:x.platform_name):
   #   if plt != release.platform_name:
@@ -26,7 +27,7 @@ def how_to_apply_cfaru_releases_scraper():
   #     print('\t', release.release_time, release.title)
   #   else:
   #     print('\t', release.release_time, release.title)
-# how_to_apply_cfaru_releases_scraper()
+how_to_apply_cfaru_releases_scraper()
 
 def how_to_apply_dzen_news_scraper():
   from scraper import CfaDzenNewsScraper, Periods
@@ -58,7 +59,7 @@ def how_to_apply_all_news_scraper():
   print(f'{len(all_news)=}')
   # print(f'{len(set(all_news))=}')
   # pprint(all_news[:5])
-how_to_apply_all_news_scraper()
+# how_to_apply_all_news_scraper()
 
 '''
 Scraper:
