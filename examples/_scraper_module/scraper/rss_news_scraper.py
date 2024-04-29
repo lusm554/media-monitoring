@@ -28,10 +28,13 @@ class CfaRssNewsScraper(NewsBaseScraper):
   Парсер новоей ЦФА из Rss каналов.
   Парсит список новостных источников.
   '''
-  def __init__(self):
+  def __init__(self, *args, **kwargs):
     '''
     Определяет список rss каналов для парсинга.
     '''
+    super().__init__(*args, **kwargs)
+    if self.error == 'ignore':
+      logger.warning(f'Error handler set to {self.error!r}')
     self.RSS_FEEDS = (
       RssFeed(publisher_name='РИА Новости', url='https://ria.ru/export/rss2/archive/index.xml'),
       RssFeed(publisher_name='Рамблер', url='https://news.rambler.ru/rss/'),
