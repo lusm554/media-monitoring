@@ -11,8 +11,10 @@ class CfaAllNewsScraper(NewsBaseScraper):
   '''
   Объединяет в себе все парсеры новостей для удобства парсинга всех новостей за раз.
   '''
-  def __init__(self):
-    super().__init__()
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    if self.error == 'ignore':
+      logger.warning(f'Error handler set to {self.error!r}')
     self.NEWS_SCRAPERS = [
       CfaDzenNewsScraper,
       CfaRssNewsScraper,
