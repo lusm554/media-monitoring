@@ -53,7 +53,7 @@ class CfaGoogleNewsScraper(NewsBaseScraper):
       f'https://www.google.ru/search',
       params=params,
       headers=self.HEADERS,
-      timeout=2, # seconds
+      timeout=5, # seconds
     )
     logger.info(f'Fetched in {response.elapsed.total_seconds():.2f}, {response.request.method} {response.status_code} {response.url!r}')
     assert response.status_code == 200
