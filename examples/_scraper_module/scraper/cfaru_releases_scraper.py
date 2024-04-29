@@ -15,6 +15,11 @@ class CfaReleasesScraper(BaseScraper):
   Парсер выпусков ЦФА с сайта цфа.рф.
   Запрашивает HTML страницу, находит платформы и выпуски, парсит в эклземпляры класса Release.
   '''
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    if self.error == 'ignore':
+      logger.warning(f'Error handler set to {self.error!r}')
+
   def page_fetcher(self):
     '''
     Запрашивает HTML страницы выпусков ЦФА.
