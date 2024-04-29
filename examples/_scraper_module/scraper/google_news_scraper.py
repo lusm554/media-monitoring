@@ -94,22 +94,28 @@ class CfaGoogleNewsScraper(NewsBaseScraper):
     Асинхронно запрашивается и парсится несколько страниц для эффективности.
     '''
     final_articles = set()
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-      logger.debug(f'{executor._max_workers=}')
-      fetch_and_parse_jobs = {
-        executor.submit(
-          lambda page_num: self.page_parser(
-            page_html=self.page_fetcher(
-              for_period=period,
-              page_num=page_num,
+    try:
+      with concurrent.futures.ThreadPoolExecutor() as executor:
+        logger.debug(f'{executor._max_workers=}')
+        fetch_and_parse_jobs = {
+          executor.submit(
+            lambda page_num: self.page_parser(
+              page_html=self.page_fetcher(
+                for_period=period,
+                page_num=page_num,
+              ),
             ),
-          ),
-          page_num
-        ): page_num
-        for page_num in range(10) 
-      }
-      for done_job in concurrent.futures.as_completed(fetch_and_parse_jobs):
-        cfa_articles = done_job.result()
-        final_articles.update(cfa_articles)
-    logger.info(f'Found {len(final_articles)} articles for {period}')
-    return final_articles
+            page_num
+          ): page_num
+          for page_num in range(10)
+        }
+        for done_job in concurrent.futures.as_completed(fetch_and_parse_jobs):
+          cfa_articles = done_job.result()
+          final_articles.update(cfa_articles)
+      logger.info(f'Found {len(final_articles)} articles for {period}')
+      return final_articles
+    except Exception as error:
+      if self.error == 'raise':
+        raise error
+      logger.error(error)
+      return final_articles
