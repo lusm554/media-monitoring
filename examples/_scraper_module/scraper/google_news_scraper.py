@@ -9,7 +9,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 class CfaGoogleNewsScraper(NewsBaseScraper):
-  def __init__(self):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    if self.error == 'ignore':
+      logger.warning(f'Error handler set to {self.error!r}')
     self.HEADERS = {
       'authority': 'www.google.com',
       'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
