@@ -16,7 +16,7 @@ class BaseScraper:
   '''
   def filter_by_period(self):
     raise NotImplemented()
-  
+
   @abstractmethod
   def fetch_and_parse(self, period):
     raise NotImplemented()
@@ -32,7 +32,7 @@ class NewsBaseScraper(BaseScraper):
       'forpost-sevastopol.ru',
       'adi19.ru',
     )
-  
+
   @abstractmethod
   def filter_news_by_blacklist(self):
     '''
