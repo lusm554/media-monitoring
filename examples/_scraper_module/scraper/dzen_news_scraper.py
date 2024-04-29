@@ -12,10 +12,13 @@ class CfaDzenNewsScraper(NewsBaseScraper):
   '''
   Парсер новоей ЦФА из Дзена.
   '''
-  def __init__(self):
+  def __init__(self, *args, **kwargs):
     '''
     Устанавливает параметры HTTP запроса к Дзену.
     '''
+    super().__init__(*args, **kwargs)
+    if self.error == 'ignore':
+      logger.warning(f'Error handler set to {self.error!r}')
     self.DZEN_HTML_PARSER = 1
     self.DZEN_JSON_PARSER = 2
     self.DZEN_URL = 'https://dzen.ru/news/search'
