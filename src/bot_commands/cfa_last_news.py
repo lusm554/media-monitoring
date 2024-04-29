@@ -70,6 +70,12 @@ def get_cfa_last_news_post_markup(post):
 async def cfa_last_news(update, context):
   scraper = context.bot_data.get("scraper")
   articles = scraper.CfaAllNewsScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_24_HOURS)
+  if len(articles) == 0:
+    await context.bot.send_message(
+      chat_id=update.effective_chat.id,
+      text='Новости не найдены.',
+    )
+    return
   post = Post(
     post_id=uuid4(),
     post_articles=articles
@@ -87,6 +93,12 @@ async def cfa_last_news(update, context):
 async def cfa_week_news(update, context):
   scraper = context.bot_data.get("scraper")
   articles = scraper.CfaAllNewsScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_WEEK)
+  if len(articles) == 0:
+    await context.bot.send_message(
+      chat_id=update.effective_chat.id,
+      text='Новости не найдены.',
+    )
+    return
   post = Post(
     post_id=uuid4(),
     post_articles=articles
