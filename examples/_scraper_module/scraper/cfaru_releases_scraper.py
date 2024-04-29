@@ -105,13 +105,20 @@ class CfaReleasesScraper(BaseScraper):
     '''
     Собирает методы вместе, запрашивает код страницы затем парсит ее в экземпляры Release.
     '''
-    page_html = self.page_fetcher()
-    cfa_releases = self.page_parser(page_html)
-    releases_start_time = datetime.datetime.now() - period
-    cfa_releases = [
-      release
-      for release in cfa_releases
-      if release.release_time >= releases_start_time
-    ]
-    logger.info(f'Found {len(cfa_releases)} releases for {period}')
-    return cfa_releases
+    cfa_releases = []
+    try:
+      page_html = self.page_fetcher()
+      cfa_releases = self.page_parser(page_html)
+      releases_start_time = datetime.datetime.now() - period
+      cfa_releases = [
+        release
+        for release in cfa_releases
+        if release.release_time >= releases_start_time
+      ]
+      logger.info(f'Found {len(cfa_releases)} releases for {period}')
+      return cfa_releases
+    except Exception as error:
+      if self.error == 'raise':
+        raise error
+      logger.error(error)
+      return cfa_releases
