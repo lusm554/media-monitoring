@@ -149,13 +149,19 @@ class CfaDzenNewsScraper(NewsBaseScraper):
     Основная функция класса, запрашивает HTML или JSON новостей Дзена и парсит их в общий формат данных.
     '''
     final_articles = list()
-    _format = self.DZEN_JSON_PARSER
-    parser = self.get_page_parser(_format)
-    parsed_articles = list()
-    for dzen_page_data in self.page_fetcher(for_period=period, content_type=_format):
-      page_articles = parser(dzen_page_data)
-      if len(page_articles) == 0:
-        break
-      parsed_articles.extend(page_articles)
-    logger.info(f'Found {len(parsed_articles)} articles for {period}')
-    return parsed_articles
+    try:
+      _format = self.DZEN_JSON_PARSER
+      parser = self.get_page_parser(_format)
+      parsed_articles = list()
+      for dzen_page_data in self.page_fetcher(for_period=period, content_type=_format):
+        page_articles = parser(dzen_page_data)
+        if len(page_articles) == 0:
+          break
+        parsed_articles.extend(page_articles)
+      logger.info(f'Found {len(parsed_articles)} articles for {period}')
+      return parsed_articles
+    except Exception as error:
+      if self.error == 'raise':
+        raise error
+      logger.error(error)
+      return final_articles
