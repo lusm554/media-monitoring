@@ -15,6 +15,11 @@ class CfaReleasesScraper(BaseScraper):
   Парсер выпусков ЦФА с сайта цфа.рф.
   Запрашивает HTML страницу, находит платформы и выпуски, парсит в эклземпляры класса Release.
   '''
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    if self.error == 'ignore':
+      logger.warning(f'Error handler set to {self.error!r}')
+
   def page_fetcher(self):
     '''
     Запрашивает HTML страницы выпусков ЦФА.
@@ -100,13 +105,20 @@ class CfaReleasesScraper(BaseScraper):
     '''
     Собирает методы вместе, запрашивает код страницы затем парсит ее в экземпляры Release.
     '''
-    page_html = self.page_fetcher()
-    cfa_releases = self.page_parser(page_html)
-    releases_start_time = datetime.datetime.now() - period
-    cfa_releases = [
-      release
-      for release in cfa_releases
-      if release.release_time >= releases_start_time
-    ]
-    logger.info(f'Found {len(cfa_releases)} releases for {period}')
-    return cfa_releases
+    cfa_releases = []
+    try:
+      page_html = self.page_fetcher()
+      cfa_releases = self.page_parser(page_html)
+      releases_start_time = datetime.datetime.now() - period
+      cfa_releases = [
+        release
+        for release in cfa_releases
+        if release.release_time >= releases_start_time
+      ]
+      logger.info(f'Found {len(cfa_releases)} releases for {period}')
+      return cfa_releases
+    except Exception as error:
+      if self.error == 'raise':
+        raise error
+      logger.error(error)
+      return cfa_releases

@@ -12,10 +12,13 @@ class CfaDzenNewsScraper(NewsBaseScraper):
   '''
   Парсер новоей ЦФА из Дзена.
   '''
-  def __init__(self):
+  def __init__(self, *args, **kwargs):
     '''
     Устанавливает параметры HTTP запроса к Дзену.
     '''
+    super().__init__(*args, **kwargs)
+    if self.error == 'ignore':
+      logger.warning(f'Error handler set to {self.error!r}')
     self.DZEN_HTML_PARSER = 1
     self.DZEN_JSON_PARSER = 2
     self.DZEN_URL = 'https://dzen.ru/news/search'
@@ -146,13 +149,19 @@ class CfaDzenNewsScraper(NewsBaseScraper):
     Основная функция класса, запрашивает HTML или JSON новостей Дзена и парсит их в общий формат данных.
     '''
     final_articles = list()
-    _format = self.DZEN_JSON_PARSER
-    parser = self.get_page_parser(_format)
-    parsed_articles = list()
-    for dzen_page_data in self.page_fetcher(for_period=period, content_type=_format):
-      page_articles = parser(dzen_page_data)
-      if len(page_articles) == 0:
-        break
-      parsed_articles.extend(page_articles)
-    logger.info(f'Found {len(parsed_articles)} articles for {period}')
-    return parsed_articles
+    try:
+      _format = self.DZEN_JSON_PARSER
+      parser = self.get_page_parser(_format)
+      parsed_articles = list()
+      for dzen_page_data in self.page_fetcher(for_period=period, content_type=_format):
+        page_articles = parser(dzen_page_data)
+        if len(page_articles) == 0:
+          break
+        parsed_articles.extend(page_articles)
+      logger.info(f'Found {len(parsed_articles)} articles for {period}')
+      return parsed_articles
+    except Exception as error:
+      if self.error == 'raise':
+        raise error
+      logger.error(error)
+      return final_articles
