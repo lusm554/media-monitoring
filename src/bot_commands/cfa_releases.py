@@ -31,9 +31,7 @@ def get_releases_post_markup(post):
   keyboard_markup = InlineKeyboardMarkup(keyboard)
   return msg_text, keyboard_markup
 
-async def cfa_last_releases(update, context):
-  scraper = context.bot_data.get("scraper")
-  releases = scraper.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_24_HOURS)
+async def cfa_releases_base(update, context, releases):
   post = Post(post_items=sorted(releases, key=lambda x: x.platform_name))
   context.bot_data['post_cache'][post.post_id] = post
   if len(releases) == 0:
@@ -50,6 +48,21 @@ async def cfa_last_releases(update, context):
     parse_mode=ParseMode.HTML,
     disable_web_page_preview=True,
   )
+
+async def cfa_last_releases(update, context):
+  scraper = context.bot_data.get("scraper")
+  releases = scraper.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_24_HOURS)
+  await cfa_releases_base(update, context, releases)
+
+async def cfa_week_releases(update, context):
+  scraper = context.bot_data.get("scraper")
+  releases = scraper.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_WEEK)
+  await cfa_releases_base(update, context, releases)
+
+async def cfa_all_time_releases(update, context):
+  scraper = context.bot_data.get("scraper")
+  releases = scraper.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper.Periods.ALL_AVAILABLE_TIME)
+  await cfa_releases_base(update, context, releases)
 
 async def cfa_releases_button_callback(update, context):
   query = update.callback_query
