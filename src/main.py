@@ -98,11 +98,22 @@ def setup_bot_handlers(telegram_app, commands):
 def shedule_bot_tasks(telegram_app):
   job_interval = datetime.timedelta(hours=1)
   job_time_to_first_run = datetime.timedelta(seconds=30)
+  newsletter_time = datetime.time(hour=9, tzinfo=time_zone_moscow)
   telegram_app.job_queue.run_repeating(
     callback=bot_regular_tasks.post_cache_cleaner,
     interval=job_interval,
     first=job_time_to_first_run,
   )
+  telegram_app.job_queue.run_daily(
+    callback=bot_regular_tasks.cfa_news_sender,
+    time=newsletter_time,
+  )
+  # telegram_app.job_queue.run_repeating(
+  #   bot_regular_tasks.cfa_news_sender,
+  #   interval=60,
+  #   first=15,
+  #   data=bot_commands.cfa_last_news_regular,
+  # )
 
 def set_list_of_bot_commands(telegram_app, commands):
   cmds = [
