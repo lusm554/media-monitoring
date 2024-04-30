@@ -2,8 +2,8 @@ import datetime
 from uuid import uuid4
 
 class Post:
-  def __init__(self, post_items, post_id=uuid4(), creation_time=None):
-    self._items_count_on_page = 4
+  def __init__(self, post_items, post_id=uuid4(), creation_time=None, page_items_cnt=4):
+    self._items_count_on_page = page_items_cnt
     self._current_page = 0
     self.post_id = str(post_id)
     self.post_items = post_items
