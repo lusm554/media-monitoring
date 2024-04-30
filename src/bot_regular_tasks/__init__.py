@@ -1,1 +1,2 @@
 from .post_cache_cleaner import post_cache_cleaner
+from .cfa_newsletter_sender import cfa_news_sender
