@@ -17,7 +17,7 @@ def get_cfa_last_news_post_markup(post):
     f'<b>Взято из:</b> {article.scraper}.'
     for n, article in enumerate(
       post.current_page(),
-      start=post._current_page * post._post_count_on_page + 1
+      start=post.current_page_number * post.items_count_on_page
     )
   )
   internal_post_id = post.post_id
@@ -84,7 +84,7 @@ async def cfa_last_news_button_callback(update, context):
       text='По некоторым причинам кеш этого поста не найден, поэтому действие недоступно.'
     )
     return
-  if post._pages_size == 0:
+  if post.pages_count == 1:
     return
   match keyboard_action:
     case 'counter':
