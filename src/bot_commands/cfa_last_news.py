@@ -17,7 +17,7 @@ def get_cfa_last_news_post_markup(post):
     f'<b>Взято из:</b> {article.scraper}.'
     for n, article in enumerate(
       post.current_page(),
-      start=post.current_page_number * post.items_count_on_page
+      start=(post.current_page_number - 1) * post.items_count_on_page
     )
   )
   internal_post_id = post.post_id
