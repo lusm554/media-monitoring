@@ -32,10 +32,10 @@ def get_cfa_last_news_post_markup(post):
   keyboard_markup = InlineKeyboardMarkup(pagination_keyboard)
   return msg, keyboard_markup
 
-async def cfa_news_base(update, context, articles):
+async def cfa_news_base(context, effective_chat_id, articles):
   if len(articles) == 0:
     await context.bot.send_message(
-      chat_id=update.effective_chat.id,
+      chat_id=effective_chat_id,
       text='Новости не найдены.',
     )
     return
@@ -43,7 +43,7 @@ async def cfa_news_base(update, context, articles):
   context.bot_data['post_cache'][post.post_id] = post
   msg_text, keyboard = get_cfa_last_news_post_markup(post)
   await context.bot.send_message(
-    chat_id=update.effective_chat.id,
+    chat_id=effective_chat_id,
     text=msg_text,
     reply_markup=keyboard,
     parse_mode=ParseMode.HTML,
@@ -53,12 +53,14 @@ async def cfa_news_base(update, context, articles):
 async def cfa_last_news(update, context):
   scraper = context.bot_data.get("scraper")
   articles = scraper.CfaAllNewsScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_24_HOURS)
-  await cfa_news_base(update, context, articles)
+  effective_chat_id = update.effective_chat.id
+  await cfa_news_base(context, effective_chat_id, articles)
 
 async def cfa_week_news(update, context):
   scraper = context.bot_data.get("scraper")
   articles = scraper.CfaAllNewsScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_WEEK)
-  await cfa_news_base(update, context, articles)
+  effective_chat_id = update.effective_chat.id
+  await cfa_news_base(context, effective_chat_id, articles)
 
 async def cfa_last_news_button_callback(update, context):
   query = update.callback_query
