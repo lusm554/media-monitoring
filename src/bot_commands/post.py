@@ -1,14 +1,14 @@
 import datetime
 
 class Post:
-  def __init__(self, post_id, post_articles, creation_time=None):
+  def __init__(self, post_id, post_items, creation_time=None):
     self._post_count_on_page = 4
     self._current_page = 0
     self.post_id = str(post_id)
-    self.post_articles = post_articles
+    self.post_items = post_items
     self.pages = [
-      self.post_articles[i:i+self._post_count_on_page]
-      for i in range(0, len(self.post_articles), self._post_count_on_page)
+      self.post_items[i:i+self._post_count_on_page]
+      for i in range(0, len(self.post_items), self._post_count_on_page)
     ]
     self._pages_size = len(self.pages) - 1
     self.creation_time = creation_time or datetime.datetime.now()

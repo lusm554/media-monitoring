@@ -44,7 +44,7 @@ async def cfa_last_news(update, context):
     return
   post = Post(
     post_id=uuid4(),
-    post_articles=articles
+    post_items=articles
   )
   context.bot_data['post_cache'][post.post_id] = post
   msg_text, keyboard = get_cfa_last_news_post_markup(post)
@@ -67,7 +67,7 @@ async def cfa_week_news(update, context):
     return
   post = Post(
     post_id=uuid4(),
-    post_articles=articles
+    post_items=articles
   )
   context.bot_data['post_cache'][post.post_id] = post
   msg_text, keyboard = get_cfa_last_news_post_markup(post)
