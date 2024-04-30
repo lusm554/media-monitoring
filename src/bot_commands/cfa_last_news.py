@@ -56,6 +56,11 @@ async def cfa_last_news(update, context):
   effective_chat_id = update.effective_chat.id
   await cfa_news_base(context, effective_chat_id, articles)
 
+async def cfa_last_news_regular(context, effective_chat_id):
+  scraper = context.bot_data.get("scraper")
+  articles = scraper.CfaAllNewsScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_24_HOURS)
+  await cfa_news_base(context, effective_chat_id, articles)
+
 async def cfa_week_news(update, context):
   scraper = context.bot_data.get("scraper")
   articles = scraper.CfaAllNewsScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_WEEK)
