@@ -87,6 +87,7 @@ def setup_bot_handlers(telegram_app, commands):
     CallbackQueryHandler(
       bot_handlers.button_dispatcher({
         'cfa_last_news': bot_commands.cfa_last_news_button_callback,
+        'cfa_releases': bot_commands.cfa_releases_button_callback,
       })
     )
   )
@@ -118,6 +119,7 @@ def main():
     Command(callback=bot_commands.help_, desc='инфо по командам', name='help'),
     Command(callback=bot_commands.cfa_last_news, desc='новости ЦФА за сутки', name='last_news_cfa'),
     Command(callback=bot_commands.cfa_week_news, desc='новости ЦФА за неделю', name='week_news_cfa'),
+    Command(callback=bot_commands.cfa_last_releases, desc='выпуски ЦФА', name='releases_cfa'),
   )
   if os.environ.get('dev'):
     TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN_DEV')
