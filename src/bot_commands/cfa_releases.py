@@ -31,7 +31,7 @@ def get_releases_post_markup(post):
   keyboard_markup = InlineKeyboardMarkup(keyboard)
   return msg_text, keyboard_markup
 
-async def cfa_releases_base(update, context, releases):
+async def cfa_releases_base(context, effective_chat_id, releases):
   post = Post(
     post_items=sorted(releases, key=lambda x: x.platform_name),
     page_items_cnt=6,
@@ -39,13 +39,13 @@ async def cfa_releases_base(update, context, releases):
   context.bot_data['post_cache'][post.post_id] = post
   if len(releases) == 0:
     await context.bot.send_message(
-      chat_id=update.effective_chat.id,
+      chat_id=effective_chat_id,
       text='Релизы не найдены.',
     )
     return
   msg_text, keyboard_markup = get_releases_post_markup(post)
   await context.bot.send_message(
-    chat_id=update.effective_chat.id,
+    chat_id=effective_chat_id,
     text=msg_text,
     reply_markup=keyboard_markup,
     parse_mode=ParseMode.HTML,
@@ -55,17 +55,20 @@ async def cfa_releases_base(update, context, releases):
 async def cfa_last_releases(update, context):
   scraper = context.bot_data.get("scraper")
   releases = scraper.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_24_HOURS)
-  await cfa_releases_base(update, context, releases)
+  effective_chat_id = update.effective_chat.id
+  await cfa_releases_base(context, effective_chat_id, releases)
 
 async def cfa_week_releases(update, context):
   scraper = context.bot_data.get("scraper")
   releases = scraper.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_WEEK)
-  await cfa_releases_base(update, context, releases)
+  effective_chat_id = update.effective_chat.id
+  await cfa_releases_base(context, effective_chat_id, releases)
 
 async def cfa_all_time_releases(update, context):
   scraper = context.bot_data.get("scraper")
   releases = scraper.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper.Periods.ALL_AVAILABLE_TIME)
-  await cfa_releases_base(update, context, releases)
+  effective_chat_id = update.effective_chat.id
+  await cfa_releases_base(context, effective_chat_id, releases)
 
 async def cfa_releases_button_callback(update, context):
   query = update.callback_query
