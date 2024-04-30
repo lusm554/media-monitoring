@@ -1,4 +1,3 @@
-from uuid import uuid4
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 from .post import Post
@@ -42,10 +41,7 @@ async def cfa_last_news(update, context):
       text='Новости не найдены.',
     )
     return
-  post = Post(
-    post_id=uuid4(),
-    post_items=articles
-  )
+  post = Post(post_items=articles)
   context.bot_data['post_cache'][post.post_id] = post
   msg_text, keyboard = get_cfa_last_news_post_markup(post)
   await context.bot.send_message(
@@ -65,10 +61,7 @@ async def cfa_week_news(update, context):
       text='Новости не найдены.',
     )
     return
-  post = Post(
-    post_id=uuid4(),
-    post_items=articles
-  )
+  post = Post(post_items=articles)
   context.bot_data['post_cache'][post.post_id] = post
   msg_text, keyboard = get_cfa_last_news_post_markup(post)
   await context.bot.send_message(
