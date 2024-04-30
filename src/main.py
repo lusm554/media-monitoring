@@ -119,7 +119,9 @@ def main():
     Command(callback=bot_commands.help_, desc='инфо по командам', name='help'),
     Command(callback=bot_commands.cfa_last_news, desc='новости ЦФА за сутки', name='last_news_cfa'),
     Command(callback=bot_commands.cfa_week_news, desc='новости ЦФА за неделю', name='week_news_cfa'),
-    Command(callback=bot_commands.cfa_last_releases, desc='выпуски ЦФА', name='releases_cfa'),
+    Command(callback=bot_commands.cfa_last_releases, desc='выпуски ЦФА за сутки', name='last_releases_cfa'),
+    Command(callback=bot_commands.cfa_week_releases, desc='выпуски ЦФА за неделю', name='week_releases_cfa'),
+    Command(callback=bot_commands.cfa_all_time_releases, desc='выпуски ЦФА за все время', name='all_releases_cfa'),
   )
   if os.environ.get('dev'):
     TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN_DEV')
