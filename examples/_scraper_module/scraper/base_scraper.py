@@ -7,7 +7,7 @@ class Periods:
   '''
   LAST_24_HOURS = datetime.timedelta(hours=24)
   LAST_WEEK = datetime.timedelta(weeks=1)
-  ALL_AVAILABLE_TIME = datetime.timedelta(weeks=8)
+  ALL_AVAILABLE_TIME = datetime.timedelta(weeks=104)
 
 class BaseScraper:
   '''
