@@ -32,7 +32,10 @@ def get_releases_post_markup(post):
   return msg_text, keyboard_markup
 
 async def cfa_releases_base(update, context, releases):
-  post = Post(post_items=sorted(releases, key=lambda x: x.platform_name))
+  post = Post(
+    post_items=sorted(releases, key=lambda x: x.platform_name),
+    page_items_cnt=6,
+  )
   context.bot_data['post_cache'][post.post_id] = post
   if len(releases) == 0:
     await context.bot.send_message(
