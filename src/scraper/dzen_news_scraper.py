@@ -64,7 +64,7 @@ class CfaDzenNewsScraper(NewsBaseScraper):
         filter_date=f'{news_start_time_ms},{news_end_time_ms}', # for period more than 24 hours
         flat=1, # flag for no aggregation by article theme
         p=page_num,
-        sortby='date', # news sort key
+        # sortby='date', # news sort key
       )
       if content_type == self.DZEN_JSON_PARSER:
         params['ajax'] = 1 # flag for json response
