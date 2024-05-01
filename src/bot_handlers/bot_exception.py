@@ -1,4 +1,4 @@
-import traceback, json, html, os
+import traceback, json, html
 from telegram import Update
 from telegram.constants import ParseMode
 import logging
@@ -20,5 +20,7 @@ async def error_handler(update, context):
   )
   logger.info(f'Error message size {len(message)}')
   await context.bot.send_message(
-    chat_id=os.environ.get('DEVELOPER_CHAT_ID'), text=message, parse_mode=ParseMode.HTML
+    chat_id=context.bot_data.get('DEVELOPER_CHAT_ID'),
+    text=message,
+    parse_mode=ParseMode.HTML,
   )
