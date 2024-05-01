@@ -74,6 +74,8 @@ def setup_bot_data_variables(telegram_app, commands):
   telegram_app.bot_data['scraper'] = scraper
   telegram_app.bot_data['post_cache'] = dict()
   telegram_app.bot_data['regular_newsletter_chats'] = set(str(x) for x in os.environ.get('NEWS_SCHEDULED_CHATS').split(',') if x != '')
+  telegram_app.bot_data['cfa_newsletter_time'] = datetime.time(hour=9, tzinfo=time_zone_moscow)
+  telegram_app.bot_data['cfa_releases_time'] = datetime.time(hour=18, tzinfo=time_zone_moscow)
 
 def setup_bot_handlers(telegram_app, commands):
   telegram_app.add_handler(TypeHandler(Update, bot_handlers.updates_logger), -1)
@@ -98,8 +100,8 @@ def setup_bot_handlers(telegram_app, commands):
 def shedule_bot_tasks(telegram_app):
   job_interval = datetime.timedelta(hours=1)
   job_time_to_first_run = datetime.timedelta(seconds=30)
-  newsletter_time = datetime.time(hour=9, tzinfo=time_zone_moscow)
-  releases_time = datetime.time(hour=18, tzinfo=time_zone_moscow)
+  newsletter_time = telegram_app.bot_data.get('cfa_newsletter_time')
+  releases_time = telegram_app.bot_data.get('cfa_releases_time')
   telegram_app.job_queue.run_repeating(
     callback=bot_regular_tasks.post_cache_cleaner,
     interval=job_interval,
