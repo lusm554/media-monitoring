@@ -36,7 +36,7 @@ async def cfa_news_base(context, effective_chat_id, articles):
   if len(articles) == 0:
     await context.bot.send_message(
       chat_id=effective_chat_id,
-      text='Новости не найдены.',
+      text='Новости ЦФА не найдены.',
     )
     return
   post = Post(post_items=articles)
