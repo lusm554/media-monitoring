@@ -40,7 +40,7 @@ async def cfa_releases_base(context, effective_chat_id, releases):
   if len(releases) == 0:
     await context.bot.send_message(
       chat_id=effective_chat_id,
-      text='Релизы не найдены.',
+      text='Выпуски ЦФА не найдены.',
     )
     return
   msg_text, keyboard_markup = get_releases_post_markup(post)
