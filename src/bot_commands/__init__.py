@@ -13,3 +13,4 @@ from .cfa_releases import (
   cfa_all_time_releases,
   cfa_releases_button_callback,
 )
+from .subscribe_news import newsletter_subscribe, newsletter_cancel_subscribe
