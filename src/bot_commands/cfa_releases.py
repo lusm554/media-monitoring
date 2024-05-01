@@ -58,6 +58,11 @@ async def cfa_last_releases(update, context):
   effective_chat_id = update.effective_chat.id
   await cfa_releases_base(context, effective_chat_id, releases)
 
+async def cfa_last_releases_regular(context, effective_chat_id):
+  scraper = context.bot_data.get("scraper")
+  releases = scraper.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_24_HOURS)
+  await cfa_releases_base(context, effective_chat_id, releases)
+
 async def cfa_week_releases(update, context):
   scraper = context.bot_data.get("scraper")
   releases = scraper.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_WEEK)
