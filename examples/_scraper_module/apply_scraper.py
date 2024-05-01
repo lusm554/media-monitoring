@@ -29,14 +29,14 @@ def how_to_apply_cfaru_releases_scraper():
   #     print('\t', release.release_time, release.title)
   #   else:
   #     print('\t', release.release_time, release.title)
-how_to_apply_cfaru_releases_scraper()
+# how_to_apply_cfaru_releases_scraper()
 
 def how_to_apply_dzen_news_scraper():
   from scraper import CfaDzenNewsScraper, Periods
   dzen_news = CfaDzenNewsScraper(error='ignore').fetch_and_parse(period=Periods.LAST_24_HOURS)
   # dzen_news = CfaDzenNewsScraper().fetch_and_parse(period=Periods.LAST_WEEK)
   pprint(dzen_news)
-# how_to_apply_dzen_news_scraper()
+how_to_apply_dzen_news_scraper()
 
 def how_to_apply_rss_news_scraper():
   from scraper import CfaRssNewsScraper, Periods
