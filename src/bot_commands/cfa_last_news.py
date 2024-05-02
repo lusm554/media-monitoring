@@ -40,7 +40,7 @@ def transform_update_context(func):
 
 def cfa_news_factory(scraper, period, *, chat_id_from_update=True):
   async def cfa_news(context, effective_chat_id):
-    articles = scraper.CfaAllNewsScraper(error='ignore').fetch_and_parse(period)
+    articles = scraper(error='ignore').fetch_and_parse(period)
     if len(articles) == 0:
       await context.bot.send_message(
         chat_id=effective_chat_id,
@@ -62,18 +62,18 @@ def cfa_news_factory(scraper, period, *, chat_id_from_update=True):
   return cfa_news
 
 cfa_last_news = cfa_news_factory(
-  scraper=scraper,
+  scraper=scraper.CfaAllNewsScraper,
   period=scraper.Periods.LAST_24_HOURS,
 )
 
 cfa_last_news_regular = cfa_news_factory(
-  scraper=scraper,
+  scraper=scraper.CfaAllNewsScraper,
   period=scraper.Periods.LAST_24_HOURS,
   chat_id_from_update=False,
 )
 
 cfa_week_news = cfa_news_factory(
-  scraper=scraper,
+  scraper=scraper.CfaAllNewsScraper,
   period=scraper.Periods.LAST_WEEK,
 )
 
