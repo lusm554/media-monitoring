@@ -69,7 +69,7 @@ def get_articles(context, scraper, period):
 
 def cfa_news_factory(scraper, period, *, chat_id_from_update=True):
   async def cfa_news(context, effective_chat_id):
-    articles = scraper(error='ignore').fetch_and_parse(period)
+    articles = get_articles(context, scraper, period)
     if len(articles) == 0:
       await context.bot.send_message(
         chat_id=effective_chat_id,
