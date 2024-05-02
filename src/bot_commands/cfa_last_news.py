@@ -1,6 +1,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 from .post import Post
+import scraper
 import logging
 
 logger = logging.getLogger(__name__)
@@ -32,40 +33,49 @@ def get_cfa_last_news_post_markup(post):
   keyboard_markup = InlineKeyboardMarkup(pagination_keyboard)
   return msg, keyboard_markup
 
-async def cfa_news_base(context, effective_chat_id, articles):
-  if len(articles) == 0:
+def transform_update_context(func):
+  async def wrapper(update, context):
+    return await func(context=context, effective_chat_id=update.effective_chat.id)
+  return wrapper
+
+def cfa_news_factory(scraper, period, *, chat_id_from_update=True):
+  async def cfa_news(context, effective_chat_id):
+    articles = scraper.CfaAllNewsScraper(error='ignore').fetch_and_parse(period)
+    if len(articles) == 0:
+      await context.bot.send_message(
+        chat_id=effective_chat_id,
+        text='Новости ЦФА не найдены.',
+      )
+      return
+    post = Post(post_items=articles)
+    context.bot_data['post_cache'][post.post_id] = post
+    msg_text, keyboard = get_cfa_last_news_post_markup(post)
     await context.bot.send_message(
       chat_id=effective_chat_id,
-      text='Новости ЦФА не найдены.',
+      text=msg_text,
+      reply_markup=keyboard,
+      parse_mode=ParseMode.HTML,
+      disable_web_page_preview=True,
     )
-    return
-  post = Post(post_items=articles)
-  context.bot_data['post_cache'][post.post_id] = post
-  msg_text, keyboard = get_cfa_last_news_post_markup(post)
-  await context.bot.send_message(
-    chat_id=effective_chat_id,
-    text=msg_text,
-    reply_markup=keyboard,
-    parse_mode=ParseMode.HTML,
-    disable_web_page_preview=True,
-  )
+  if chat_id_from_update:
+    cfa_news = transform_update_context(cfa_news)
+  return cfa_news
 
-async def cfa_last_news(update, context):
-  scraper = context.bot_data.get("scraper")
-  articles = scraper.CfaAllNewsScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_24_HOURS)
-  effective_chat_id = update.effective_chat.id
-  await cfa_news_base(context, effective_chat_id, articles)
+cfa_last_news = cfa_news_factory(
+  scraper=scraper,
+  period=scraper.Periods.LAST_24_HOURS,
+)
 
-async def cfa_last_news_regular(context, effective_chat_id):
-  scraper = context.bot_data.get("scraper")
-  articles = scraper.CfaAllNewsScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_24_HOURS)
-  await cfa_news_base(context, effective_chat_id, articles)
+cfa_last_news_regular = cfa_news_factory(
+  scraper=scraper,
+  period=scraper.Periods.LAST_24_HOURS,
+  chat_id_from_update=False,
+)
 
-async def cfa_week_news(update, context):
-  scraper = context.bot_data.get("scraper")
-  articles = scraper.CfaAllNewsScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_WEEK)
-  effective_chat_id = update.effective_chat.id
-  await cfa_news_base(context, effective_chat_id, articles)
+cfa_week_news = cfa_news_factory(
+  scraper=scraper,
+  period=scraper.Periods.LAST_WEEK,
+)
 
 async def cfa_last_news_button_callback(update, context):
   query = update.callback_query
