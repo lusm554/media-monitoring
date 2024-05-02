@@ -26,6 +26,10 @@ class BaseScraper:
   def fetch_and_parse(self, period):
     raise NotImplemented()
 
+  def __repr__(self):
+    cls_name = self.__class__.__name__
+    return f'{cls_name}()'
+
 class NewsBaseScraper(BaseScraper):
   '''
   Базовый класс для скреперов новостей.
