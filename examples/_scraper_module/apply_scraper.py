@@ -73,8 +73,15 @@ def test_repr():
     CfaReleasesScraper(error='ignore'),
   ]
   for scr in scrs:
-    print(scr)
-    print(repr(scr))
+    print(f'{str(scr)=}, {repr(scr)=}')
+  from scraper import Periods
+  periods = [
+    Periods.LAST_24_HOURS,
+    Periods.LAST_WEEK,
+    Periods.ALL_AVAILABLE_TIME,
+  ]
+  for pr in periods:
+    print(f'{str(pr)=}, {repr(pr)=}')
 test_repr()
 
 '''
