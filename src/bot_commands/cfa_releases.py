@@ -16,7 +16,7 @@ def get_releases_post_markup(post):
     f'<b>Опубликовано:</b> {release.release_time}.'
     for n, release in enumerate(
       post.current_page(),
-      start=(post.current_page_number - 1) * post.items_count_on_page
+      start=(post.current_page_number - 1) * post.items_count_on_page + 1
     )
   )
   callback_id = CFA_RELEASES_CALLBACK_ID
