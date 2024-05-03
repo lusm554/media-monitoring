@@ -1,7 +1,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 import datetime
-from .post import Post
+from bot_helpers import Post
 import scraper
 import logging
 

@@ -1,6 +1,6 @@
 from telegram.constants import ParseMode
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from .post import Post
+from bot_helpers import Post
 import logging
 
 logger = logging.getLogger(__name__)
