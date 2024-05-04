@@ -1,3 +1,45 @@
+'''
+Process:
+Command -> Cache exist     -> Create Post & Save -> markup, buttons -> Return Result
+        -> Cache not exist -> Run scraper -> Save Cache -> Create Post & Save -> markup, buttons -> Return Result
+
+class Cache:
+  Params:
+    - id
+    - cache_data
+    - creatime_time
+    - expire_time
+  Methods:
+    - is_expired
+
+class Post:
+  Params:
+    - id
+
+  class CfaNewsPost:
+    Params:
+      - data
+      ...
+    Methods:
+      - button callback
+      - post markup generator
+
+  class CfaReleasesPost:
+    ...
+
+class ScraperResult:
+  Params:
+    - id
+    - scraper_result
+
+Scenarios:
+  Scraper -> ScraperResult -> Cache
+  ScraperResult -> Post -> Cache
+
+  !But why, if we can!:
+    Scraper -> ScraperResult -> Post -> Cache
+
+'''
 from timezone import time_zone_moscow
 import datetime
 import logging
