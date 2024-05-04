@@ -39,6 +39,8 @@ Scenarios:
   !But why, if we can!:
     Scraper -> ScraperResult -> Post -> Cache
 
+class Command:
+  pass 
 '''
 from timezone import time_zone_moscow
 import datetime
