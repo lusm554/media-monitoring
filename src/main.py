@@ -39,7 +39,7 @@ Scenarios:
   !But why, if we can!:
     Scraper -> ScraperResult -> Post -> Cache
 
-class Command:
+class ScraperCommandFactory:
   pass 
 '''
 from timezone import time_zone_moscow
