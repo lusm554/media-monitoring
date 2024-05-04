@@ -13,6 +13,9 @@ urls = ['https://цфа.рф/reshenie/Sberbank/Mollinomenedjment', 'https://цф
 
 import requests
 from bs4 import BeautifulSoup, SoupStrainer
+
+result = {}
+
 def fetch_file_name(url):
   res = requests.get(url)
   res.encoding = 'utf-8'
@@ -23,12 +26,12 @@ def fetch_file_name(url):
     features='lxml',
     parse_only=only_title_elements,
   )
-  #print(soup)
   title = soup.find('title').string.split(' "')[0]
   print(f'{title=!r}')
   return title
 
 def fetch_pdf_file(url, filename):
+  _input_url = url
   if url == 'https://цфа.рф/reshenie/Sberbank/STPPZMC':
     url += f'/files/assets/common/downloads/{filename}.pdf'
   else:
@@ -38,12 +41,20 @@ def fetch_pdf_file(url, filename):
   res.encoding = 'utf-8'
   print(res.status_code, res.elapsed.total_seconds())
   print(f'{res.url=}')
+  result[_input_url] = {
+    'res_url': res.url,
+    'status': res.status_code,
+  }
 
 import time 
 for url in urls:
   print(url)
+  if url.endswith('.pdf'):
+    continue
   filename = fetch_file_name(url)
   fetch_pdf_file(url, filename)
   print()
-  time.sleep(1)
+  time.sleep(.1)
 
+from pprint import pprint
+pprint(result)
