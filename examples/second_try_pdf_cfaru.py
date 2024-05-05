@@ -260,4 +260,14 @@ print('Status 200 cnt', sum(1 for v in res.values() if v['status'] == 200))
 print('Status 404 cnt', sum(1 for v in res.values() if v['status'] == 404))
 print('Status unknown cnt', sum(1 for v in res.values() if v['status'] not in (404, 200)))
 
+from pprint import pprint
+i = 1
+for k,v in res.items():
+	if v['status'] != 404:
+		continue
+	print(k)
+	pprint(v)
+	i += 1
+	if i == 3:
+		break
 
