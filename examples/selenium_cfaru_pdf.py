@@ -58,7 +58,7 @@ def scrap_pdf_url(url):
   time.sleep(.5)
   try:
     download_button = driver.find_element(By.XPATH, '//*[@class="download-full-button"]')
-    download_href = 'test.pdf'
+    download_href = '_'.join(url.split('/')[-2:]).lower() + '.pdf'
     driver.execute_script("arguments[0].setAttribute('download', arguments[1])", download_button, download_href)
     ActionChains(driver).click(download_button).perform()
     button_href = download_button.get_attribute('href')
@@ -99,7 +99,6 @@ def sync_scrap_pdf():
   for i in range(10):
     target_url = random.choice(urls)
     scrap_pdf_url(target_url)
-    break
 
 #sync_scrap_pdf()
 
@@ -116,4 +115,4 @@ def async_scrap_pdf():
       cfa_articles = done_job.result()
       logger.info(f'Done {url}')
 
-#async_scrap_pdf()
+async_scrap_pdf()
