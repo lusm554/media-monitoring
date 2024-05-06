@@ -24,10 +24,10 @@ examples_200 = [
 def check_preloader_removed(driver):
   try:
     preloader_text = driver.find_element(By.XPATH, '//*[@class="preloader-title"]')
-    #logger.info(f'Preloader found')
+    logger.info(f'Preloader found')
     return False
   except NoSuchElementException:
-    #logger.info(f'Preloader not found')
+    logger.info(f'Preloader not found')
     return True
 
 def scrap_pdf_url(url):
@@ -48,12 +48,12 @@ def scrap_pdf_url(url):
     timeout=15,
     poll_frequency=.5,
   )
-  #logger.info('Waiting download menu button')
+  logger.info('Waiting download menu button')
   wait.until(check_preloader_removed)
   try:
     download_menu_button = driver.find_element(By.XPATH, '//*[@title="Download"]')
     ActionChains(driver).click(download_menu_button).perform()
-    #logger.info('Clicked download menu button')
+    logger.info('Clicked download menu button')
   except Exception as error:
     logger.error(error)
   time.sleep(.5)
@@ -62,11 +62,11 @@ def scrap_pdf_url(url):
     ActionChains(driver).click(download_button).perform()
     #download_button = driver.find_element(By.XPATH, '//*[@href="linkFull"]')
     #print(download_button.href)
-    #logger.info('Clicked download button')
+    logger.info('Clicked download button')
     time.sleep(1)
   except Exception as error:
     logger.error(error)
-  #logger.info('Waiting for close')
+  logger.debug('Waiting for close')
   #time.sleep(10)
 
 urls = ['https://цфа.рф/reshenie/Sberbank/Mollinomenedjment', 'https://цфа.рф/reshenie/Sberbank/Treidberry', 'https://цфа.рф/reshenie/Sberbank/pigm', 'https://цфа.рф/reshenie/Sberbank/AOSTP', 'https://цфа.рф/reshenie/Sberbank/ROSH', 'https://цфа.рф/reshenie/Sberbank/TP', 'https://цфа.рф/reshenie/Sberbank/FTS', 'https://цфа.рф/reshenie/Sberbank/PG', 'https://цфа.рф/reshenie/Sberbank/STPPZMC', 'https://цфа.рф/reshenie/Sberbank/Gloringfarm', 'https://цфа.рф/reshenie/Sberbank/Resyrs', 'https://цфа.рф/reshenie/Sberbank/Pigment',
@@ -83,9 +83,20 @@ urls = ['https://цфа.рф/reshenie/Sberbank/Mollinomenedjment', 'https://цф
  'https://цфа.рф/reshenie/Mosbirzha/Invest', 'https://цфа.рф/reshenie/Mosbirzha/Rostelecom', 'https://цфа.рф/reshenie/Mosbirzha/Gazpromneft', 'https://цфа.рф/reshenie/Mosbirzha/GPB'] 
 
 
+urls = [url for url in urls if not url.endswith('.pdf')]
+
 def sync_scrap_pdf():
-  for target_url in urls: #examples_404 + examples_200:
+  '''
+  for target_url in urls[::-1]: #examples_404 + examples_200:
     scrap_pdf_url(target_url)
+  '''
+  import random
+  for i in range(10):
+    target_url = random.choice(urls)
+    scrap_pdf_url(target_url)
+    
+
+sync_scrap_pdf()
 
 def async_scrap_pdf():
   import concurrent.futures
@@ -100,5 +111,5 @@ def async_scrap_pdf():
       cfa_articles = done_job.result()
       logger.info(f'Done {url}')
 
-async_scrap_pdf()
+#async_scrap_pdf()
 
