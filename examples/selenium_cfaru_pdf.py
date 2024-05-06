@@ -82,8 +82,10 @@ urls = ['https://цфа.рф/reshenie/Sberbank/Mollinomenedjment', 'https://цф
  'https://цфа.рф/reshenie/Tokeon/TMobaile2', 'https://цфа.рф/reshenie/Tokeon/TMobaile3', 'https://цфа.рф/files/reshenie_o_vypuske_carmoney4.pdf', 'https://цфа.рф/files/reshenie_o_vypuske_real3.pdf', 'https://цфа.рф/files/reshenie_o_vypuske_psb2.pdf', 'https://цфа.рф/reshenie/Tokeon/Goldex/', 'https://цфа.рф/reshenie/Spb_Birzha/Karbon_Ziro', 'https://цфа.рф/reshenie/EvrofinansMosnarbank/EM', 'https://цфа.рф/reshenie/EvrofinansMosnarbank/SibAvtoTrans', 'https://цфа.рф/reshenie/EvrofinansMosnarbank/SAT', 'https://цфа.рф/reshenie/EvrofinansMosnarbank/SAT3', 'https://цфа.рф/reshenie/EvrofinansMosnarbank/SAT4', 'https://цфа.рф/reshenie/EvrofinansMosnarbank/EL6', 'https://цфа.рф/reshenie/EvrofinansMosnarbank/Uralzavod', 'https://цфа.рф/reshenie/Mosbirzha/Rostelec', 'https://цфа.рф/reshenie/Mosbirzha/Rostel', 'https://цфа.рф/reshenie/Mosbirzha/VBRR',
  'https://цфа.рф/reshenie/Mosbirzha/Invest', 'https://цфа.рф/reshenie/Mosbirzha/Rostelecom', 'https://цфа.рф/reshenie/Mosbirzha/Gazpromneft', 'https://цфа.рф/reshenie/Mosbirzha/GPB'] 
 
+print('Urls count', len(urls))
 
 urls = [url for url in urls if not url.endswith('.pdf')]
+print('Not pdf urls count', len(urls))
 
 def sync_scrap_pdf():
   '''
@@ -94,9 +96,8 @@ def sync_scrap_pdf():
   for i in range(10):
     target_url = random.choice(urls)
     scrap_pdf_url(target_url)
-    
 
-sync_scrap_pdf()
+#sync_scrap_pdf()
 
 def async_scrap_pdf():
   import concurrent.futures
@@ -112,4 +113,3 @@ def async_scrap_pdf():
       logger.info(f'Done {url}')
 
 #async_scrap_pdf()
-
