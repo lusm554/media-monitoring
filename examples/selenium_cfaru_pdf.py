@@ -14,60 +14,60 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 examples_404 = [
-	'https://цфа.рф/reshenie/Tokeon/Zalog',
+  'https://цфа.рф/reshenie/Tokeon/Zalog',
 ]
 examples_200 = [
-	'https://цфа.рф/reshenie/Tokeon/TMobaile3',
+  'https://цфа.рф/reshenie/Tokeon/TMobaile3',
 ]
 
 
 def check_preloader_removed(driver):
-	try:
-		preloader_text = driver.find_element(By.XPATH, '//*[@class="preloader-title"]')
-		logger.info(f'Preloader found')
-		return False
-	except NoSuchElementException:
-		logger.info(f'Preloader not found')
-		return True
+  try:
+    preloader_text = driver.find_element(By.XPATH, '//*[@class="preloader-title"]')
+    logger.info(f'Preloader found')
+    return False
+  except NoSuchElementException:
+    logger.info(f'Preloader not found')
+    return True
 
 def scrap_pdf_url(url):
-	options = ChromeOptions()
-	options.add_argument("--headless")
-	options.add_experimental_option("prefs", {
-			"download.default_directory": './pdfs',
-			"download.prompt_for_download": False,
-			"download.directory_upgrade": True,
-			"plugins.always_open_pdf_externally": True
-	})
-	driver = webdriver.Chrome(options=options)
+  options = ChromeOptions()
+  options.add_argument("--headless")
+  options.add_experimental_option("prefs", {
+      "download.default_directory": './pdfs',
+      "download.prompt_for_download": False,
+      "download.directory_upgrade": True,
+      "plugins.always_open_pdf_externally": True
+  })
+  driver = webdriver.Chrome(options=options)
 
-	logger.info(f'Driver {url!r}')
-	driver.get(url)
-	wait = WebDriverWait(
-		driver,
-		timeout=15,
-		poll_frequency=.5,
-	)
-	logger.info('Waiting download menu button')
-	wait.until(check_preloader_removed)
-	try:
-		download_menu_button = driver.find_element(By.XPATH, '//*[@title="Download"]')
-		ActionChains(driver).click(download_menu_button).perform()
-		logger.info('Clicked download menu button')
-	except Exception as error:
-		logger.error(error)
-	time.sleep(.5)
-	try:
-		download_button = driver.find_element(By.XPATH, '//*[@href="linkFull"]')
-		ActionChains(driver).click(download_button).perform()
-		#download_button = driver.find_element(By.XPATH, '//*[@href="linkFull"]')
-		#print(download_button.href)
-		logger.info('Clicked download button')
-		time.sleep(1)
-	except Exception as error:
-		logger.error(error)
-	logger.info('Waiting for close')
-	#time.sleep(10)
+  logger.info(f'Driver {url!r}')
+  driver.get(url)
+  wait = WebDriverWait(
+    driver,
+    timeout=15,
+    poll_frequency=.5,
+  )
+  logger.info('Waiting download menu button')
+  wait.until(check_preloader_removed)
+  try:
+    download_menu_button = driver.find_element(By.XPATH, '//*[@title="Download"]')
+    ActionChains(driver).click(download_menu_button).perform()
+    logger.info('Clicked download menu button')
+  except Exception as error:
+    logger.error(error)
+  time.sleep(.5)
+  try:
+    download_button = driver.find_element(By.XPATH, '//*[@href="linkFull"]')
+    ActionChains(driver).click(download_button).perform()
+    #download_button = driver.find_element(By.XPATH, '//*[@href="linkFull"]')
+    #print(download_button.href)
+    logger.info('Clicked download button')
+    time.sleep(1)
+  except Exception as error:
+    logger.error(error)
+  logger.info('Waiting for close')
+  #time.sleep(10)
 
 urls = ['https://цфа.рф/reshenie/Sberbank/Mollinomenedjment', 'https://цфа.рф/reshenie/Sberbank/Treidberry', 'https://цфа.рф/reshenie/Sberbank/pigm', 'https://цфа.рф/reshenie/Sberbank/AOSTP', 'https://цфа.рф/reshenie/Sberbank/ROSH', 'https://цфа.рф/reshenie/Sberbank/TP', 'https://цфа.рф/reshenie/Sberbank/FTS', 'https://цфа.рф/reshenie/Sberbank/PG', 'https://цфа.рф/reshenie/Sberbank/STPPZMC', 'https://цфа.рф/reshenie/Sberbank/Gloringfarm', 'https://цфа.рф/reshenie/Sberbank/Resyrs', 'https://цфа.рф/reshenie/Sberbank/Pigment',
  'https://цфа.рф/reshenie/Sberbank/Sberbank', 'https://цфа.рф/reshenie/Sberbank/SBKParitet', 'https://цфа.рф/reshenie/Sberbank/YurPesok', 'https://цфа.рф/reshenie/Sberbank/AlfaBank', 'https://цфа.рф/reshenie/Sberbank/BiznesInvesticii', 'https://цфа.рф/reshenie/Sberbank/BiznesInvest', 'https://цфа.рф/reshenie/Sberbank/77', 'https://цфа.рф/reshenie/Sberbank/omega', 'https://цфа.рф/reshenie/Sberbank/Biznes/Investicii', 'https://цфа.рф/reshenie/Sberbank/BIZNESINVESTICII', 'https://цфа.рф/reshenie/Sberbank/BizInv', 'https://цфа.рф/reshenie/Sberbank/BI', 'https://цфа.рф/reshenie/Sberbank/Avtomatrashet', 'https://цфа.рф/reshenie/Sberbank/BIZ/INVEST', 'https://цфа.рф/reshenie/Sberbank/Sber',
@@ -82,23 +82,23 @@ urls = ['https://цфа.рф/reshenie/Sberbank/Mollinomenedjment', 'https://цф
  'https://цфа.рф/reshenie/Tokeon/TMobaile2', 'https://цфа.рф/reshenie/Tokeon/TMobaile3', 'https://цфа.рф/files/reshenie_o_vypuske_carmoney4.pdf', 'https://цфа.рф/files/reshenie_o_vypuske_real3.pdf', 'https://цфа.рф/files/reshenie_o_vypuske_psb2.pdf', 'https://цфа.рф/reshenie/Tokeon/Goldex/', 'https://цфа.рф/reshenie/Spb_Birzha/Karbon_Ziro', 'https://цфа.рф/reshenie/EvrofinansMosnarbank/EM', 'https://цфа.рф/reshenie/EvrofinansMosnarbank/SibAvtoTrans', 'https://цфа.рф/reshenie/EvrofinansMosnarbank/SAT', 'https://цфа.рф/reshenie/EvrofinansMosnarbank/SAT3', 'https://цфа.рф/reshenie/EvrofinansMosnarbank/SAT4', 'https://цфа.рф/reshenie/EvrofinansMosnarbank/EL6', 'https://цфа.рф/reshenie/EvrofinansMosnarbank/Uralzavod', 'https://цфа.рф/reshenie/Mosbirzha/Rostelec', 'https://цфа.рф/reshenie/Mosbirzha/Rostel', 'https://цфа.рф/reshenie/Mosbirzha/VBRR',
  'https://цфа.рф/reshenie/Mosbirzha/Invest', 'https://цфа.рф/reshenie/Mosbirzha/Rostelecom', 'https://цфа.рф/reshenie/Mosbirzha/Gazpromneft', 'https://цфа.рф/reshenie/Mosbirzha/GPB'] 
 
-'''
-for target_url in urls: #examples_404 + examples_200:
-	scrap_pdf_url(target_url)	
-'''
 
-import concurrent.futures
-with concurrent.futures.ThreadPoolExecutor() as executor:
-	logger.debug(f'{executor._max_workers=}')
-	fetch_and_parse_jobs = {
-		executor.submit(
-			scrap_pdf_url,
-			url
-		): url
-		for url in urls
-	}
-	for done_job in concurrent.futures.as_completed(fetch_and_parse_jobs):
-		url = fetch_and_parse_jobs[done_job]
-		cfa_articles = done_job.result()
-		logger.info(f'Done {url}')
+def sync_scrap_pdf():
+  for target_url in urls: #examples_404 + examples_200:
+    scrap_pdf_url(target_url)
+
+def async_scrap_pdf():
+  import concurrent.futures
+  with concurrent.futures.ThreadPoolExecutor() as executor:
+    logger.debug(f'{executor._max_workers=}')
+    scrap_pdf_jobs = {
+      executor.submit(scrap_pdf_url, url): url
+      for url in urls
+    }
+    for done_job in concurrent.futures.as_completed(scrap_pdf_jobs):
+      url = scrap_pdf_jobs[done_job]
+      cfa_articles = done_job.result()
+      logger.info(f'Done {url}')
+
+async_scrap_pdf()
 
