@@ -20,7 +20,6 @@ examples_200 = [
   'https://цфа.рф/reshenie/Tokeon/TMobaile3',
 ]
 
-
 def check_preloader_removed(driver):
   try:
     preloader_text = driver.find_element(By.XPATH, '//*[@class="preloader-title"]')
@@ -102,7 +101,7 @@ def sync_scrap_pdf():
     scrap_pdf_url(target_url)
     break
 
-sync_scrap_pdf()
+#sync_scrap_pdf()
 
 def async_scrap_pdf():
   import concurrent.futures
