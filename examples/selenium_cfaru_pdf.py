@@ -58,10 +58,14 @@ def scrap_pdf_url(url):
     logger.error(error)
   time.sleep(.5)
   try:
-    download_button = driver.find_element(By.XPATH, '//*[@href="linkFull"]')
+    download_button = driver.find_element(By.XPATH, '//*[@class="download-full-button"]')
+    download_href = 'test.pdf'
+    driver.execute_script("arguments[0].setAttribute('download', arguments[1])", download_button, download_href)
     ActionChains(driver).click(download_button).perform()
-    #download_button = driver.find_element(By.XPATH, '//*[@href="linkFull"]')
-    #print(download_button.href)
+    button_href = download_button.get_attribute('href')
+    button_pdf_name = download_button.get_attribute('download')
+    print(button_href)
+    print(button_pdf_name)
     logger.info('Clicked download button')
     time.sleep(1)
   except Exception as error:
@@ -96,8 +100,9 @@ def sync_scrap_pdf():
   for i in range(10):
     target_url = random.choice(urls)
     scrap_pdf_url(target_url)
+    break
 
-#sync_scrap_pdf()
+sync_scrap_pdf()
 
 def async_scrap_pdf():
   import concurrent.futures
