@@ -10,7 +10,8 @@ atoken_patterns = {
 }
 
 sberbank_patterns = {
-  'cfa_nominal_pattern': re.compile(r'Цена приобретения.*?составляет\s+(\d+)\s+\(.*?\)\s+рублей', re.DOTALL),
+  'cfa_nominal': re.compile(r'Цена приобретения.*?составляет\s+(\d+)\s+\(.*?\)\s+рублей', re.DOTALL),
+  'cfa_start_placement_dt': re.compile(r'Дата и время начала размещения ЦФА:.*?([\d.]+\s+\d+:\d+\s+[А-Я]{3})'),
 }
 
 def pdf_to_text(filepath):
@@ -24,6 +25,7 @@ def pdf_to_text(filepath):
   return document_text
 
 def find_with_pattern(pattern, text):
+  print(text)
   match = pattern.search(text)
   if match:
     return match.group(1)
@@ -44,7 +46,6 @@ def parse_pdf(filepath, patterns):
 
 
 def main():
-  '''
   #filepath = 'pdfs/a-token_ab.pdf'
   filepath = 'pdfs/sberbank_rs.pdf'
   parse_pdf(filepath, sberbank_patterns)
@@ -59,6 +60,7 @@ def main():
         print(filepath)
         parse_pdf(filepath, sberbank_patterns)
         pass
+  '''
 
 if __name__ == '__main__':
   main()
