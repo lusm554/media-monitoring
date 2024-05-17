@@ -1,5 +1,6 @@
 import fitz
 import re
+import os
 from pprint import pprint
 
 def pdf_to_text(filepath):
@@ -28,6 +29,9 @@ def parse_pdf(filepath):
   file_text = pdf_to_text(filepath)
   res = parse_text(file_text)
 
+def main():
+  filepath = 'pdfs/a-token_ab.pdf'
+  parse_pdf(filepath)
 
-filepath = 'pdfs/a-token_ab.pdf'
-parse_pdf(filepath)
+if __name__ == '__main__':
+  main()
