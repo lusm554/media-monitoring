@@ -14,8 +14,17 @@ def pdf_to_text(filepath):
       document_text += text
     return document_text
 
+def find_with_pattern(pattern, text):
+  match = pattern.search(text)
+  if match:
+    return match.group(1)
+  return None
+
 def parse_text(text):
-  pass
+  #print(text)
+  cfa_nominal_pattern = re.compile(r'Цена приобретения ЦФА в течение Периода размещения ЦФА.*?составляет\s+(\d{1,3}(?: \d{3})*(?:,\d{2})?)', re.DOTALL)
+  cfa_nominal_value = find_with_pattern(cfa_nominal_pattern, text)
+  print(cfa_nominal_value)
 
 def parse_pdf(filepath):
   file_text = pdf_to_text(filepath)
