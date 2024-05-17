@@ -5,8 +5,8 @@ from pprint import pprint
 
 def pdf_to_text(filepath):
   with fitz.open(filepath) as document:
-    print(f'{document.page_count=}')
-    pprint(document.metadata)
+    #print(f'{document.page_count=}')
+    #pprint(document.metadata)
     document_text = ''
     for page in document:
       text = page.get_text()
@@ -20,8 +20,7 @@ def find_with_pattern(pattern, text):
   return None
 
 def parse_text(text):
-  #print(text)
-  cfa_nominal_pattern = re.compile(r'Цена приобретения ЦФА в течение Периода размещения ЦФА.*?составляет\s+(\d{1,3}(?: \d{3})*(?:,\d{2})?)', re.DOTALL)
+  cfa_nominal_pattern = re.compile(r'Цена приобретения ЦФА при их выпуске.*?составляет\s+(\d{1,3}(?: \d{3})*(?:,\d{2})?)', re.DOTALL)
   cfa_nominal_value = find_with_pattern(cfa_nominal_pattern, text)
   print(cfa_nominal_value)
 
@@ -30,8 +29,17 @@ def parse_pdf(filepath):
   res = parse_text(file_text)
 
 def main():
+  '''
   filepath = 'pdfs/a-token_ab.pdf'
   parse_pdf(filepath)
+  '''
+  for root, dirs, files in os.walk('pdfs/'):
+    for file in files:
+      if not file.startswith('a-token'): continue
+      filepath = os.path.join(root, file)
+      print(filepath)
+      parse_pdf(filepath)
+      print()
 
 if __name__ == '__main__':
   main()
