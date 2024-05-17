@@ -87,7 +87,7 @@ def setup_bot_data_variables(telegram_app, commands):
   telegram_app.bot_data['regular_newsletter_chats'] = set(str(x) for x in os.environ.get('NEWS_SCHEDULED_CHATS').split(',') if x != '')
   telegram_app.bot_data['bot_timezone'] = time_zone_moscow
   telegram_app.bot_data['cfa_newsletter_time'] = datetime.time(hour=9, tzinfo=time_zone_moscow)
-  telegram_app.bot_data['cfa_releases_time'] = datetime.time(hour=18, tzinfo=time_zone_moscow)
+  telegram_app.bot_data['cfa_releases_time'] = datetime.time(hour=19, tzinfo=time_zone_moscow)
   telegram_app.bot_data['DEVELOPER_CHAT_ID'] = os.environ.get('DEVELOPER_CHAT_ID')
 
 def setup_bot_handlers(telegram_app, commands):
