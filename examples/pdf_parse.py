@@ -2,8 +2,6 @@ import fitz
 import re
 from pprint import pprint
 
-filepath = 'pdfs/a-token_ab.pdf'
-
 def pdf_to_text(filepath):
   with fitz.open(filepath) as document:
     print(f'{document.page_count=}')
@@ -30,4 +28,6 @@ def parse_pdf(filepath):
   file_text = pdf_to_text(filepath)
   res = parse_text(file_text)
 
+
+filepath = 'pdfs/a-token_ab.pdf'
 parse_pdf(filepath)
