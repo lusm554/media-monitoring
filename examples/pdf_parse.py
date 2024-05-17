@@ -10,7 +10,7 @@ atoken_patterns = {
 }
 
 sberbank_patterns = {
-  'cfa_nominal_pattern': re.compile(r'Цена приобретения ЦФА при их выпуске.*?составляет\s+(\d+)\s+\(.*?\)\s+рублей\s+РФ', re.DOTALL),
+  'cfa_nominal_pattern': re.compile(r'Цена приобретения.*?составляет\s+(\d+)\s+\(.*?\)\s+рублей', re.DOTALL),
 }
 
 def pdf_to_text(filepath):
@@ -46,7 +46,7 @@ def parse_pdf(filepath, patterns):
 def main():
   '''
   #filepath = 'pdfs/a-token_ab.pdf'
-  filepath = 'pdfs/sberbank_fts.pdf'
+  filepath = 'pdfs/sberbank_rs.pdf'
   parse_pdf(filepath, sberbank_patterns)
   '''
   for root, dirs, files in os.walk('pdfs/'):
