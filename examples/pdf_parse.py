@@ -5,8 +5,8 @@ from pprint import pprint
 
 atoken_patterns = {
   'cfa_nominal_pattern': re.compile(r'Цена приобретения ЦФА при их выпуске.*?составляет\s+(\d{1,3}(?: \d{3})*(?:,\d{2})?)', re.DOTALL),
-  #'cfa_start_placement_dt_pattern': re.compile(r'Дата начала размещения ЦФА: (.*)'),
-  #'cfa_end_placement_dt_pattern': re.compile(r'Дата завершения \(окончания\) размещения ЦФА: (.*)'),
+  'cfa_start_placement_dt_pattern': re.compile(r'Дата начала размещения ЦФА:\s(.?)'),
+  'cfa_end_placement_dt_pattern': re.compile(r'Дата завершения \(окончания\) размещения ЦФА:\s(\d{2}\.\d{2}\.\d{4} до \d{2}\.\d{2} часов московского времени)'),
 }
 
 sberbank_patterns = {
@@ -54,16 +54,14 @@ def parse_pdf(filepath, patterns):
   pprint(res)
 
 def main():
-  filepath = 'pdfs/a-token_ab.pdf'
+  filepath = 'pdfs/a-token_alrosa.pdf'
   #filepath = 'pdfs/sberbank_rs.pdf'
   #filepath = 'pdfs/tokeon_giberno.pdf'
-  parse_pdf(filepath, atoken_patterns)
-  '''
+  #parse_pdf(filepath, atoken_patterns)
   for root, dirs, files in os.walk('pdfs/'):
     for file in files:
       filepath = os.path.join(root, file)
       if file.startswith('a-token'): 
-        continue
         print(filepath)
         parse_pdf(filepath, atoken_patterns)
       if file.startswith('sberbank'):
@@ -72,10 +70,10 @@ def main():
         parse_pdf(filepath, sberbank_patterns)
         pass
       if file.startswith('tokeon'):
+        continue
         print(filepath)
         parse_pdf(filepath, tokeon_patterns)
         pass
-  '''
 
 if __name__ == '__main__':
   main()
