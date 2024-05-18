@@ -27,6 +27,9 @@ def pdf_to_text(filepath):
     for page in document:
       text = page.get_text()
       document_text += text
+  document_text = document_text.replace('\n', ' ')
+  document_text = re.sub(" +", " ", document_text)
+  document_text = document_text.strip()
   return document_text
 
 def find_with_pattern(pattern, text):
