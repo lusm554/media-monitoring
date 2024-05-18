@@ -46,6 +46,7 @@ def parse_pdf(filepath, patterns):
 
 
 def main():
+  '''
   #filepath = 'pdfs/a-token_ab.pdf'
   filepath = 'pdfs/sberbank_rs.pdf'
   parse_pdf(filepath, sberbank_patterns)
@@ -60,7 +61,6 @@ def main():
         print(filepath)
         parse_pdf(filepath, sberbank_patterns)
         pass
-  '''
 
 if __name__ == '__main__':
   main()
