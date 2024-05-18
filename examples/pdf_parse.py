@@ -5,8 +5,8 @@ from pprint import pprint
 
 atoken_patterns = {
   'cfa_nominal_pattern': re.compile(r'Цена приобретения ЦФА при их выпуске.*?составляет\s+(\d{1,3}(?: \d{3})*(?:,\d{2})?)', re.DOTALL),
-  'cfa_start_placement_dt_pattern': re.compile(r'Дата начала размещения ЦФА: (.*)'),
-  'cfa_end_placement_dt_pattern': re.compile(r'Дата завершения \(окончания\) размещения ЦФА: (.*)'),
+  #'cfa_start_placement_dt_pattern': re.compile(r'Дата начала размещения ЦФА: (.*)'),
+  #'cfa_end_placement_dt_pattern': re.compile(r'Дата завершения \(окончания\) размещения ЦФА: (.*)'),
 }
 
 sberbank_patterns = {
@@ -16,7 +16,9 @@ sberbank_patterns = {
 }
 
 tokeon_patterns = {
-  'cfa_nominal': re.compile(r'Цена приобретения\s*ЦФА при выпуске\s*([\d\s]+ ₽)')
+  'cfa_nominal': re.compile(r'Цена приобретения\s*ЦФА при выпуске\s*([\d\s]+ ₽)'),
+  'cfa_start_placement_dt': re.compile(r'Начало\s*Московское время \(GMT\+3\)\s*\n*\s*(\d{2}\.\d{2}\.\d{4} в \d{2}:\d{2})'
+  ),
 }
 
 def pdf_to_text(filepath):
@@ -52,11 +54,10 @@ def parse_pdf(filepath, patterns):
   pprint(res)
 
 def main():
-  '''
-  #filepath = 'pdfs/a-token_ab.pdf'
+  filepath = 'pdfs/a-token_ab.pdf'
   #filepath = 'pdfs/sberbank_rs.pdf'
-  filepath = 'pdfs/tokeon_giberno.pdf'
-  parse_pdf(filepath, tokeon_patterns)
+  #filepath = 'pdfs/tokeon_giberno.pdf'
+  parse_pdf(filepath, atoken_patterns)
   '''
   for root, dirs, files in os.walk('pdfs/'):
     for file in files:
@@ -74,6 +75,7 @@ def main():
         print(filepath)
         parse_pdf(filepath, tokeon_patterns)
         pass
+  '''
 
 if __name__ == '__main__':
   main()
