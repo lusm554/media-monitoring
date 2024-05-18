@@ -11,7 +11,8 @@ atoken_patterns = {
 
 sberbank_patterns = {
   'cfa_nominal': re.compile(r'Цена приобретения.*?составляет\s+(\d+)\s+\(.*?\)\s+рублей', re.DOTALL),
-  'cfa_start_placement_dt': re.compile(r'Дата и время начала размещения ЦФА:.*?([\d.]+\s+\d+:\d+\s+[А-Я]{3})'),
+  'cfa_start_placement_dt': re.compile(r'Дата и время начала размещения ЦФА[\s\S]*?(\d{2}\.\d{2}\.\d{4} \d{2}:\d{2} МСК)'),
+  'cfa_end_placement_dt': re.compile(r'Дата и время окончания размещения ЦФА[\s\S]*?(\d{2}\.\d{2}\.\d{4} \d{2}:\d{2} МСК)'),
 }
 
 def pdf_to_text(filepath):
@@ -25,7 +26,6 @@ def pdf_to_text(filepath):
   return document_text
 
 def find_with_pattern(pattern, text):
-  print(text)
   match = pattern.search(text)
   if match:
     return match.group(1)
