@@ -15,6 +15,10 @@ sberbank_patterns = {
   'cfa_end_placement_dt': re.compile(r'Дата и время окончания размещения ЦФА[\s\S]*?(\d{2}\.\d{2}\.\d{4} \d{2}:\d{2} МСК)'),
 }
 
+tokeon_patterns = {
+  'cfa_nominal': re.compile(r'Цена приобретения\s*ЦФА при выпуске\s*([\d\s]+ ₽)')
+}
+
 def pdf_to_text(filepath):
   with fitz.open(filepath) as document:
     #print(f'{document.page_count=}')
@@ -44,22 +48,28 @@ def parse_pdf(filepath, patterns):
   res = parse_text(file_text, patterns)
   pprint(res)
 
-
 def main():
   '''
   #filepath = 'pdfs/a-token_ab.pdf'
-  filepath = 'pdfs/sberbank_rs.pdf'
-  parse_pdf(filepath, sberbank_patterns)
+  #filepath = 'pdfs/sberbank_rs.pdf'
+  filepath = 'pdfs/tokeon_giberno.pdf'
+  parse_pdf(filepath, tokeon_patterns)
   '''
   for root, dirs, files in os.walk('pdfs/'):
     for file in files:
       filepath = os.path.join(root, file)
       if file.startswith('a-token'): 
         continue
-        #parse_pdf(filepath, atoken_patterns)
+        print(filepath)
+        parse_pdf(filepath, atoken_patterns)
       if file.startswith('sberbank'):
+        continue
         print(filepath)
         parse_pdf(filepath, sberbank_patterns)
+        pass
+      if file.startswith('tokeon'):
+        print(filepath)
+        parse_pdf(filepath, tokeon_patterns)
         pass
 
 if __name__ == '__main__':
