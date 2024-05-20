@@ -4,6 +4,8 @@ import re, os
 
 import nltk
 nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('wordnet')
 
 def pdf_to_text(filepath):
   with fitz.open(filepath) as document:
@@ -23,12 +25,33 @@ def tokenize_text(text):
   tokens = nltk.word_tokenize(text)
   return tokens
 
+def _get_wordnet_pos(treebank_tag):
+  if treebank_tag.startswith('J'):
+    return nltk.corpus.wordnet.ADJ
+  elif treebank_tag.startswith('V'):
+    return nltk.corpus.wordnet.VERB
+  elif treebank_tag.startswith('N'):
+    return nltk.corpus.wordnet.NOUN
+  elif treebank_tag.startswith('R'):
+    return nltk.corpus.wordnet.ADV
+  else:
+    return None
+
+def lemmatize_tokens(tokens):
+  lemmatizer = nltk.stem.WordNetLemmatizer()
+  lemmatized_tokens = list()
+  for token, pos in nltk.pos_tag(tokens):
+    wordnet_pos = _get_wordnet_pos(pos) or nltk.corpus.wordnet.NOUN
+    lemmatized_tokens.append(lemmatizer.lemmatize(token, pos=wordnet_pos))
+  return lemmatized_tokens
+
 def main():
   filepath = 'pdfs/a-token_alrosa.pdf'
   filetext = pdf_to_text(filepath)
   filetext = preprocess_text(filetext)
   tokens = tokenize_text(filetext)
-  print(tokens)
+  lemmatized_tokens = lemmatize_tokens(tokens)
+  print(lemmatized_tokens)
   '''
   for root, dirs, files in os.walk('pdfs/'):
     for file in files:
