@@ -32,13 +32,26 @@ def lemmatize_tokens(tokens):
   lemmatized_tokens = [token for token in lemmatized_tokens if token.strip()]
   return lemmatized_tokens
 
+def extract_values(tokens, keywords):
+  values = list()
+  for i, token in enumerate(tokens):
+    if token in keywords:
+      context_window = tokens[max(0, i-5):i+5]
+      values.append((token, context_window))
+  return values
+
 def main():
   filepath = 'pdfs/a-token_alrosa.pdf'
   filetext = pdf_to_text(filepath)
   filetext = preprocess_text(filetext)
   tokens = tokenize_text(filetext)
   lemmatized_tokens = lemmatize_tokens(tokens)
-  print(lemmatized_tokens)
+  keywords = ['приобретение']
+  extracted_values = extract_values(lemmatized_tokens, keywords)
+  for kw, context in extracted_values:
+    result = parse_context(context, kw)
+    if result:
+      print(result)
   '''
   for root, dirs, files in os.walk('pdfs/'):
     for file in files:
