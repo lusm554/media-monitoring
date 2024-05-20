@@ -9,12 +9,15 @@ def pdf_to_text(filepath):
     for page in document:
       text = page.get_text()
       document_text += text
-  #document_text = document_text.replace('\n', ' ')
-  #document_text = re.sub(" +", " ", document_text)
-  #document_text = document_text.strip()
   return document_text
 
-def tokenize(text):
+def preprocess_text(text):
+  text = text.lower()
+  text = re.sub(r'\s+', ' ', text)
+  text = re.sub(r'[^\w\s]', '', text)
+  return text
+
+def tokenize_text(text):
   import nltk
   nltk.download('punkt')
   tokens = nltk.word_tokenize(text)
@@ -23,8 +26,10 @@ def tokenize(text):
 def main():
   filepath = 'pdfs/a-token_alrosa.pdf'
   filetext = pdf_to_text(filepath)
-  tokens = tokenize(filetext)
-  print(tokens)
+  filetext = preprocess_text(filetext)
+  print(filetext)
+  #tokens = tokenize_text(filetext)
+  #print(tokens)
   '''
   for root, dirs, files in os.walk('pdfs/'):
     for file in files:
