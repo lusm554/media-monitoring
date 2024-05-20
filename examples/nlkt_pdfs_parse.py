@@ -1,7 +1,9 @@
-import fitz
-import re
-import os
 from pprint import pprint
+import fitz
+import re, os
+
+import nltk
+nltk.download('punkt')
 
 def pdf_to_text(filepath):
   with fitz.open(filepath) as document:
@@ -18,8 +20,6 @@ def preprocess_text(text):
   return text
 
 def tokenize_text(text):
-  import nltk
-  nltk.download('punkt')
   tokens = nltk.word_tokenize(text)
   return tokens
 
@@ -27,9 +27,8 @@ def main():
   filepath = 'pdfs/a-token_alrosa.pdf'
   filetext = pdf_to_text(filepath)
   filetext = preprocess_text(filetext)
-  print(filetext)
-  #tokens = tokenize_text(filetext)
-  #print(tokens)
+  tokens = tokenize_text(filetext)
+  print(tokens)
   '''
   for root, dirs, files in os.walk('pdfs/'):
     for file in files:
