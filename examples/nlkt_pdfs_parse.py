@@ -22,16 +22,14 @@ def preprocess_text(text):
   return text
 
 def tokenize_text(text):
-  tokens = nltk.word_tokenize(text)
+  tokens = nltk.word_tokenize(text, language='russian')
   return tokens
 
 def lemmatize_tokens(tokens):
-  import pymorphy2
-  morph = pymorphy2.MorphAnalyzer()
-  lemmatized_tokens = list()
-  for token in tokens:
-    p = morph.parse(token)[0]
-    lemmatized_tokens.append(p)
+  from pymystem3 import Mystem
+  mystem = Mystem()
+  lemmatized_tokens = mystem.lemmatize(' '.join(tokens))
+  lemmatized_tokens = [token for token in lemmatized_tokens if token.strip()]
   return lemmatized_tokens
 
 def main():
