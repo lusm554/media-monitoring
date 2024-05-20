@@ -14,11 +14,17 @@ def pdf_to_text(filepath):
   #document_text = document_text.strip()
   return document_text
 
+def tokenize(text):
+  import nltk
+  nltk.download('punkt')
+  tokens = nltk.word_tokenize(text)
+  return tokens
 
 def main():
   filepath = 'pdfs/a-token_alrosa.pdf'
   filetext = pdf_to_text(filepath)
-  print(filetext)
+  tokens = tokenize(filetext)
+  print(tokens)
   '''
   for root, dirs, files in os.walk('pdfs/'):
     for file in files:
