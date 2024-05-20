@@ -25,24 +25,13 @@ def tokenize_text(text):
   tokens = nltk.word_tokenize(text)
   return tokens
 
-def _get_wordnet_pos(treebank_tag):
-  if treebank_tag.startswith('J'):
-    return nltk.corpus.wordnet.ADJ
-  elif treebank_tag.startswith('V'):
-    return nltk.corpus.wordnet.VERB
-  elif treebank_tag.startswith('N'):
-    return nltk.corpus.wordnet.NOUN
-  elif treebank_tag.startswith('R'):
-    return nltk.corpus.wordnet.ADV
-  else:
-    return None
-
 def lemmatize_tokens(tokens):
-  lemmatizer = nltk.stem.WordNetLemmatizer()
+  import pymorphy2
+  morph = pymorphy2.MorphAnalyzer()
   lemmatized_tokens = list()
-  for token, pos in nltk.pos_tag(tokens):
-    wordnet_pos = _get_wordnet_pos(pos) or nltk.corpus.wordnet.NOUN
-    lemmatized_tokens.append(lemmatizer.lemmatize(token, pos=wordnet_pos))
+  for token in tokens:
+    p = morph.parse(token)[0]
+    lemmatized_tokens.append(p)
   return lemmatized_tokens
 
 def main():
