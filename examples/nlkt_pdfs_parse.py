@@ -4,8 +4,6 @@ import re, os
 
 import nltk
 nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
-nltk.download('wordnet')
 
 def pdf_to_text(filepath):
   with fitz.open(filepath) as document:
@@ -39,6 +37,12 @@ def extract_values(tokens, keywords):
       context_window = tokens[max(0, i-5):i+5]
       values.append((token, context_window))
   return values
+
+def parse_context(context_window, keyword):
+  for word in context_window:
+    if keyword == 'приобретение' and word.isdigit():
+      return f"Номинал: {word}"
+  return None
 
 def main():
   filepath = 'pdfs/a-token_alrosa.pdf'
