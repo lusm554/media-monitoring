@@ -56,11 +56,46 @@ def test_ner(text):
   markup = ner(text)
   show_markup(markup.text, markup.spans)
 
+def test_extractors(text):
+  from natasha import (
+    Doc,
+    Segmenter,
+    NewsEmbedding,
+    NewsMorphTagger,
+    NewsSyntaxParser,
+    NewsNERTagger,
+    MorphVocab,
+    NamesExtractor,
+    DatesExtractor,
+    MoneyExtractor,
+    AddrExtractor,
+  )
+  segmenter = Segmenter()
+  morph_vocab = MorphVocab()
+
+  emb = NewsEmbedding()
+  morph_tagger = NewsMorphTagger(emb)
+  syntax_parser = NewsSyntaxParser(emb)
+  ner_tagger = NewsNERTagger(emb)
+
+  names_extractor = NamesExtractor(morph_vocab)
+  dates_extractor = DatesExtractor(morph_vocab)
+  money_extractor = MoneyExtractor(morph_vocab)
+  addr_extractor = AddrExtractor(morph_vocab)
+
+  doc = Doc(text)
+  doc.segment(segmenter)
+  doc.tag_morph(morph_tagger)
+  doc.parse_syntax(syntax_parser)
+  doc.tag_ner(ner_tagger)
+  pprint(doc.tokens[:10])
+
 def main():
   filepath = 'pdfs/a-token_alrosa.pdf'
   filetext = pdf_to_text(filepath)
   #filetext = preprocess_text(filetext)
-  test_ner(filetext)
+  #test_ner(filetext)
+  test_extractors(filetext)
   '''
   tokens = tokenize_text(filetext)
   lemmatized_tokens = lemmatize_tokens(tokens)
