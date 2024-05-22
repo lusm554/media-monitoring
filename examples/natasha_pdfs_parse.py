@@ -88,7 +88,10 @@ def test_extractors(text):
   doc.tag_morph(morph_tagger)
   doc.parse_syntax(syntax_parser)
   doc.tag_ner(ner_tagger)
-  pprint(doc.tokens[:10])
+  #pprint(doc.tokens[:10]) # print doc tokens
+  #doc.ner.print() # print ner markup
+  #doc.sents[0].morph.print() # print morph for first sentence in doc
+  doc.sents[0].syntax.print() # print syntax for first sentence in doc
 
 def main():
   filepath = 'pdfs/a-token_alrosa.pdf'
