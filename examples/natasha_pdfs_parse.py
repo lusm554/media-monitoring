@@ -91,7 +91,10 @@ def test_extractors(text):
   #pprint(doc.tokens[:10]) # print doc tokens
   #doc.ner.print() # print ner markup
   #doc.sents[0].morph.print() # print morph for first sentence in doc
-  doc.sents[0].syntax.print() # print syntax for first sentence in doc
+  #doc.sents[0].syntax.print() # print syntax for first sentence in doc
+  dts = dates_extractor(doc.text)
+  dts = list(dts)
+  pprint(dts)
 
 def main():
   filepath = 'pdfs/a-token_alrosa.pdf'
