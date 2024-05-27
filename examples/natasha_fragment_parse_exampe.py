@@ -65,12 +65,19 @@ def preproc_text(text):
 def split_on_sections(text):
   section_pattern = re.compile(r'^\d+\.\d+\.\s.+', re.MULTILINE)
   sections = list(section_pattern.finditer(text))
-  return sections
+  extracted_sections = list()
+  for i, section in enumerate(sections):
+    start = section.end()
+    end = sections[i + 1].start() if (i + 1) < len(sections) else len(text)
+    section_text = text[section.start():end]
+    print(start, end)
+    print(section)
+    extracted_sections.append(section_text)
+  return extracted_sections
 
 def parse_pdf(pdf_filepath):
   pdf_text = pdf_to_text(pdf_filepath)
-  for sec in split_on_sections(pdf_text):
-    print(sec)
+  split_on_sections(pdf_text)
   #preproced_text = preproc_text(pdf_text)
   #print(preproced_text)
 
