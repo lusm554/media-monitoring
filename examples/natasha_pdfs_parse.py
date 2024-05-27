@@ -92,9 +92,16 @@ def test_extractors(text):
   #doc.ner.print() # print ner markup
   #doc.sents[0].morph.print() # print morph for first sentence in doc
   #doc.sents[0].syntax.print() # print syntax for first sentence in doc
+  '''
   dts = dates_extractor(doc.text)
   dts = list(dts)
   pprint(dts)
+  '''
+  text = 'Цена приобретения ЦФА составляет 765922 (Семьсот шестьдесят пять тысяч девятьсот двадцать два) российских рубля за 1 (Одну) штуку ЦФА.'
+  #money = money_extractor(doc.text)
+  money = money_extractor(text)
+  money = list(money)
+  pprint(money)
 
 def main():
   filepath = 'pdfs/a-token_alrosa.pdf'
