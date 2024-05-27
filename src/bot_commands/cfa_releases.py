@@ -71,7 +71,8 @@ async def cfa_week_releases(update, context):
 
 async def cfa_all_time_releases(update, context):
   scraper = context.bot_data.get("scraper")
-  releases = scraper.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper.Periods.ALL_AVAILABLE_TIME)
+  #releases = scraper.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper.Periods.ALL_AVAILABLE_TIME)
+  releases = scraper.CfaReleasesScraper(error='raise').fetch_and_parse(scraper.Periods.ALL_AVAILABLE_TIME)
   effective_chat_id = update.effective_chat.id
   await cfa_releases_base(context, effective_chat_id, releases)
 
