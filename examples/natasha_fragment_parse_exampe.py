@@ -1,11 +1,19 @@
 from pprint import pprint
+import fitz
+import re, os
 from natasha import (
-  MorphVocab,
-  NamesExtractor,
-  DatesExtractor,
-  MoneyExtractor,
-  AddrExtractor,
-)
+    Doc,
+    Segmenter,
+    NewsEmbedding,
+    NewsMorphTagger,
+    NewsSyntaxParser,
+    NewsNERTagger,
+    MorphVocab,
+    NamesExtractor,
+    DatesExtractor,
+    MoneyExtractor,
+    AddrExtractor,
+  )
 morph_vocab = MorphVocab()
 
 names_extractor = NamesExtractor(morph_vocab)
@@ -32,6 +40,38 @@ Parse plan:
       1. Parse all money in text frament
       2. By keywords detect cfa nominal
 '''
+
+def pdf_to_text(filepath):
+  with fitz.open(filepath) as document:
+    document_text = ''
+    for page in document:
+      text = page.get_text()
+      document_text += text
+  return document_text
+
+def preproc_text(text):
+  segmenter = Segmenter()
+  emb = NewsEmbedding()
+  morph_tagger = NewsMorphTagger(emb)
+  syntax_parser = NewsSyntaxParser(emb)
+  ner_tagger = NewsNERTagger(emb)
+  doc = Doc(text)
+  doc.segment(segmenter)
+  doc.tag_morph(morph_tagger)
+  doc.parse_syntax(syntax_parser)
+  doc.tag_ner(ner_tagger)
+  return doc
+
+def parse_pdf(pdf_filepath):
+  pdf_text = pdf_to_text(pdf_filepath)
+  preproced_text = preproc_text(pdf_text)
+  print(preproced_text)
+
+def main():
+  pdf_filepath = 'pdfs/a-token_alrosa.pdf'
+  parse_pdf(pdf_filepath)
+
+main()
 
 '''
 def test_date_extarctor():
