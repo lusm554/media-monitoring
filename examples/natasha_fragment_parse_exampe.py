@@ -84,6 +84,7 @@ def parse_pdf(pdf_filepath):
 
 def main():
   pdf_filepath = 'pdfs/a-token_alrosa.pdf'
+  pdf_filepath = 'pdfs/mosbirzha_rostelec.pdf'
   parse_pdf(pdf_filepath)
 
 #main()
@@ -94,12 +95,13 @@ def test_on_all_files():
   for root, dirs, files in os.walk('pdfs/'):
     for file in files:
       filepath = os.path.join(root, file)
-      print(filepath)
       s = parse_pdf(filepath)
-      print(len(s))
       if len(s) > 10:
         found_cnt += 1
       else:
+        print(filepath)
+        print(len(s))
+        print()
         not_found_cnt += 1
   print(found_cnt)
   print(not_found_cnt)
