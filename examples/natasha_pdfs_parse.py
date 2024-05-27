@@ -104,10 +104,16 @@ def test_extractors(text):
   money = list(money)
   pprint(money)
   '''
+  '''
   for span in doc.spans:
     name = names_extractor.find(span.text)
     if name is not None:
       print(name)
+  '''
+  for span in doc.spans:
+    addr = addr_extractor.find(span.text)
+    if addr is not None:
+      print(addr)
 
 def main():
   filepath = 'pdfs/a-token_alrosa.pdf'
