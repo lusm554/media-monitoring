@@ -97,11 +97,17 @@ def test_extractors(text):
   dts = list(dts)
   pprint(dts)
   '''
+  '''
   text = 'Цена приобретения ЦФА составляет 765922 (Семьсот шестьдесят пять тысяч девятьсот двадцать два) российских рубля за 1 (Одну) штуку ЦФА.'
   #money = money_extractor(doc.text)
   money = money_extractor(text)
   money = list(money)
   pprint(money)
+  '''
+  for span in doc.spans:
+    name = names_extractor.find(span.text)
+    if name is not None:
+      print(name)
 
 def main():
   filepath = 'pdfs/a-token_alrosa.pdf'
