@@ -106,7 +106,27 @@ def test_on_all_files():
   print(found_cnt)
   print(not_found_cnt)
 
-test_on_all_files()
+#test_on_all_files()
+
+pdfs_types_to_test = [
+  'pdfs/tokeon_zalog.pdf',
+  'pdfs/atomyze_tkf.pdf',
+  'pdfs/lighthouse_vtbfactoring.pdf',
+  'pdfs/evrofinansmosnarbank_sat.pdf',
+  'pdfs/a-token_gaztranssnab.pdf',
+  'pdfs/mosbirzha_vbrr.pdf',
+  'pdfs/sberbank_fts.pdf',
+  'pdfs/masterchain_finteh.pdf',
+  'pdfs/cfahab_devaises.pdf',
+]
+print(len(pdfs_types_to_test))
+low_importance_types = [
+  'pdfs/spb_birzha_karbon_ziro.pdf', # low importance
+  'pdfs/pdfs/goldex_.pdf', # low importance
+  'pdfs/biz_invest.pdf', # low importance, pdf style like sber
+  'pdfs/biznes_investicii.pdf', # low importance, pdf style like sber
+]
+
 
 '''
 def test_date_extarctor():
