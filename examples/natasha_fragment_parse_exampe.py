@@ -70,22 +70,41 @@ def split_on_sections(text):
     start = section.end()
     end = sections[i + 1].start() if (i + 1) < len(sections) else len(text)
     section_text = text[section.start():end]
-    print(start, end)
-    print(section)
+    #print(start, end)
+    #print(section)
     extracted_sections.append(section_text)
   return extracted_sections
 
 def parse_pdf(pdf_filepath):
   pdf_text = pdf_to_text(pdf_filepath)
-  split_on_sections(pdf_text)
+  sections = split_on_sections(pdf_text)
   #preproced_text = preproc_text(pdf_text)
   #print(preproced_text)
+  return sections
 
 def main():
   pdf_filepath = 'pdfs/a-token_alrosa.pdf'
   parse_pdf(pdf_filepath)
 
-main()
+#main()
+
+def test_on_all_files():
+  found_cnt = 0
+  not_found_cnt = 0
+  for root, dirs, files in os.walk('pdfs/'):
+    for file in files:
+      filepath = os.path.join(root, file)
+      print(filepath)
+      s = parse_pdf(filepath)
+      print(len(s))
+      if len(s) > 10:
+        found_cnt += 1
+      else:
+        not_found_cnt += 1
+  print(found_cnt)
+  print(not_found_cnt)
+
+test_on_all_files()
 
 '''
 def test_date_extarctor():
