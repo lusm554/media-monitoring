@@ -62,10 +62,17 @@ def preproc_text(text):
   doc.tag_ner(ner_tagger)
   return doc
 
+def split_on_sections(text):
+  section_pattern = re.compile(r'^\d+\.\d+\.\s.+', re.MULTILINE)
+  sections = list(section_pattern.finditer(text))
+  return sections
+
 def parse_pdf(pdf_filepath):
   pdf_text = pdf_to_text(pdf_filepath)
-  preproced_text = preproc_text(pdf_text)
-  print(preproced_text)
+  for sec in split_on_sections(pdf_text):
+    print(sec)
+  #preproced_text = preproc_text(pdf_text)
+  #print(preproced_text)
 
 def main():
   pdf_filepath = 'pdfs/a-token_alrosa.pdf'
