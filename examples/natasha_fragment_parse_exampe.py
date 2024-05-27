@@ -119,6 +119,7 @@ pdfs_types_to_test = [
   'pdfs/masterchain_finteh.pdf',
   'pdfs/cfahab_devaises.pdf',
 ]
+print(' '.join(pdfs_types_to_test))
 print(len(pdfs_types_to_test))
 low_importance_types = [
   'pdfs/spb_birzha_karbon_ziro.pdf', # low importance
