@@ -19,4 +19,8 @@ develop_run:
 	docker build --platform=linux/amd64 -t develop .
 	docker run -d --env dev=1 --env-file .dev_env develop
 
+prod_run:
+	docker build --platform=linux/amd64 -t develop .
+	docker run -d --env-file .env develop
+
 all: deploy
