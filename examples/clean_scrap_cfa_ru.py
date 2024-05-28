@@ -33,30 +33,36 @@ def parse_emits_page(html):
     last_date = None
     last_span_header = None
     date_emits = defaultdict(lambda: defaultdict(set))
-    for nxt in platform_div.find_all(['span', 'li']):
-      span_text = nxt.get_text()
-      span_text = span_text.strip()
-      if span_text == '':
-        continue
-      is_date = date_pattern.match(span_text)       
-      if is_date:
-        last_date = span_text
-        last_span_header = None
-      else:
-        is_span_header = not any(parent.name == 'li' for n, parent in zip(range(3), nxt.parents))
-        if is_span_header and nxt.name =='span':
-          last_span_header = span_text
+    for nxt in platform_div.find_all(['b', 'span', 'li']): # ['span', 'li']
+      try:
+        span_text = nxt.get_text()
+        span_text = span_text.strip()
+        if span_text == '':
+          continue
+        is_date = date_pattern.match(span_text)
+        if is_date:
+          last_date = span_text
+          last_span_header = None
         else:
-          tag_a = nxt.find('a')
-          if tag_a is None:
-            continue
-          emit_name = tag_a.get_text()
-          emit_href = tag_a.get('href')
-          emit_href = urllib.parse.urljoin(site_url, emit_href)
-          if last_span_header:
-            date_emits[last_date][(last_span_header, emit_name)].add(emit_href)
+          is_span_header = not any(parent.name == 'li' for n, parent in zip(range(3), nxt.parents))
+          if is_span_header and nxt.name =='span':
+            last_span_header = span_text
           else:
-            date_emits[last_date][emit_name].add(emit_href)
+            tag_a = nxt.find('a')
+            if tag_a is None:
+              continue
+            emit_name = tag_a.get_text()
+            emit_href = tag_a.get('href')
+            emit_href = urllib.parse.urljoin(site_url, emit_href)
+            print(last_date,last_span_header, emit_name, emit_href)
+            #if last_date is None:
+            #  last_date = 'Не определено'
+            if last_span_header:
+              date_emits[last_date][(last_span_header, emit_name)].add(emit_href)
+            else:
+              date_emits[last_date][emit_name].add(emit_href)
+      except Exception as error:
+        print(error)
     return date_emits
 
   result_emits_by_platform = dict()
@@ -66,7 +72,7 @@ def parse_emits_page(html):
       print(platform_name)
     platform_emits = parse_platform(platform_emits_div)     
     result_emits_by_platform[platform_name] = platform_emits
-    _platform_emits = sorted(platform_emits.items(), key=lambda x: datetime.datetime.strptime(x[0], '%d.%m.%Y'), reverse=True)
+    _platform_emits = sorted(platform_emits.items(), key=lambda x: datetime.datetime.strptime(x[0] or '28.05.2024', '%d.%m.%Y'), reverse=True)
     if show_log:
       for k,v in _platform_emits:
         print(k)
