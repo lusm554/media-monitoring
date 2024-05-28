@@ -17,6 +17,6 @@ deploy: push
 
 develop_run:
 	docker build --platform=linux/amd64 -t develop .
-	docker run -d --env dev=1 --env-file .env develop
+	docker run -d --env dev=1 --env-file .dev_env develop
 
 all: deploy
