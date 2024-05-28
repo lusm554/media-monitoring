@@ -50,7 +50,7 @@ class CfaReleasesScraper(BaseScraper):
     last_date = None
     last_span_header = None
     platform_releases = set()
-    for nxt in platform_html.find_all(['span', 'li']):
+    for nxt in platform_html.find_all(['b', 'span', 'li']):
       span_text = nxt.get_text()
       span_text = span_text.strip()
       if span_text == '':
@@ -68,7 +68,7 @@ class CfaReleasesScraper(BaseScraper):
             continue
           emit_name = tag_a.get_text()
           emit_href = urllib.parse.urljoin(site_url, tag_a.get('href'))
-          emit_date = datetime.datetime.strptime(last_date, "%d.%m.%Y")
+          emit_date = datetime.datetime(year=2000, month=1, day=1) if last_date is None else datetime.datetime.strptime(last_date, "%d.%m.%Y")
           if last_span_header:
             emit_name = f'{last_span_header} {emit_name}'
           release = Release(
