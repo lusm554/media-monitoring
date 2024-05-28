@@ -10,3 +10,4 @@ logs
 api-gw.yaml
 *.pdf
 *.tar
+.dev_env
