@@ -23,7 +23,7 @@ def get_articles(context, scraper, period):
     scraper_result_cache = ScraperMemCache(
       items=scraper_result,
       cache_key=cache_key,
-      expire_delta=datetime.timedelta(seconds=30)
+      expire_delta=datetime.timedelta(minutes=20)
     )
     scraper_cache[cache_key] = scraper_result_cache
   else:
