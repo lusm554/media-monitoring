@@ -8,3 +8,6 @@ logs
 .DS_Store
 .venv
 api-gw.yaml
+*.pdf
+*.tar
+.dev_env
