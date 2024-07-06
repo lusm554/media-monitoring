@@ -8,3 +8,11 @@ services:
       - BOT_TOKEN=1
     volumes:
       - ./shared:/shared
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=1111
+      - POSTGRES_USER=postgres
+    volumes:
+      - ./shared/postgres:/var/lib/postgresql/data
