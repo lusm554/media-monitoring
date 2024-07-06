@@ -1,5 +1,2 @@
 .env
-.env.example
-*.example
-Makefile
 .venv
