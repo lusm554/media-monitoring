@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 
 host = 'localhost'
+host = 'db'
 port = '5432'
 
 user = 'postgres'
