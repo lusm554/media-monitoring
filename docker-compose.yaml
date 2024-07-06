@@ -1,0 +1,10 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ['python3', 'backend.py']
+    environment:
+      - BOT_TOKEN=1
+    volumes:
+      - ./shared:/shared
