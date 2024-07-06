@@ -1,3 +1,6 @@
 import bot
+import os
 
-bot.start()
+BOT_TOKEN = os.getenv('BOT_TOKEN')
+assert BOT_TOKEN
+bot.start(BOT_TOKEN)

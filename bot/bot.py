@@ -4,6 +4,6 @@ import scraper
 def handle_request():
   insert_row()
 
-def start():
+def start(TOKEN):
   print('but running')
   handle_request()
