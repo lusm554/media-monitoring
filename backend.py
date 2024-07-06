@@ -1,1 +1,3 @@
-import scraper
+import bot
+
+bot.start()
