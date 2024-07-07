@@ -79,7 +79,6 @@ def get_cfa_last_news_post_markup(post):
 	keyboard_markup = InlineKeyboardMarkup(pagination_keyboard)
 	return msg, keyboard_markup
 
-#async def cfa_news(context, effective_chat_id):
 async def cfa_news(update, context):
 	effective_chat_id = update.effective_chat.id
 	articles = scraper.CfaAllNewsScraper(error='ignore').fetch_and_parse(period=scraper.Periods.LAST_24_HOURS)

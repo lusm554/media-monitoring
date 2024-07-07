@@ -36,18 +36,8 @@ def update_commands_ui_description(telegram_app, commands):
   loop = asyncio.get_event_loop()
   loop.run_until_complete(telegram_app.bot.set_my_commands(cmds))
 
-def setup_button_dispatcher_handlers(telegram_app, cfa_last_news_button_callback):
+def setup_button_handlers(telegram_app, cfa_last_news_button_callback):
 	telegram_app.add_handler(CallbackQueryHandler(cfa_last_news_button_callback, pattern='cfa_last_news*'))	
-	'''
-  telegram_app.add_handler(
-    CallbackQueryHandler(
-      bot_handlers.button_dispatcher({
-        'cfa_last_news': cfa_last_news_button_callback,
-        #'cfa_releases': bot_commands.cfa_releases_button_callback,
-      })
-    )
-  )
-	'''
 
 def shedule_bot_tasks(telegram_app):
 	pass
