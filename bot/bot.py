@@ -31,6 +31,7 @@ def setup(telegram_app):
   Command = namedtuple('Cmd', ['callback', 'desc', 'name'])
   commands = (
     Command(callback=bot_commands.start, desc='начать работу', name='start'),
+    Command(callback=bot_commands.cfa_news, desc='новости ЦФА за сутки', name='last_news_cfa'),
   )
   #setup_bot_data_variables(telegram_app, commands)
   setup_bot_commands(telegram_app, commands)
