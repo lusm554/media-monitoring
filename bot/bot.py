@@ -1,7 +1,6 @@
 from telegram.ext import ApplicationBuilder
 from collections import namedtuple
 
-from storage import insert_row
 import scraper
 from bot.setup import (
   setup_bot_data_variables,
@@ -13,20 +12,6 @@ from bot.setup import (
 )
 from bot.handlers import unknown_command_handler, error_handler, updates_handler
 import bot.commands as bot_commands
-
-import datetime
-import logging
-logging.basicConfig(
-  level=logging.INFO,
-  format='[%(asctime)s] %(levelname)s [%(name)s] %(message)s',
-  datefmt='%Y-%m-%d %H:%M:%S %Z',
-  handlers=[
-    #logging.FileHandler(datetime.datetime.now().strftime('shared/logs/log_%Y-%m-%d_%H-%M-%S.log')),
-    logging.StreamHandler(),
-  ],
-)
-logging.getLogger("httpx").setLevel(logging.WARNING)
-logger = logging.getLogger(__name__)
 
 def setup(telegram_app):
   Command = namedtuple('Cmd', ['callback', 'desc', 'name'])

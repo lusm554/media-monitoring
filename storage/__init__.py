@@ -1,4 +1,1 @@
-from .postgres_connect import conn
-
-def insert_row():
-  print('insert_row')
+from storage.postgres_client import connect, create_tables, select, insert
