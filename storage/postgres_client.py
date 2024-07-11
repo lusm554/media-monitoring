@@ -8,58 +8,64 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import Session
+from datetime import datetime
 
-def engine():
-  host = 'localhost'
-  #host = 'db'
-  port = '5432'
-
-  user = 'postgres'
-  pwd = ''
-
-  database = 'test'
-  url = f'postgresql+psycopg2://{user}:{pwd}@{host}:{port}/{database}'
-  engine = create_engine(url)
-  return engine
-
-def connect():
-  _engine = engine()
-  return _engine.connect()
+HOST, PORT = 'localhost', '5432' # db
+USER, PWD = 'postgres', ''
+DATABASE = 'test'
+URL = f'postgresql+psycopg2://{USER}:{PWD}@{HOST}:{PORT}/{DATABASE}'
+engine = create_engine(URL)
 
 class Base(DeclarativeBase):
   pass
 
 class News(Base):
   __tablename__ = "cfa_news"
-  id: Mapped[int] = mapped_column(primary_key=True)
+  id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
   title: Mapped[str]
-  url: Mapped[Optional[str]]
+  url: Mapped[str] = mapped_column(unique=True)
+  publish_time: Mapped[datetime] = mapped_column(index=True)
+  publisher_name: Mapped[str]
+  scraper: Mapped[str]
 
   def __repr__(self) -> str:
-    return ''
-    return f"User(id={self.id!r}, name={self.name!r}, fullname={self.fullname!r})"
+    return f"User(id={self.id!r}, title={self.title!r}, url={self.url!r})"
+
+def connect():
+  return engine.connect()
 
 def create_tables():
-  _engine = engine()
-  Base.metadata.create_all(_engine)
+  Base.metadata.create_all(engine)
 
-def insert():
-  _engine = engine()
-  with Session(_engine) as session:
-    row = News(
-      title='test',
-      url='https://google.com',
-    )
-    session.add(row)
-    session.commit()
+def recreate_tables():
+  Base.metadata.drop_all(engine)
+  Base.metadata.create_all(engine)
 
-def select():
-  _engine = engine()
-  sql = text('select * from cfa_news')
-  print(sql)
-  with connect() as conn:
-    res = conn.execute(sql)
-    res = list(res)
-    print(res)
+def add_news(news_list):
+  with Session(engine) as session:
+    try:
+      for news in news_list:
+        existing_news = session.query(News).filter_by(url=news["url"]).first()
+        if not existing_news:
+          session.add(News(**news))
+      session.commit()
+    except Exception as error:
+      sessions.rollback()
+      print(error)
+
+
+def get_news_by_date_range(start_dt, end_dt):
+  with Session(engine) as session:
+    try:
+      return session.query(News).filter(
+        News.publish_time >= start_dt,
+        News.publish_time <= end_dt,
+      ).all()
+    except Exception as error:
+      print(error)
+      return list()
+
+
+
 
 

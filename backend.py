@@ -16,10 +16,21 @@ logging.basicConfig(
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
-storage.create_tables()
-storage.select()
-storage.insert()
-storage.select()
+#storage.create_tables()
+#storage.recreate_tables()
+
+storage.add_news(
+  [{
+    'title': 'test',
+    'url': 'https://google.com',
+    'publish_time': datetime.datetime.now(),
+    'publisher_name': 'dzen',
+    'scraper': 'rss',
+  }]
+)
+
+rows = storage.get_news_by_date_range(datetime.datetime.now() - datetime.timedelta(hours=24), datetime.datetime.now())
+print(rows)
 
 exit()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
