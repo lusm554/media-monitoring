@@ -9,6 +9,7 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import Session
 from datetime import datetime
+from typing import get_type_hints
 
 HOST, PORT = 'localhost', '5432' # db
 USER, PWD = 'postgres', ''
@@ -29,7 +30,9 @@ class News(Base):
   scraper: Mapped[str]
 
   def __repr__(self) -> str:
-    return f"User(id={self.id!r}, title={self.title!r}, url={self.url!r})"
+    cls_level_attrs = get_type_hints(self).keys()
+    repr_str = ', '.join(f"{attr}={getattr(self, attr)!r}" for attr in cls_level_attrs)
+    return f"{self.__class__.__name__}({repr_str})"
 
 def connect():
   return engine.connect()
@@ -50,7 +53,7 @@ def add_news(news_list):
           session.add(News(**news))
       session.commit()
     except Exception as error:
-      sessions.rollback()
+      session.rollback()
       print(error)
 
 
