@@ -16,9 +16,10 @@ logging.basicConfig(
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
-#storage.create_tables()
+storage.create_tables()
 #storage.recreate_tables()
 
+'''
 storage.add_news(
   [{
     'title': 'test',
@@ -31,6 +32,7 @@ storage.add_news(
 
 rows = storage.get_news_by_date_range(datetime.datetime.now() - datetime.timedelta(hours=24), datetime.datetime.now())
 print(rows)
+'''
 
 exit()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
