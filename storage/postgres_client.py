@@ -25,7 +25,8 @@ class News(Base):
   id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
   title: Mapped[str]
   url: Mapped[str] = mapped_column(unique=True)
-  publish_time: Mapped[datetime] = mapped_column(index=True)
+  #publish_time: Mapped[datetime] = mapped_column(index=True)
+  publish_time: Mapped[str] = mapped_column(index=True)
   publisher_name: Mapped[str]
   scraper: Mapped[str]
 

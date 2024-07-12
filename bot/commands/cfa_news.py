@@ -1,6 +1,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 import scraper
+from storage.postgres_client import add_news, get_news_by_date_range
 import logging
 
 RIGHT_ARROW_SYMBOL = chr(8594) # →
@@ -11,119 +12,141 @@ import datetime
 from uuid import uuid4
 
 class Post:
-	def __init__(self, post_items, post_id=None, creation_time=None, page_items_cnt=4):
-		self._items_count_on_page = page_items_cnt
-		self._current_page = 0
-		self.post_id = post_id or str(uuid4())
-		self.post_items = post_items
-		self.pages = [
-			self.post_items[i:i+self._items_count_on_page]
-			for i in range(0, len(self.post_items), self._items_count_on_page)
-		]
-		self._pages_cnt = len(self.pages) - 1
-		self.creation_time = creation_time or datetime.datetime.now()
+  def __init__(self, post_items, post_id=None, creation_time=None, page_items_cnt=4):
+    self._items_count_on_page = page_items_cnt
+    self._current_page = 0
+    self.post_id = post_id or str(uuid4())
+    self.post_items = post_items
+    self.pages = [
+      self.post_items[i:i+self._items_count_on_page]
+      for i in range(0, len(self.post_items), self._items_count_on_page)
+    ]
+    self._pages_cnt = len(self.pages) - 1
+    self.creation_time = creation_time or datetime.datetime.now()
 
-	def current_page(self):
-		return self.pages[self._current_page]
+  def current_page(self):
+    return self.pages[self._current_page]
 
-	def next_page(self):
-		if self._current_page == self._pages_cnt:
-			self._current_page = 0
-		else:
-			self._current_page += 1
-		return self.pages[self._current_page]
+  def next_page(self):
+    if self._current_page == self._pages_cnt:
+      self._current_page = 0
+    else:
+      self._current_page += 1
+    return self.pages[self._current_page]
 
-	def previous_page(self):
-		if self._current_page == 0:
-			self._current_page = self._pages_cnt
-		else:
-			self._current_page -= 1
-		return self.pages[self._current_page]
+  def previous_page(self):
+    if self._current_page == 0:
+      self._current_page = self._pages_cnt
+    else:
+      self._current_page -= 1
+    return self.pages[self._current_page]
 
-	@property
-	def current_stage_text(self):
-		return f'{self.current_page_number}/{self.pages_count}'
-	
-	@property
-	def pages_count(self):
-		return self._pages_cnt + 1
+  @property
+  def current_stage_text(self):
+    return f'{self.current_page_number}/{self.pages_count}'
+  
+  @property
+  def pages_count(self):
+    return self._pages_cnt + 1
 
-	@property
-	def current_page_number(self):
-		return self._current_page + 1
+  @property
+  def current_page_number(self):
+    return self._current_page + 1
 
-	@property
-	def items_count_on_page(self):
-		return self._items_count_on_page
+  @property
+  def items_count_on_page(self):
+    return self._items_count_on_page
 
 def get_cfa_last_news_post_markup(post):
-	msg = '\n\n'.join(
-		f'{n}. <a href="{article.url}"> {article.title} </a>\n'
-		f'<b>Источник:</b> {article.publisher_name}.\n'
-		f'<b>Опубликовано:</b> {article.publish_time}.\n'
-		f'<b>Взято из:</b> {article.scraper}.'
-		for n, article in enumerate(
-			post.current_page(),
-			start=(post.current_page_number - 1) * post.items_count_on_page + 1
-		)
-	)
-	internal_post_id = post.post_id
-	callback_id = CFA_LAST_NEWS_CALLBACK_ID
-	pagination_keyboard = [
-		[
-			InlineKeyboardButton(LEFT_ARROW_SYMBOL, callback_data=f'{callback_id}_backward_{internal_post_id}'),
-			InlineKeyboardButton(post.current_stage_text, callback_data=f'{callback_id}_counter_{internal_post_id}'),
-			InlineKeyboardButton(RIGHT_ARROW_SYMBOL, callback_data=f'{callback_id}_forward_{internal_post_id}')
-		],
-	]
-	keyboard_markup = InlineKeyboardMarkup(pagination_keyboard)
-	return msg, keyboard_markup
+  msg = '\n\n'.join(
+    f'{n}. <a href="{article.url}"> {article.title} </a>\n'
+    f'<b>Источник:</b> {article.publisher_name}.\n'
+    f'<b>Опубликовано:</b> {article.publish_time}.\n'
+    f'<b>Взято из:</b> {article.scraper}.'
+    for n, article in enumerate(
+      post.current_page(),
+      start=(post.current_page_number - 1) * post.items_count_on_page + 1
+    )
+  )
+  internal_post_id = post.post_id
+  callback_id = CFA_LAST_NEWS_CALLBACK_ID
+  pagination_keyboard = [
+    [
+      InlineKeyboardButton(LEFT_ARROW_SYMBOL, callback_data=f'{callback_id}_backward_{internal_post_id}'),
+      InlineKeyboardButton(post.current_stage_text, callback_data=f'{callback_id}_counter_{internal_post_id}'),
+      InlineKeyboardButton(RIGHT_ARROW_SYMBOL, callback_data=f'{callback_id}_forward_{internal_post_id}')
+    ],
+  ]
+  keyboard_markup = InlineKeyboardMarkup(pagination_keyboard)
+  return msg, keyboard_markup
+
+def save_news(articles):
+  news = [
+    {
+      'title': art.title,
+      'url': art.url,
+      'publish_time': art.publish_time,
+      'publisher_name': art.publisher_name,
+      'scraper': art.scraper,
+    }
+    for art in articles
+  ]
+  add_news(news)
+
+def get_news():
+  import datetime 
+  start_dt = datetime.datetime.now() - datetime.timedelta(hours=24)
+  end_dt = datetime.datetime.now()
+  rows = get_news_by_date_range(start_dt, end_dt)
 
 async def cfa_news(update, context):
-	effective_chat_id = update.effective_chat.id
-	articles = scraper.CfaAllNewsScraper(error='ignore').fetch_and_parse(period=scraper.Periods.LAST_24_HOURS)
-	if len(articles) == 0:
-		await context.bot.send_message(
-			chat_id=effective_chat_id,
-			text='Новости ЦФА не найдены.',
-		)
-		return
-	post = Post(post_items=articles)
-	context.bot_data['post_cache'][post.post_id] = post
-	msg_text, keyboard = get_cfa_last_news_post_markup(post)
-	await context.bot.send_message(
-		chat_id=effective_chat_id,
-		text=msg_text,
-		reply_markup=keyboard,
-		parse_mode=ParseMode.HTML,
-		disable_web_page_preview=True,
-	)
+  effective_chat_id = update.effective_chat.id
+  articles = scraper.CfaAllNewsScraper(error='ignore').fetch_and_parse(period=scraper.Periods.LAST_24_HOURS)
+  if len(articles) == 0:
+    await context.bot.send_message(
+      chat_id=effective_chat_id,
+      text='Новости ЦФА не найдены.',
+    )
+    return
+  save_news(articles)
+  #n = get_news()
+  #print(n)
+  post = Post(post_items=articles)
+  context.bot_data['post_cache'][post.post_id] = post
+  msg_text, keyboard = get_cfa_last_news_post_markup(post)
+  await context.bot.send_message(
+    chat_id=effective_chat_id,
+    text=msg_text,
+    reply_markup=keyboard,
+    parse_mode=ParseMode.HTML,
+    disable_web_page_preview=True,
+  )
 
 async def cfa_last_news_button_callback(update, context):
-	query = update.callback_query
-	btn_name = query.data
-	keyboard_action, post_id = btn_name.replace(CFA_LAST_NEWS_CALLBACK_ID + '_', '').split('_')
-	post = context.bot_data['post_cache'].get(post_id)
-	if post is None:
-		await context.bot.send_message(
-			chat_id=query.message.chat.id,
-			reply_to_message_id=query.message.message_id,
-			text='По некоторым причинам кеш этого поста не найден, поэтому действие недоступно.'
-		)
-		return
-	if post.pages_count == 1:
-		return
-	match keyboard_action:
-		case 'counter':
-			return
-		case 'forward':
-			post.next_page()
-		case 'backward':
-			post.previous_page()
-	msg_text, keyboard = get_cfa_last_news_post_markup(post)
-	await query.edit_message_text(
-		text=msg_text,
-		reply_markup=keyboard,
-		parse_mode=ParseMode.HTML,
-		disable_web_page_preview=True,
-	)
+  query = update.callback_query
+  btn_name = query.data
+  keyboard_action, post_id = btn_name.replace(CFA_LAST_NEWS_CALLBACK_ID + '_', '').split('_')
+  post = context.bot_data['post_cache'].get(post_id)
+  if post is None:
+    await context.bot.send_message(
+      chat_id=query.message.chat.id,
+      reply_to_message_id=query.message.message_id,
+      text='По некоторым причинам кеш этого поста не найден, поэтому действие недоступно.'
+    )
+    return
+  if post.pages_count == 1:
+    return
+  match keyboard_action:
+    case 'counter':
+      return
+    case 'forward':
+      post.next_page()
+    case 'backward':
+      post.previous_page()
+  msg_text, keyboard = get_cfa_last_news_post_markup(post)
+  await query.edit_message_text(
+    text=msg_text,
+    reply_markup=keyboard,
+    parse_mode=ParseMode.HTML,
+    disable_web_page_preview=True,
+  )
