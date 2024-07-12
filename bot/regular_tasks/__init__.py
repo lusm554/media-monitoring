@@ -1,0 +1,1 @@
+from bot.regular_tasks.cfa_news_sender import cfa_news_sender
