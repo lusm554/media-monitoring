@@ -42,10 +42,10 @@ def setup_button_handlers(telegram_app, cfa_last_news_button_callback):
   telegram_app.add_handler(CallbackQueryHandler(cfa_last_news_button_callback, pattern='cfa_last_news*')) 
 
 def shedule_bot_tasks(telegram_app):
-  job_interval = datetime.timedelta(seconds=30)
+  job_interval = datetime.timedelta(minutes=1)
   telegram_app.job_queue.run_repeating(
     callback=cfa_news_sender,
     interval=job_interval,
-    data=lambda: print('hello'),
-    first=datetime.timedelta(seconds=30),
+    #data=lambda: print('hello'),
+    first=datetime.timedelta(seconds=1),
   )

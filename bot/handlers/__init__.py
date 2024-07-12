@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 async def error_handler(update, context):
   logger.error("Exception while handling an update:", exc_info=context.error)
+  return # TODO: remove
   tb_list = traceback.format_exception(None, context.error, context.error.__traceback__)
   tb_string = "".join(tb_list)
   update_str = update.to_dict() if isinstance(update, Update) else str(update)

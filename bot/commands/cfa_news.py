@@ -99,8 +99,37 @@ def get_news():
   end_dt = datetime.datetime.now()
   rows = get_news_by_date_range(start_dt, end_dt)
 
-async def cfa_news(update, context):
-  effective_chat_id = update.effective_chat.id
+def cfa_command_dispetcher(func):
+  from telegram import Update
+  from telegram.ext import CallbackContext
+  async def wrapper(update, context_or_target_chat_id=None):
+    print()
+    print(update, context_or_target_chat_id)
+    print()
+    if isinstance(update, Update) and isinstance(context_or_target_chat_id, CallbackContext):
+      print(1)
+      target_chat_id = update.effective_chat.id 
+      context = context_or_target_chat_id
+    else:
+      print(2)
+      target_chat_id = context_or_target_chat_id 
+      context = update
+    print()
+    print(type(update), type(context_or_target_chat_id))
+    print(update, context_or_target_chat_id)
+    print()
+    await func(context, target_chat_id)
+  return wrapper
+
+
+# <class 'telegram._update.Update'> <class 'telegram.ext._callbackcontext.CallbackContext'>
+# <class 'telegram.ext._callbackcontext.CallbackContext'> <class 'NoneType'>
+
+# cfa_news(context, target_chat_id)
+
+@cfa_command_dispetcher
+async def cfa_news(context, target_chat_id):
+  effective_chat_id = target_chat_id
   articles = scraper.CfaAllNewsScraper(error='ignore').fetch_and_parse(period=scraper.Periods.LAST_24_HOURS)
   if len(articles) == 0:
     await context.bot.send_message(
