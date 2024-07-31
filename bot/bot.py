@@ -1,7 +1,6 @@
 from telegram.ext import ApplicationBuilder
 from collections import namedtuple
 
-import scraper
 from bot.setup import (
   setup_bot_data_variables,
   setup_basic_handlers,
