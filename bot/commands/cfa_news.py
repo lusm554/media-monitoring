@@ -1,6 +1,6 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
-import scraper
+import scraper_lib as scraper
 from storage.postgres_client import add_news, get_news_by_date_range
 import logging
 
@@ -80,25 +80,6 @@ def get_cfa_last_news_post_markup(post):
   keyboard_markup = InlineKeyboardMarkup(pagination_keyboard)
   return msg, keyboard_markup
 
-def save_news(articles):
-  news = [
-    {
-      'title': art.title,
-      'url': art.url,
-      'publish_time': art.publish_time,
-      'publisher_name': art.publisher_name,
-      'scraper': art.scraper,
-    }
-    for art in articles
-  ]
-  add_news(news)
-
-def get_news():
-  import datetime 
-  start_dt = datetime.datetime.now() - datetime.timedelta(hours=24)
-  end_dt = datetime.datetime.now()
-  rows = get_news_by_date_range(start_dt, end_dt)
-
 def cfa_command_dispetcher(func):
   from telegram import Update
   from telegram.ext import CallbackContext
@@ -137,7 +118,7 @@ async def cfa_news(context, target_chat_id):
       text='Новости ЦФА не найдены.',
     )
     return
-  save_news(articles)
+  #save_news(articles)
   #n = get_news()
   #print(n)
   post = Post(post_items=articles)
