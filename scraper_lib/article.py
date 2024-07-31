@@ -13,6 +13,9 @@ class Article:
 
   @classmethod
   def from_dict(cls, dct):
+    '''
+    Constructor from dict
+    '''
     self = cls(
       title=dct['title'],
       url=dct['url'],
@@ -21,6 +24,25 @@ class Article:
       scraper=dct['scraper'],
     )
     return self
+
+  def to_dict(self):
+    '''
+    Convert class example to dict
+    '''
+    dct = {attr: getattr(self, attr) for attr in self.__slots__}
+    return dct
+
+  def __getitem__(self, key):
+    '''
+    For dict unpacking operator **
+    '''
+    return getattr(self, key)
+
+  def keys(self):
+    '''
+    For dict unpacking operator **
+    '''
+    return self.__slots__
 
   def __eq__(self, other):
     '''
@@ -53,3 +75,12 @@ class Article:
     '''
     items = [ (attr, getattr(self, attr)) for attr in self.__slots__ ]
     return f'{self.__class__.__name__}(\n{",\n".join(f"{k}={v!r}"  for k,v in items)}\n)'
+
+if __name__ == '__main__':
+  dct = {'title': 1, 'url': 2, 'publish_time': 3, 'publisher_name': 4, 'scraper': 5}
+  d = Article.from_dict(dct)
+  print(d)
+  r = d.to_dict()
+  print(r)
+  def test(*a, **b): print(a, b)
+  test(**d)
