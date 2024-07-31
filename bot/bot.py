@@ -6,7 +6,7 @@ from bot.setup import (
   setup_bot_data_variables,
   setup_basic_handlers,
   setup_bot_commands,
-  shedule_bot_tasks,
+  shedule_regular_bot_tasks,
   update_commands_ui_description,
   setup_button_handlers,
 )
@@ -23,7 +23,7 @@ def setup(telegram_app):
   setup_bot_commands(telegram_app, commands)
   setup_basic_handlers(telegram_app, error_handler, unknown_command_handler, updates_handler)
   setup_button_handlers(telegram_app, bot_commands.cfa_last_news_button_callback)
-  shedule_bot_tasks(telegram_app)
+  shedule_regular_bot_tasks(telegram_app)
   update_commands_ui_description(telegram_app, commands)
 
 def start(BOT_TOKEN):
