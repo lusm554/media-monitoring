@@ -11,6 +11,17 @@ class Article:
     self.publisher_name = publisher_name
     self.scraper = scraper
 
+  @classmethod
+  def from_dict(cls, dct):
+    self = cls(
+      title=dct['title'],
+      url=dct['url'],
+      publish_time=dct['publish_time'],
+      publisher_name=dct['publisher_name'],
+      scraper=dct['scraper'],
+    )
+    return self
+
   def __eq__(self, other):
     '''
     Метод сравнения двух экземпляров статьи на равенство. Статьи сравниваются по url'у.
