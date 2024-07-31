@@ -10,7 +10,7 @@ from telegram.ext import (
   filters,
 )
 import datetime
-from bot.regular_tasks import cfa_news_sender
+from bot.regular_tasks import cfa_news_sender, cfa_news_scraper
 import asyncio
 
 def setup_bot_data_variables(telegram_app, commands):
@@ -42,9 +42,16 @@ def setup_button_handlers(telegram_app, cfa_last_news_button_callback):
   telegram_app.add_handler(CallbackQueryHandler(cfa_last_news_button_callback, pattern='cfa_last_news*')) 
 
 def shedule_regular_bot_tasks(telegram_app):
-  job_interval = datetime.timedelta(minutes=1)
+  job_interval = datetime.timedelta(minutes=3)
+  telegram_app.job_queue.run_repeating(
+    callback=cfa_news_scraper,
+    interval=job_interval,
+    first=datetime.timedelta(seconds=1),
+  )
+  '''
   telegram_app.job_queue.run_repeating(
     callback=cfa_news_sender,
     interval=job_interval,
     first=datetime.timedelta(seconds=1),
   )
+  '''

@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine, text, select as _select
 from sqlalchemy.orm import Session
 from datetime import datetime
-from storage.postgres_datamap import Base
+from storage.postgres_datamap import Base, News
+from scraper_lib import Article
 
 HOST, PORT = 'localhost', '5432' # db
 USER, PWD = 'postgres', ''
@@ -31,6 +32,23 @@ def add_news(news_list):
       session.rollback()
       print(error)
 
+def news_to_article_converter(func):
+  def wrapper(*args, **kwargs):
+    news = func(*args, **kwargs)
+    news = [Article.from_dict(n.__dict__) for n in news]
+    return news
+  return wrapper
+
+@news_to_article_converter
+def get_n_news(n=100):
+  with Session(engine) as session:
+    try:
+      return session.query(News).limit(n).all()
+    except Exception as error:
+      print(error)
+      return list()
+
+@news_to_article_converter
 def get_news_by_date_range(start_dt, end_dt):
   with Session(engine) as session:
     try:
@@ -64,8 +82,3 @@ def get_news():
   start_dt = datetime.datetime.now() - datetime.timedelta(hours=24)
   end_dt = datetime.datetime.now()
   rows = get_news_by_date_range(start_dt, end_dt)
-
-
-
-
-
