@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, text, select as _select
 from sqlalchemy.orm import Session
-from datetime import datetime
+import datetime
 from storage.postgres_datamap import Base, News
 from scraper_lib import Article
 
@@ -60,25 +60,8 @@ def get_news_by_date_range(start_dt, end_dt):
       print(error)
       return list()
 
-#- get news like Article class
-#- save newss from Article class
-
-import datetime 
-
-def save_news(articles):
-  news = [
-    {
-      'title': art.title,
-      'url': art.url,
-      'publish_time': art.publish_time,
-      'publisher_name': art.publisher_name,
-      'scraper': art.scraper,
-    }
-    for art in articles
-  ]
-  add_news(news)
-
-def get_news():
+def get_last_24h_news():
   start_dt = datetime.datetime.now() - datetime.timedelta(hours=24)
   end_dt = datetime.datetime.now()
-  rows = get_news_by_date_range(start_dt, end_dt)
+  news = get_news_by_date_range(start_dt, end_dt)
+  return news

@@ -1,7 +1,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 import scraper_lib as scraper
-from storage.postgres_client import add_news, get_news_by_date_range
+from storage import postgres_client
 import logging
 
 RIGHT_ARROW_SYMBOL = chr(8594) # →
@@ -111,16 +111,15 @@ def cfa_command_dispetcher(func):
 @cfa_command_dispetcher
 async def cfa_news(context, target_chat_id):
   effective_chat_id = target_chat_id
-  articles = scraper.CfaAllNewsScraper(error='ignore').fetch_and_parse(period=scraper.Periods.LAST_24_HOURS)
+  #articles = scraper.CfaAllNewsScraper(error='ignore').fetch_and_parse(period=scraper.Periods.LAST_24_HOURS)
+  #articles = postgres_client.get_last_24h_news()
+  articles = postgres_client.get_n_news()
   if len(articles) == 0:
     await context.bot.send_message(
       chat_id=effective_chat_id,
       text='Новости ЦФА не найдены.',
     )
     return
-  #save_news(articles)
-  #n = get_news()
-  #print(n)
   post = Post(post_items=articles)
   context.bot_data['post_cache'][post.post_id] = post
   msg_text, keyboard = get_cfa_last_news_post_markup(post)
