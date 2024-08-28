@@ -7,6 +7,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 from typing import get_type_hints
+from datetime import datetime
 
 class Base(DeclarativeBase):
   pass
@@ -16,8 +17,8 @@ class News(Base):
   id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
   title: Mapped[str]
   url: Mapped[str] = mapped_column(unique=True)
-  #publish_time: Mapped[datetime] = mapped_column(index=True)
-  publish_time: Mapped[str] = mapped_column(index=True)
+  publish_time: Mapped[datetime] = mapped_column(index=True)
+  #publish_time: Mapped[str] = mapped_column(index=True)
   publisher_name: Mapped[str]
   scraper: Mapped[str]
 

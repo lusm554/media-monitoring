@@ -16,9 +16,24 @@ logging.basicConfig(
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
-#storage.create_tables()
-storage.recreate_tables()
+storage.create_tables()
+#storage.recreate_tables()
 
+
+#r = storage.get_n_news()
+#print(r)
+
+import scraper_lib as scraper
+dct = {'title': 'title', 'url': 'url', 'publish_time': datetime.datetime.now(), 'publisher_name': '2', 'scraper': '5'}
+d = scraper.Article.from_dict(dct)
+print(d)
+
+storage.add_news([d])
+
+r = storage.get_last_24h_news()
+print(r)
+
+exit()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 assert BOT_TOKEN
 bot.start(BOT_TOKEN)
