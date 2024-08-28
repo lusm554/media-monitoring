@@ -1,5 +1,6 @@
 from .base_scraper import NewsBaseScraper, Periods
 from .article import Article
+from .utils import unformatted_time2datetime
 from bs4 import BeautifulSoup, SoupStrainer
 import requests
 import concurrent.futures
@@ -77,7 +78,9 @@ class CfaGoogleNewsScraper(NewsBaseScraper):
       article_href = article_link.get('href')
       article_title = article_link.find(attrs={'role': 'heading'}).string
       article_source_name = article_link.find('span').string
-      article_publish_time = article_link.find_all('span')[-1].string
+      article_publish_time = unformatted_time2datetime(
+        article_link.find_all('span')[-1].string
+      )
       article = Article(
         title=article_title,
         url=article_href,

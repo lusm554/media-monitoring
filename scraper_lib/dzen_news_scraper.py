@@ -1,6 +1,7 @@
 from .base_scraper import NewsBaseScraper
 from .article import Article
 from bs4 import BeautifulSoup, SoupStrainer
+from .utils import unformatted_time2datetime
 import requests
 import datetime
 import logging
@@ -98,7 +99,9 @@ class CfaDzenNewsScraper(NewsBaseScraper):
       article_href = _article_link.get('href')
       article_title = _article_link.find('span').get_text()
       article_source_name = page_article.find(attrs={'class': 'mg-snippet-source-info__agency-name'}).get_text()
-      article_publish_time = page_article.find(attrs={'class': 'mg-snippet-source-info__time'}).get_text()
+      article_publish_time = unformatted_time2datetime(
+        page_article.find(attrs={'class': 'mg-snippet-source-info__time'}).get_text()
+      )
       article = Article(
         title=article_title,
         url=article_href,
@@ -122,7 +125,7 @@ class CfaDzenNewsScraper(NewsBaseScraper):
         article_url = doc.get('url')
         article_title = ''.join(x.get('text') for x in doc.get('title'))
         article_source_name = doc.get('sourceName')
-        article_publish_time = doc.get('time')
+        article_publish_time = unformatted_time2datetime(doc.get('time'))
         article = Article(
           title=article_title,
           url=article_url,
