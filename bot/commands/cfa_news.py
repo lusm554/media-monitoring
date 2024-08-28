@@ -1,5 +1,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
+from telegram import Update
+from telegram.ext import CallbackContext
 import scraper_lib as scraper
 from storage import postgres_client
 import logging
@@ -81,27 +83,15 @@ def get_cfa_last_news_post_markup(post):
   return msg, keyboard_markup
 
 def cfa_command_dispetcher(func):
-  from telegram import Update
-  from telegram.ext import CallbackContext
   async def wrapper(update, context_or_target_chat_id=None):
-    print()
-    print(update, context_or_target_chat_id)
-    print()
     if isinstance(update, Update) and isinstance(context_or_target_chat_id, CallbackContext):
-      print(1)
       target_chat_id = update.effective_chat.id 
       context = context_or_target_chat_id
     else:
-      print(2)
       target_chat_id = context_or_target_chat_id 
       context = update
-    print()
-    print(type(update), type(context_or_target_chat_id))
-    print(update, context_or_target_chat_id)
-    print()
     await func(context, target_chat_id)
   return wrapper
-
 
 # <class 'telegram._update.Update'> <class 'telegram.ext._callbackcontext.CallbackContext'>
 # <class 'telegram.ext._callbackcontext.CallbackContext'> <class 'NoneType'>
