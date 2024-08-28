@@ -93,17 +93,10 @@ def cfa_command_dispetcher(func):
     await func(context, target_chat_id)
   return wrapper
 
-# <class 'telegram._update.Update'> <class 'telegram.ext._callbackcontext.CallbackContext'>
-# <class 'telegram.ext._callbackcontext.CallbackContext'> <class 'NoneType'>
-
-# cfa_news(context, target_chat_id)
-
 @cfa_command_dispetcher
 async def cfa_news(context, target_chat_id):
   effective_chat_id = target_chat_id
-  #articles = scraper.CfaAllNewsScraper(error='ignore').fetch_and_parse(period=scraper.Periods.LAST_24_HOURS)
-  #articles = postgres_client.get_last_24h_news()
-  articles = postgres_client.get_n_news()
+  articles = postgres_client.get_last_24h_news()
   if len(articles) == 0:
     await context.bot.send_message(
       chat_id=effective_chat_id,

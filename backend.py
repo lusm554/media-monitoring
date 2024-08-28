@@ -20,6 +20,7 @@ storage.create_tables()
 #storage.recreate_tables()
 
 
+'''
 #r = storage.get_n_news()
 #print(r)
 
@@ -34,6 +35,8 @@ r = storage.get_last_24h_news()
 print(r)
 
 exit()
+'''
+
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 assert BOT_TOKEN
 bot.start(BOT_TOKEN)
