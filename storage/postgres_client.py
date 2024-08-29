@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, text, select as _select
 from sqlalchemy.orm import Session
 import datetime
-from storage.postgres_datamap import Base, News
+from storage.postgres_datamap import Base, News, RegularNewsSubscribers, Users
 from scraper_lib import Article
 
 HOST, PORT = 'localhost', '5432' # db
@@ -19,6 +19,31 @@ def create_tables():
 def recreate_tables():
   Base.metadata.drop_all(engine)
   Base.metadata.create_all(engine)
+
+def users_to_dict_converter(func):
+  def wrapper(*args, **kwargs):
+    users = func(*args, **kwargs)
+    users = [n.__dict__ for n in users]
+    return users
+  return wrapper
+
+def add_user(user):
+  with Session(engine) as session:
+    try:
+      session.add(Users(**user))
+      session.commit()
+    except Exception as error:
+      session.rollback()
+      print(error)
+
+@users_to_dict_converter
+def get_n_users(n=100):
+  with Session(engine) as session:
+    try:
+      return session.query(Users).limit(n).all()
+    except Exception as error:
+      print(error)
+      return list()
 
 def add_news(news_list):
   with Session(engine) as session:
