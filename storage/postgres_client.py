@@ -20,7 +20,7 @@ def recreate_tables():
   Base.metadata.drop_all(engine)
   Base.metadata.create_all(engine)
 
-def users_to_dict_converter(func):
+def db_row_to_dict_converter(func):
   def wrapper(*args, **kwargs):
     users = func(*args, **kwargs)
     users = [n.__dict__ for n in users]
@@ -36,11 +36,49 @@ def add_user(user):
       session.rollback()
       print(error)
 
-@users_to_dict_converter
+@db_row_to_dict_converter
 def get_n_users(n=100):
   with Session(engine) as session:
     try:
       return session.query(Users).limit(n).all()
+    except Exception as error:
+      print(error)
+      return list()
+
+def add_news_subscriber(news_subscriber):
+  with Session(engine) as session:
+    try:
+      existing_subscriber = (
+        session
+          .query(RegularNewsSubscribers)
+          .filter_by(telegram_user_id=news_subscriber["telegram_user_id"])
+          .first()
+      )
+      if not existing_subscriber:
+        session.add(RegularNewsSubscribers(**news_subscriber))
+      session.commit()
+    except Exception as error:
+      session.rollback()
+      print(error)
+
+def delete_news_subscriber(subsciber_telegram_id):
+  with Session(engine) as session:
+    try:
+      (session
+        .query(RegularNewsSubscribers)
+        .filter_by(telegram_user_id=subsciber_telegram_id)
+        .delete()
+      )
+      session.commit()
+    except Exception as error:
+      session.rollback()
+      print(error)
+
+@db_row_to_dict_converter
+def get_n_news_subscribers(n=100):
+  with Session(engine) as session:
+    try:
+      return session.query(RegularNewsSubscribers).limit(n).all()
     except Exception as error:
       print(error)
       return list()

@@ -17,7 +17,6 @@ async def start(update, context):
     'telegram_username': user.username,
     'telegram_first_name': user.first_name,
   })
-  print(storage.get_n_users())
   await context.bot.send_message(
     chat_id=update.effective_chat.id,
     text=msg
