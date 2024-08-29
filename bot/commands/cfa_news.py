@@ -3,7 +3,7 @@ from telegram.constants import ParseMode
 from telegram import Update
 from telegram.ext import CallbackContext
 import scraper_lib as scraper
-from storage import postgres_client
+import storage
 import logging
 
 RIGHT_ARROW_SYMBOL = chr(8594) # →
@@ -96,7 +96,9 @@ def cfa_command_dispetcher(func):
 @cfa_command_dispetcher
 async def cfa_news(context, target_chat_id):
   effective_chat_id = target_chat_id
-  articles = postgres_client.get_last_24h_news()
+  articles = storage.get_last_24h_news()
+  #from pprint import pprint
+  #pprint(articles)
   if len(articles) == 0:
     await context.bot.send_message(
       chat_id=effective_chat_id,
@@ -105,6 +107,7 @@ async def cfa_news(context, target_chat_id):
     return
   post = Post(post_items=articles)
   context.bot_data['post_cache'][post.post_id] = post
+  storage.add_news_post([{'bot_post_id': post.post_id, 'news_id': art.db_id} for art in articles])
   msg_text, keyboard = get_cfa_last_news_post_markup(post)
   await context.bot.send_message(
     chat_id=effective_chat_id,

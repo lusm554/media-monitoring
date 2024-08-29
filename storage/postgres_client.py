@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, text, select as _select
 from sqlalchemy.orm import Session
 import datetime
-from storage.postgres_datamap import Base, News, RegularNewsSubscribers, Users
+from storage.postgres_datamap import Base, News, RegularNewsSubscribers, Users, NewsPosts
 from scraper_lib import Article
 
 HOST, PORT = 'localhost', '5432' # db
@@ -13,7 +13,7 @@ engine = create_engine(URL)
 def connect():
   return engine.connect()
 
-def create_tables():
+def create_tables_if_not_exists():
   Base.metadata.create_all(engine)
 
 def recreate_tables():
@@ -21,24 +21,67 @@ def recreate_tables():
   Base.metadata.create_all(engine)
 
 def db_row_to_dict_converter(func):
+  from collections.abc import Iterable
+  def filter_alchemy_attrs(dct):
+    if '_sa_instance_state' in dct:
+      del dct['_sa_instance_state']
+    return dct
   def wrapper(*args, **kwargs):
-    users = func(*args, **kwargs)
-    users = [n.__dict__ for n in users]
-    return users
+    db_result = func(*args, **kwargs)
+    if isinstance(db_result, Iterable):
+      db_result = [filter_alchemy_attrs(n.__dict__) for n in db_result]
+    else:
+      db_result = filter_alchemy_attrs(db_result.__dict__)
+    return db_result
   return wrapper
 
-'''
-def add_news_post(articles, post_id):
+####################### NEWS POST #######################
+def add_news_post(post_articles):
  with Session(engine) as session:
   try:
-    for article in articles:
-      session.add(Users(**user))
+    for post_article in post_articles:
+      session.add(NewsPosts(**post_article))
     session.commit()
   except Exception as error:
     session.rollback()
-    print(error) 
-'''
+    print(error)
 
+@db_row_to_dict_converter
+def get_news_post(post_id):
+  with Session(engine) as session:
+    try:
+        post = session.query(NewsPosts).filter_by(bot_post_id=post_id).all()
+        return post
+    except Exception as error:
+      print(error)
+      return list()
+
+@db_row_to_dict_converter
+def get_articles_by_news_post(post_id):
+  with Session(engine) as session:
+    try:
+        articles = (
+          session
+            .query(News)
+            .filter(NewsPosts.bot_post_id == post_id)
+            .filter(NewsPosts.news_id == News.id)
+            .all()
+        )
+        return articles
+    except Exception as error:
+      print(error)
+      return list()
+
+@db_row_to_dict_converter
+def get_n_news_posts(n=100):
+  with Session(engine) as session:
+    try:
+      return session.query(NewsPosts).limit(n).all()
+    except Exception as error:
+      print(error)
+      return list()
+
+####################### USER #######################
 def add_user(user):
   with Session(engine) as session:
     try:
@@ -57,6 +100,7 @@ def get_n_users(n=100):
       print(error)
       return list()
 
+####################### NEWS SUBSCRIBER #######################
 def add_news_subscriber(news_subscriber):
   with Session(engine) as session:
     try:
@@ -95,17 +139,20 @@ def get_n_news_subscribers(n=100):
       print(error)
       return list()
 
+####################### NEWS #######################
 def add_news(news_list):
   with Session(engine) as session:
     try:
       for news in news_list:
         existing_news = session.query(News).filter_by(url=news["url"]).first()
         if not existing_news:
+          news = news.to_dict()
+          del news['db_id']
           session.add(News(**news))
       session.commit()
     except Exception as error:
       session.rollback()
-      print(error)
+      raise error
 
 def news_to_article_converter(func):
   def rename_db_row_keys_to_article(dbrow):
@@ -113,7 +160,6 @@ def news_to_article_converter(func):
     return dbrow
   def wrapper(*args, **kwargs):
     news = func(*args, **kwargs)
-    print(news[0])
     news = [Article.from_dict(rename_db_row_keys_to_article(n.__dict__)) for n in news]
     return news
   return wrapper

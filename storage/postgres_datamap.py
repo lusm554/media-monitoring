@@ -42,3 +42,9 @@ class RegularNewsSubscribers(Base):
   telegram_user_id: Mapped[int]
   add_time: Mapped[datetime]
 
+class NewsPosts(Base):
+  __tablename__ = 'news_posts'
+  id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+  bot_post_id: Mapped[str]
+  news_id: Mapped[int]
+
