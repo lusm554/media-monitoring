@@ -27,6 +27,18 @@ def db_row_to_dict_converter(func):
     return users
   return wrapper
 
+'''
+def add_news_post(articles, post_id):
+ with Session(engine) as session:
+  try:
+    for article in articles:
+      session.add(Users(**user))
+    session.commit()
+  except Exception as error:
+    session.rollback()
+    print(error) 
+'''
+
 def add_user(user):
   with Session(engine) as session:
     try:
@@ -96,9 +108,13 @@ def add_news(news_list):
       print(error)
 
 def news_to_article_converter(func):
+  def rename_db_row_keys_to_article(dbrow):
+    dbrow['db_id'] = dbrow.pop('id')
+    return dbrow
   def wrapper(*args, **kwargs):
     news = func(*args, **kwargs)
-    news = [Article.from_dict(n.__dict__) for n in news]
+    print(news[0])
+    news = [Article.from_dict(rename_db_row_keys_to_article(n.__dict__)) for n in news]
     return news
   return wrapper
 

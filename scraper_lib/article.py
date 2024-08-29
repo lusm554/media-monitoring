@@ -3,13 +3,14 @@ class Article:
   Класс представление новостной статьи.
   Описывает характеристики новости - заголовок, ссылка на новость источника, время, источник и парсер статьи.
   '''
-  __slots__ = ('title', 'url', 'publish_time', 'publisher_name', 'scraper')
-  def __init__(self, title, url, publish_time, publisher_name, scraper):
+  __slots__ = ('title', 'url', 'publish_time', 'publisher_name', 'scraper', 'db_id')
+  def __init__(self, title, url, publish_time, publisher_name, scraper, db_id=None):
     self.title = title
     self.url = url
     self.publish_time = publish_time
     self.publisher_name = publisher_name
     self.scraper = scraper
+    self.db_id = db_id
 
   @classmethod
   def from_dict(cls, dct):
@@ -22,6 +23,7 @@ class Article:
       publish_time=dct['publish_time'],
       publisher_name=dct['publisher_name'],
       scraper=dct['scraper'],
+      db_id=dct.get('db_id'),
     )
     return self
 
