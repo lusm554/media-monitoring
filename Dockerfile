@@ -11,6 +11,6 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 COPY backend.py .
 COPY bot ./bot
 COPY storage ./storage
-COPY scraper ./scraper
+COPY scraper_lib ./scraper_lib
 
 CMD ["python3", "backend.py"]

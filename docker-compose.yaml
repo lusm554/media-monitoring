@@ -13,6 +13,18 @@ services:
     volumes:
       - ./shared:/shared
 
+  redis:
+    image: redis
+    restart: always
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - ./shared/redis:/data
+    ports:
+      - 6379:6379
+    expose:
+      - 6379
+
   db:
     image: postgres
     restart: always
