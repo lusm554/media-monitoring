@@ -133,21 +133,21 @@ import time
 
 urls = [a.url for a in articles]
 for url in urls:
-	print(url)
-	try:
-		_text_extractor = newspaper.Article(url)
-		_text_extractor.download()
-		_text_extractor.parse()
-		text = _text_extractor.text
-		print(text)	
-	except Exception as error:
-		print(error)
-	print()
-	print()
-	print()
-	print()
-	print()
-	time.sleep(.2)
+  print(url)
+  try:
+    _text_extractor = newspaper.Article(url)
+    _text_extractor.download()
+    _text_extractor.parse()
+    text = _text_extractor.text
+    print(text) 
+  except Exception as error:
+    print(error)
+  print()
+  print()
+  print()
+  print()
+  print()
+  time.sleep(.2)
 '''
 
 import goose3
@@ -155,17 +155,43 @@ import time
 
 urls = [a.url for a in articles]
 g = goose3.Goose()
+
+def get_article_text(url):
+  try:
+    text = g.extract(url=url).cleaned_text
+  except:
+    text = ''
+  return text
+
+'''
 for url in urls:
-	print(url)
-	try:
-		text = g.extract(url=url).cleaned_text
-		print(text)	
-	except Exception as error:
-		print(error)
-	print()
-	print()
-	print()
-	print()
-	print()
-	time.sleep(.2)
+  print(url)
+  try:
+    text = g.extract(url=url).cleaned_text
+    print(text) 
+  except Exception as error:
+    print(error)
+  print()
+  print()
+  print()
+  print()
+  print()
+  time.sleep(.2)
+'''
+
+import concurrent.futures
+
+with concurrent.futures.ThreadPoolExecutor() as executor:
+  print(f'{executor._max_workers=}')
+  fetch_and_parse_jobs = {
+    executor.submit(
+      get_article_text,
+      article_url
+    ): article_url
+    for article_url in urls
+  }
+  for done_job in concurrent.futures.as_completed(fetch_and_parse_jobs):
+    result = done_job.result()
+    print(len(result))
+
 
