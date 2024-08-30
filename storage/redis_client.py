@@ -8,5 +8,7 @@ def set_complex_obj(key, obj):
 
 def get_complex_obj(key):
   obj = redis_client.get(key)
+  if obj is None:
+    return obj
   return pickle.loads(obj)
 
