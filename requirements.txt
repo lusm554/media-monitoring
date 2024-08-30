@@ -1,5 +1,6 @@
 SQLAlchemy
 psycopg2
+redis==5.0.8
 anyio==4.2.0
 APScheduler==3.10.4
 beautifulsoup4==4.12.2
