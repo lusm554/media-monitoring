@@ -18,6 +18,7 @@ services:
     restart: always
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
+    command: ["redis-server", "--appendonly", "no", "--maxmemory", "150mb", "--maxmemory-policy", "allkeys-lru"]
     volumes:
       - ./shared/redis:/data
     ports:
