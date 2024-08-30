@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 storage.create_tables_if_not_exists()
 #storage.recreate_tables()
 
+'''
 from pprint import pprint
 #articles = storage.get_last_24h_news()
 #pprint(articles[:3])
@@ -35,6 +36,7 @@ t = storage.get_articles_by_news_post('ad3732aa-3cda-4093-bf33-25dcbae19d8e')
 pprint(t)
 
 exit()
+'''
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 assert BOT_TOKEN

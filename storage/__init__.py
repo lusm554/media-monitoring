@@ -4,3 +4,4 @@ from storage.postgres_client import (
 	add_news_subscriber, get_n_news_subscribers, delete_news_subscriber,
   add_news_post, get_n_news_posts, get_news_post, get_articles_by_news_post
 )
+from storage import redis_client

@@ -97,8 +97,6 @@ def cfa_command_dispetcher(func):
 async def cfa_news(context, target_chat_id):
   effective_chat_id = target_chat_id
   articles = storage.get_last_24h_news()
-  #from pprint import pprint
-  #pprint(articles)
   if len(articles) == 0:
     await context.bot.send_message(
       chat_id=effective_chat_id,
@@ -106,7 +104,10 @@ async def cfa_news(context, target_chat_id):
     )
     return
   post = Post(post_items=articles)
-  context.bot_data['post_cache'][post.post_id] = post
+  # Save post to cache
+  #context.bot_data['post_cache'][post.post_id] = post # bot cache
+  storage.redis_client.set_complex_obj(post.post_id, post) # redis cache
+  # Save post to db
   storage.add_news_post([{'bot_post_id': post.post_id, 'news_id': art.db_id} for art in articles])
   msg_text, keyboard = get_cfa_last_news_post_markup(post)
   await context.bot.send_message(
@@ -121,14 +122,19 @@ async def cfa_last_news_button_callback(update, context):
   query = update.callback_query
   btn_name = query.data
   keyboard_action, post_id = btn_name.replace(CFA_LAST_NEWS_CALLBACK_ID + '_', '').split('_')
-  post = context.bot_data['post_cache'].get(post_id)
+  # Get post from cache
+  #post = context.bot_data['post_cache'].get(post_id) # bot cache
+  post = storage.redis_client.get_complex_obj(post_id) # redis cache
   if post is None:
-    await context.bot.send_message(
-      chat_id=query.message.chat.id,
-      reply_to_message_id=query.message.message_id,
-      text='По некоторым причинам кеш этого поста не найден, поэтому действие недоступно.'
-    )
-    return
+    post_articles = storage.get_articles_by_news_post(post_id)
+    if len(post_articles) == 0:
+      await context.bot.send_message(
+        chat_id=query.message.chat.id,
+        reply_to_message_id=query.message.message_id,
+        text='По некоторым причинам кеш этого поста не найден, поэтому действие недоступно.'
+      )
+      return
+    post = Post(post_items=post_articles, post_id=post_id)
   if post.pages_count == 1:
     return
   match keyboard_action:
@@ -138,6 +144,7 @@ async def cfa_last_news_button_callback(update, context):
       post.next_page()
     case 'backward':
       post.previous_page()
+  storage.redis_client.set_complex_obj(post_id, post)
   msg_text, keyboard = get_cfa_last_news_post_markup(post)
   await query.edit_message_text(
     text=msg_text,

@@ -20,6 +20,16 @@ def recreate_tables():
   Base.metadata.drop_all(engine)
   Base.metadata.create_all(engine)
 
+def news_to_article_converter(func):
+  def rename_db_row_keys_to_article(dbrow):
+    dbrow['db_id'] = dbrow.pop('id')
+    return dbrow
+  def wrapper(*args, **kwargs):
+    news = func(*args, **kwargs)
+    news = [Article.from_dict(rename_db_row_keys_to_article(n.__dict__)) for n in news]
+    return news
+  return wrapper
+
 def db_row_to_dict_converter(func):
   from collections.abc import Iterable
   def filter_alchemy_attrs(dct):
@@ -56,7 +66,7 @@ def get_news_post(post_id):
       print(error)
       return list()
 
-@db_row_to_dict_converter
+@news_to_article_converter
 def get_articles_by_news_post(post_id):
   with Session(engine) as session:
     try:
@@ -153,16 +163,6 @@ def add_news(news_list):
     except Exception as error:
       session.rollback()
       raise error
-
-def news_to_article_converter(func):
-  def rename_db_row_keys_to_article(dbrow):
-    dbrow['db_id'] = dbrow.pop('id')
-    return dbrow
-  def wrapper(*args, **kwargs):
-    news = func(*args, **kwargs)
-    news = [Article.from_dict(rename_db_row_keys_to_article(n.__dict__)) for n in news]
-    return news
-  return wrapper
 
 @news_to_article_converter
 def get_n_news(n=100):
