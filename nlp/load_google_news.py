@@ -1,19 +1,32 @@
-from .base_scraper import NewsBaseScraper, Periods
-from .article import Article
-from .utils import unformatted_time2datetime
+import sys; sys.path.insert(0,'.')
+import scraper_lib as scraper
+from scraper_lib import Periods, Article
+import pickle
 from bs4 import BeautifulSoup, SoupStrainer
+import logging
 import requests
 import concurrent.futures
 import time
-import logging
+import goose3
 
 logger = logging.getLogger(__name__)
 
-class CfaGoogleNewsScraper(NewsBaseScraper):
+import dateparser
+import datetime
+
+def unformatted_time2datetime(time_str):
+  settings = {'TIMEZONE': 'Europe/Moscow'}
+  if isinstance(time_str, datetime.datetime):
+    return time_str
+  try:
+    parsed_dttm = dateparser.parse(time_str, settings=settings)
+  except:
+    parsed_dttm = datetime.datetime.now()
+  return parsed_dttm
+
+class CfaGoogleNewsScraper:
   def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-    if self.error == 'ignore':
-      logger.warning(f'Error handler set to {self.error!r}')
+    self.error = 'ignore'
     self.HEADERS = {
       'authority': 'www.google.com',
       'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
@@ -89,9 +102,21 @@ class CfaGoogleNewsScraper(NewsBaseScraper):
         publish_time=article_publish_time,
         publisher_name=article_source_name,
         scraper='google',
+        body_text=self.add_news_body(article_href)
       )
       articles_parsed.append(article)
     return articles_parsed
+
+  def add_news_body(self, url):
+    g = goose3.Goose()
+    try:
+      text = g.extract(url=url).cleaned_text
+      if len(text) == 0:
+        text = None
+    except Exception as error:
+      print(error)
+      text = None
+    return text
 
   def fetch_and_parse(self, period):
     '''
@@ -100,29 +125,54 @@ class CfaGoogleNewsScraper(NewsBaseScraper):
     '''
     final_articles = set()
     try:
-      with concurrent.futures.ThreadPoolExecutor() as executor:
-        logger.debug(f'{executor._max_workers=}')
-        fetch_and_parse_jobs = {
-          executor.submit(
-            lambda page_num: self.page_parser(
-              page_html=self.page_fetcher(
-                for_period=period,
-                page_num=page_num,
+      pages = 31
+      n = 3
+      for i in range(0, pages, n):
+        _range = range(i, i+n)
+        print(_range)
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+          logger.debug(f'{executor._max_workers=}')
+          fetch_and_parse_jobs = {
+            executor.submit(
+              lambda page_num: self.page_parser(
+                page_html=self.page_fetcher(
+                  for_period=period,
+                  page_num=page_num,
+                ),
               ),
-            ),
-            page_num
-          ): page_num
-          for page_num in range(10)
-        }
-        for done_job in concurrent.futures.as_completed(fetch_and_parse_jobs):
-          cfa_articles = done_job.result()
-          final_articles.update(cfa_articles)
+              page_num
+            ): page_num
+            for page_num in _range
+          }
+          for done_job in concurrent.futures.as_completed(fetch_and_parse_jobs):
+            cfa_articles = done_job.result()
+            final_articles.update(cfa_articles)
+        time.sleep(5)
       logger.info(f'Found {len(final_articles)} articles for {period}')
       # extract news text
-      final_articles = self.add_news_body_to_article(final_articles)
+      #final_articles = self.add_news_body_to_article(final_articles)
       return final_articles
     except Exception as error:
       if self.error == 'raise':
         raise error
       logger.error(error)
       return final_articles
+
+pickle_filepath = 'news_sample_google.pickle'
+'''
+result = CfaGoogleNewsScraper().fetch_and_parse(scraper.Periods.ALL_AVAILABLE_TIME)
+print(len(result))
+
+with open(pickle_filepath, 'wb') as f:
+  pickle.dump(result, f)
+'''
+
+import pandas as pd
+with open(pickle_filepath, 'rb') as f:
+  result = pickle.load(f)
+  result = [a.to_dict() for a in result]
+  result = pd.DataFrame(result)
+  result.to_csv('google_news.csv', index=False)
+  print(pd.read_csv('google_news.csv').info())
+
+
