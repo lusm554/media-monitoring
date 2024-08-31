@@ -25,6 +25,7 @@ class Article:
       publisher_name=dct['publisher_name'],
       scraper=dct['scraper'],
       db_id=dct.get('db_id'),
+      body_text=dct.get('body_text'),
     )
     return self
 

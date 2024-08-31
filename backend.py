@@ -20,21 +20,13 @@ storage.create_tables_if_not_exists()
 #storage.recreate_tables()
 
 '''
+import scraper_lib
+
+articles = scraper_lib.CfaAllNewsScraper(error='ignore').fetch_and_parse(period=scraper_lib.Periods.LAST_24_HOURS)
+storage.add_news(articles)
 from pprint import pprint
-#articles = storage.get_last_24h_news()
-#pprint(articles[:3])
-
-#post_articles = [{'bot_post_id': 'sdfsd', 'news_id': art.db_id} for art in articles]
-#storage.add_news_post(post_articles)
-t = storage.get_n_news_posts()
-pprint(t)
-
-t = storage.get_news_post('ad3732aa-3cda-4093-bf33-25dcbae19d8e')
-pprint(t)
-
-t = storage.get_articles_by_news_post('ad3732aa-3cda-4093-bf33-25dcbae19d8e')
-pprint(t)
-
+articles = storage.get_n_news()
+pprint(articles)
 exit()
 '''
 

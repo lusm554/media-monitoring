@@ -1,7 +1,7 @@
 from typing import List
 from typing import Optional
 from sqlalchemy import ForeignKey
-from sqlalchemy import String
+from sqlalchemy import String, Text
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -20,6 +20,7 @@ class News(Base):
   publish_time: Mapped[datetime] = mapped_column(index=True)
   #publish_time: Mapped[str] = mapped_column(index=True)
   publisher_name: Mapped[str]
+  body_text: Mapped[str]
   scraper: Mapped[str]
 
   def __repr__(self) -> str:
