@@ -162,6 +162,8 @@ class CfaDzenNewsScraper(NewsBaseScraper):
           break
         parsed_articles.extend(page_articles)
       logger.info(f'Found {len(parsed_articles)} articles for {period}')
+      # extract news text
+      parsed_articles = self.add_news_body_to_article(parsed_articles)
       return parsed_articles
     except Exception as error:
       if self.error == 'raise':

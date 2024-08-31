@@ -125,6 +125,8 @@ class CfaRssNewsScraper(NewsBaseScraper):
         if article.publish_time >= news_start_time
       ]
       logger.info(f'Found {len(result_cfa_articles)} articles for {period}')
+      # extract news
+      result_cfa_articles = self.add_news_body_to_article(result_cfa_articles)
       return result_cfa_articles
     except Exception as error:
       if self.error == 'raise':

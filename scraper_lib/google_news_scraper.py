@@ -116,6 +116,8 @@ class CfaGoogleNewsScraper(NewsBaseScraper):
           cfa_articles = done_job.result()
           final_articles.update(cfa_articles)
       logger.info(f'Found {len(final_articles)} articles for {period}')
+      # extract news text
+      final_articles = self.add_news_body_to_article(final_articles)
       return final_articles
     except Exception as error:
       if self.error == 'raise':

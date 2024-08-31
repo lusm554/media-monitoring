@@ -4,7 +4,14 @@ from scraper_lib import Article
 import datetime
 from pprint import pprint
 
+#news = scraper.CfaGoogleNewsScraper(error='raise').fetch_and_parse(period=scraper.Periods.LAST_24_HOURS)
+news = scraper.CfaAllNewsScraper(error='raise').fetch_and_parse(period=scraper.Periods.LAST_24_HOURS)
+pprint(news)
+
+exit()
+
 #news = scraper.CfaAllNewsScraper(error='raise').fetch_and_parse(period=scraper.Periods.LAST_24_HOURS)
+CfaGoogleNewsScraper
 #pprint(news)
 articles =[Article(
 title='«Газпром» показал рост финансовых показателей в первом полугодии',
@@ -179,8 +186,8 @@ for url in urls:
   time.sleep(.2)
 '''
 
+'''
 import concurrent.futures
-
 with concurrent.futures.ThreadPoolExecutor() as executor:
   print(f'{executor._max_workers=}')
   fetch_and_parse_jobs = {
@@ -193,5 +200,6 @@ with concurrent.futures.ThreadPoolExecutor() as executor:
   for done_job in concurrent.futures.as_completed(fetch_and_parse_jobs):
     result = done_job.result()
     print(len(result))
+'''
 
 
