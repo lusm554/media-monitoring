@@ -30,6 +30,20 @@ class CfaAllNewsScraper(NewsBaseScraper):
       if not urlparse(article.url).netloc in self.cfa_news_url_blacklist
     ]
 
+  def filter_no_cfa_news(self, articles):
+    cfa_keys_words = [
+      'цфа',
+      'цифровые финансовые активы',
+      'цифровых финансовых активов',
+      'цифровым финансовым активам',
+      'цифровыми финансовыми активами',
+      'цифровых финансовых активах',
+    ]
+    return [
+      art for art in articles
+      if any(kw in art.title for kw in cfa_keys_words)
+    ]
+
   def fetch_and_parse(self, period):
     '''
     Забирает новости по каждому парсеру, вызывая метод fetch_and_parse у каждого парсера.
@@ -41,6 +55,7 @@ class CfaAllNewsScraper(NewsBaseScraper):
         scraper_articles = scraper(error=self.error).fetch_and_parse(period=period)
         all_scrapers_articles.extend(scraper_articles)
       all_scrapers_articles = self.filter_by_blacklist(all_scrapers_articles)
+      all_scrapers_articles = self.filter_no_cfa_news(all_scrapers_articles)
       all_scrapers_articles = list(set(all_scrapers_articles))
       logger.info(f'Found {len(all_scrapers_articles)} releases for {period}')
       logger.info(f'Run {len(self.NEWS_SCRAPERS)} scrapers')
