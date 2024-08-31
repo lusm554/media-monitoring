@@ -5,8 +5,14 @@ import datetime
 from pprint import pprint
 
 #news = scraper.CfaGoogleNewsScraper(error='raise').fetch_and_parse(period=scraper.Periods.LAST_24_HOURS)
-news = scraper.CfaAllNewsScraper(error='raise').fetch_and_parse(period=scraper.Periods.LAST_24_HOURS)
-pprint(news)
+#news = scraper.CfaAllNewsScraper(error='raise').fetch_and_parse(period=scraper.Periods.LAST_24_HOURS)
+news = scraper.CfaAllNewsScraper(error='raise').fetch_and_parse(period=scraper.Periods.LAST_WEEK)
+for n in news:
+  print(n.url)
+  print(n.body_text)
+  print()
+  print()
+  print()
 
 exit()
 
