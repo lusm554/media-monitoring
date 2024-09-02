@@ -8,22 +8,30 @@ storage.recreate_tables()
 #################### Add rows ####################
 import datetime
 
-def test_add_users():
-  user_row = {
-    'telegram_user_id': 1,
+def test_add_postgres(row, rows, testing_add, testing_get_n_rows):
+  # one row insert
+  testing_add(row)
+  assert len(testing_get_n_rows()) == 1, testing_get_n_rows()
+
+  # multiple rows with same id col
+  equal_rows = [row for i in range(5)]
+  testing_add(equal_rows)
+  assert len(testing_get_n_rows()) == 1, testing_get_n_rows()
+
+  # multiple unique rows
+  testing_add(rows)
+  assert len(testing_get_n_rows()) == len(rows)+1, testing_get_n_rows()
+
+# Test add_users
+test_add_postgres(
+  row={
+    'telegram_user_id': 24,
     'add_time': datetime.datetime.now(),
     'update_time': datetime.datetime.now(),
     'telegram_username': 'abobus',
     'telegram_first_name': 'abobus',
-  }
-  storage.add_users(user_row)
-  assert len(storage.get_n_users()) == 1, storage.get_n_users()
-
-  user_rows = [user_row for i in range(5)]
-  storage.add_users(user_rows)
-  assert len(storage.get_n_users()) == 1, storage.get_n_users()
-
-  user_rows = [
+  },
+  rows=[
     {
       'telegram_user_id': i,
       'add_time': datetime.datetime.now(),
@@ -32,69 +40,70 @@ def test_add_users():
       'telegram_first_name': 'abobus',
     }
     for i in range(5)
-  ]
-  storage.add_users(user_rows)
-  assert len(storage.get_n_users()) == 5, storage.get_n_users()
+  ],
+  testing_add=storage.add_users,
+  testing_get_n_rows=storage.get_n_users,
+)
 
-def test_add_news():
-  # add news test
-  news_row = {
+# Test add_news
+test_add_postgres(
+  row={
     "title": "test",
     "url": "https",
     "publish_time": datetime.datetime.now(),
     "publisher_name": "test",
     "body_text": "test",
     "scraper": "test",
-  }
-  storage.add_news(news_row)
-  assert len(storage.get_n_news()) == 1, storage.get_n_news()
-
-  # filter duplicates test
-  news_rows = [news_row for i in range(5)]
-  storage.add_news(news_rows)
-  assert len(storage.get_n_news()) == 1, storage.get_n_news()
-  
-  # multiple add test
-  news_rows = [
+    "db_id": 123,
+  },
+  rows=[
     {
-        "title": "test",
-        "url": f"https{i}",
-        "publish_time": datetime.datetime.now(),
-        "publisher_name": "test",
-        "body_text": "test",
-        "scraper": "test",
+      "title": "test",
+      "url": f"https{i}",
+      "publish_time": datetime.datetime.now(),
+      "publisher_name": "test",
+      "body_text": "test",
+      "scraper": "test",
+      "db_id": 123,
     }
     for i in range(5)
-  ]
-  storage.add_news(news_rows)
-  assert len(storage.get_n_news()) == 6, storage.get_n_news()
+  ],
+  testing_add=storage.add_news,
+  testing_get_n_rows=storage.get_n_news,
+)
 
-def test_add_news_posts():
-  # add news test
-  news_posts_row = {
-    'bot_post_id': 'adsf',
-    'news_id': 1,
-  }
-  storage.add_news_posts(news_posts_row)
-  assert len(storage.get_n_news_posts()) == 1, storage.get_n_news_posts()
+# Test add_news_posts
+test_add_postgres(
+  row={ 'bot_post_id': 'adsf', 'news_id': 1, },
+  rows=[{ 'bot_post_id': f'adsf{i}', 'news_id': 1, } for i in range(5)],
+  testing_add=storage.add_news_posts,
+  testing_get_n_rows=storage.get_n_news_posts,
+)
 
-  # filter duplicates test
-  news_posts_rows = [news_posts_row for i in range(5)]
-  storage.add_news_posts(news_posts_rows)
-  assert len(storage.get_n_news_posts()) == 1, storage.get_n_news_posts()
-  
-  # multiple add test
-  news_posts_rows = [
+# Test add_releases_posts
+test_add_postgres(
+  row={ 'bot_post_id': 'adsf', 'release_id': 1, },
+  rows=[{ 'bot_post_id': f'adsf{i}', 'release_id': 1, } for i in range(5)],
+  testing_add=storage.add_releases_posts,
+  testing_get_n_rows=storage.get_n_releases_posts,
+)
+
+test_add_postgres(
+  row={
+    'platform_name': 'test',
+    'url': 'test',
+    'release_time': datetime.datetime.now(),
+    'title': 'test',
+  },
+  rows=[
     {
-      'bot_post_id': f'adsf{i}',
-      'news_id': 1,
+      'platform_name': 'test',
+      'url': f'test{i}',
+      'release_time': datetime.datetime.now(),
+      'title': 'test',
     }
     for i in range(5)
-  ]
-  storage.add_news_posts(news_posts_rows)
-  assert len(storage.get_n_news_posts()) == 6, storage.get_n_news_posts()
-
-test_add_news_posts()
-test_add_news()
-test_add_users()
-
+  ],
+  testing_add=storage.add_releases,
+  testing_get_n_rows=storage.get_n_releases,
+)
