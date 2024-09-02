@@ -28,6 +28,19 @@ class News(Base):
     repr_str = ', '.join(f"{attr}={getattr(self, attr)!r}" for attr in cls_level_attrs)
     return f"{self.__class__.__name__}({repr_str})"
 
+class Releases(Base):
+  __tablename__ = "cfa_releases_content"
+  id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+  platform_name: Mapped[str]
+  url: Mapped[str] = mapped_column(unique=True)
+  release_time: Mapped[release_time] = mapped_column(index=True)
+  title: Mapped[str]
+
+  def __repr__(self) -> str:
+    cls_level_attrs = get_type_hints(self).keys()
+    repr_str = ', '.join(f"{attr}={getattr(self, attr)!r}" for attr in cls_level_attrs)
+    return f"{self.__class__.__name__}({repr_str})"
+
 class Users(Base):
   __tablename__ = 'bot_users'
   id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -48,4 +61,10 @@ class NewsPosts(Base):
   id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
   bot_post_id: Mapped[str]
   news_id: Mapped[int]
+
+class ReleasesPosts(Base):
+  __tablename__ = 'releases_posts'
+  id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+  bot_post_id: Mapped[str]
+  release_id: Mapped[int]
 
