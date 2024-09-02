@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 import datetime
 from storage.postgres_datamap import Base, News, RegularNewsSubscribers, Users, NewsPosts
 from scraper_lib import Article
+from collections.abc import Iterable
 
 HOST, PORT = 'localhost', '5432' # db
 USER, PWD = 'postgres', ''
@@ -19,6 +20,90 @@ def create_tables_if_not_exists():
 def recreate_tables():
   Base.metadata.drop_all(engine)
   Base.metadata.create_all(engine)
+
+'''
+1. Converter from row to Article, Release instance
+2. Converter from row to dict
+3. Select n items
+4. Select items by id
+5. Select items by period
+6. Save items, with unique option
+'''
+
+'''
+def select_n_rows_factory(table, result_convertor=None):
+  def selector(n=100):
+    with Session(engine) as session:
+      try:
+        return session.query(table).limit(n).all()
+      except Exception as error:
+        print(error)
+        return list()
+  if result_convertor:
+    selector = result_convertor(selector)
+  return selector
+'''
+
+##############################################
+#1. use add all
+#2. filter for existing
+#3. filter for keys
+#4. add only from dict
+
+def add_rows_factory(table, filter_existing_rows_key=None):
+  def add_rows(rows):
+    with Session(engine) as session:
+      try:
+        if not isinstance(rows, Iterable) or isinstance(rows, dict):
+          rows = [rows]
+        if filter_existing_rows_key:
+          rows = [
+            row for row in rows 
+            if not (
+              session
+                .query(table)
+                .filter(getattr(table,filter_existing_rows_key)==row[filter_existing_rows_key])
+                .first()
+            )
+          ]
+        rows = [table(**row) for row in rows]
+        session.add_all(rows)
+        session.commit()
+      except Exception as error:
+        session.rollback()
+        print(error)
+  return add_rows
+
+add_users = add_rows_factory(Users, filter_existing_rows_key='telegram_user_id')
+add_news = add_rows_factory(News, filter_existing_rows_key='url')
+add_news_posts = add_rows_factory(NewsPosts, filter_existing_rows_key='bot_post_id')
+
+def add_user(user):
+  with Session(engine) as session:
+    try:
+      session.add(Users(**user))
+      session.commit()
+    except Exception as error:
+      session.rollback()
+      print(error)
+
+def add_news_subscriber(news_subscriber):
+  with Session(engine) as session:
+    try:
+      existing_subscriber = (
+        session
+          .query(RegularNewsSubscribers)
+          .filter_by(telegram_user_id=news_subscriber["telegram_user_id"])
+          .first()
+      )
+      if not existing_subscriber:
+        session.add(RegularNewsSubscribers(**news_subscriber))
+      session.commit()
+    except Exception as error:
+      session.rollback()
+      print(error)
+
+##############################################
 
 def news_to_article_converter(func):
   def rename_db_row_keys_to_article(dbrow):
@@ -46,6 +131,7 @@ def db_row_to_dict_converter(func):
   return wrapper
 
 ####################### NEWS POST #######################
+'''
 def add_news_post(post_articles):
  with Session(engine) as session:
   try:
@@ -55,6 +141,7 @@ def add_news_post(post_articles):
   except Exception as error:
     session.rollback()
     print(error)
+'''
 
 @db_row_to_dict_converter
 def get_news_post(post_id):
@@ -150,6 +237,7 @@ def get_n_news_subscribers(n=100):
       return list()
 
 ####################### NEWS #######################
+'''
 def add_news(news_list):
   with Session(engine) as session:
     try:
@@ -163,6 +251,7 @@ def add_news(news_list):
     except Exception as error:
       session.rollback()
       raise error
+'''
 
 @news_to_article_converter
 def get_n_news(n=100):

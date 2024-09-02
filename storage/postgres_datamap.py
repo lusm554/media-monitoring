@@ -33,7 +33,7 @@ class Releases(Base):
   id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
   platform_name: Mapped[str]
   url: Mapped[str] = mapped_column(unique=True)
-  release_time: Mapped[release_time] = mapped_column(index=True)
+  release_time: Mapped[datetime]
   title: Mapped[str]
 
   def __repr__(self) -> str:
