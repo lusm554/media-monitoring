@@ -53,6 +53,16 @@ def db_row_to_dict_converter(func):
     return db_result
   return wrapper
 
+def news_to_article_converter(func):
+  def rename_db_row_keys_to_article(dbrow):
+    dbrow['db_id'] = dbrow.pop('id')
+    return dbrow
+  def wrapper(*args, **kwargs):
+    news = func(*args, **kwargs)
+    news = [Article.from_dict(rename_db_row_keys_to_article(n.__dict__)) for n in news]
+    return news
+  return wrapper
+
 def get_n_rows_factory(table, result_convertor=None):
   def selector(n=100):
     with Session(engine) as session:
@@ -67,6 +77,10 @@ def get_n_rows_factory(table, result_convertor=None):
 
 get_n_releases_posts = get_n_rows_factory(ReleasesPosts, db_row_to_dict_converter)
 get_n_releases = get_n_rows_factory(Releases, db_row_to_dict_converter)
+get_n_news_posts = get_n_rows_factory(NewsPosts, db_row_to_dict_converter)
+get_n_users = get_n_rows_factory(Users, db_row_to_dict_converter)
+get_n_news_subscribers = get_n_rows_factory(RegularNewsSubscribers, db_row_to_dict_converter)
+get_n_news = get_n_rows_factory(News, news_to_article_converter)
 
 ##############################################
 #1. use add all
@@ -108,31 +122,7 @@ add_releases = add_rows_factory(Releases, filter_existing_rows_key='url')
 add_releases_posts = add_rows_factory(ReleasesPosts, filter_existing_rows_key='bot_post_id')
 
 ##############################################
-
-def news_to_article_converter(func):
-  def rename_db_row_keys_to_article(dbrow):
-    dbrow['db_id'] = dbrow.pop('id')
-    return dbrow
-  def wrapper(*args, **kwargs):
-    news = func(*args, **kwargs)
-    news = [Article.from_dict(rename_db_row_keys_to_article(n.__dict__)) for n in news]
-    return news
-  return wrapper
-
-
 ####################### NEWS POST #######################
-'''
-def add_news_post(post_articles):
- with Session(engine) as session:
-  try:
-    for post_article in post_articles:
-      session.add(NewsPosts(**post_article))
-    session.commit()
-  except Exception as error:
-    session.rollback()
-    print(error)
-'''
-
 @db_row_to_dict_converter
 def get_news_post(post_id):
   with Session(engine) as session:
@@ -155,34 +145,6 @@ def get_articles_by_news_post(post_id):
             .all()
         )
         return articles
-    except Exception as error:
-      print(error)
-      return list()
-
-@db_row_to_dict_converter
-def get_n_news_posts(n=100):
-  with Session(engine) as session:
-    try:
-      return session.query(NewsPosts).limit(n).all()
-    except Exception as error:
-      print(error)
-      return list()
-
-####################### USER #######################
-def add_user(user):
-  with Session(engine) as session:
-    try:
-      session.add(Users(**user))
-      session.commit()
-    except Exception as error:
-      session.rollback()
-      print(error)
-
-@db_row_to_dict_converter
-def get_n_users(n=100):
-  with Session(engine) as session:
-    try:
-      return session.query(Users).limit(n).all()
     except Exception as error:
       print(error)
       return list()
@@ -219,14 +181,6 @@ def delete_news_subscriber(subsciber_telegram_id):
       session.rollback()
       print(error)
 
-@db_row_to_dict_converter
-def get_n_news_subscribers(n=100):
-  with Session(engine) as session:
-    try:
-      return session.query(RegularNewsSubscribers).limit(n).all()
-    except Exception as error:
-      print(error)
-      return list()
 
 ####################### NEWS #######################
 '''
@@ -245,14 +199,6 @@ def add_news(news_list):
       raise error
 '''
 
-@news_to_article_converter
-def get_n_news(n=100):
-  with Session(engine) as session:
-    try:
-      return session.query(News).limit(n).all()
-    except Exception as error:
-      print(error)
-      return list()
 
 @news_to_article_converter
 def get_news_by_date_range(start_dt, end_dt):
