@@ -1,13 +1,13 @@
 import sys; sys.path.insert(0, '.')
 import storage
 from storage import postgres_datamap 
-
-storage.recreate_tables()
-#storage.create_tables_if_not_exists()
-
-#################### Add rows ####################
 import datetime
 
+#storage.recreate_tables()
+#storage.create_tables_if_not_exists()
+
+######################### START TEST ADD ROWS #########################
+storage.recreate_tables()
 def test_add_postgres(row, rows, testing_add, testing_get_n_rows):
   # one row insert
   testing_add(row)
@@ -88,6 +88,7 @@ test_add_postgres(
   testing_get_n_rows=storage.get_n_releases_posts,
 )
 
+# Test add_releases
 test_add_postgres(
   row={
     'platform_name': 'test',
@@ -107,3 +108,15 @@ test_add_postgres(
   testing_add=storage.add_releases,
   testing_get_n_rows=storage.get_n_releases,
 )
+######################### END TEST ADD ROWS #########################
+
+
+######################### START GET BY ID ROWS #########################
+storage.recreate_tables()
+
+news_post_row = { 'bot_post_id': 'adsf', 'news_id': '1234', }
+storage.add_news_posts(news_post_row)
+r = storage.get_news_post('adsf')
+print(r)
+
+######################### END GET BY ID ROWS #########################

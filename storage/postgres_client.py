@@ -122,16 +122,21 @@ add_releases = add_rows_factory(Releases, filter_existing_rows_key='url')
 add_releases_posts = add_rows_factory(ReleasesPosts, filter_existing_rows_key='bot_post_id')
 
 ##############################################
+def get_rows_by_col(table, key, result_convertor=None):
+  def selector(col_val):
+    with Session(engine) as session:
+      try:
+        return session.query(table).filter(getattr(table, key) == col_val).all()
+      except Exception as error:
+        print(error)
+        return list()
+  if result_convertor:
+    selector = result_convertor(selector)
+  return selector
+
+get_news_post = get_rows_by_col(table=NewsPosts, key='bot_post_id', result_convertor=db_row_to_dict_converter)
+
 ####################### NEWS POST #######################
-@db_row_to_dict_converter
-def get_news_post(post_id):
-  with Session(engine) as session:
-    try:
-        post = session.query(NewsPosts).filter_by(bot_post_id=post_id).all()
-        return post
-    except Exception as error:
-      print(error)
-      return list()
 
 @news_to_article_converter
 def get_articles_by_news_post(post_id):
@@ -150,24 +155,6 @@ def get_articles_by_news_post(post_id):
       return list()
 
 ####################### NEWS SUBSCRIBER #######################
-'''
-def add_news_subscriber(news_subscriber):
-  with Session(engine) as session:
-    try:
-      existing_subscriber = (
-        session
-          .query(RegularNewsSubscribers)
-          .filter_by(telegram_user_id=news_subscriber["telegram_user_id"])
-          .first()
-      )
-      if not existing_subscriber:
-        session.add(RegularNewsSubscribers(**news_subscriber))
-      session.commit()
-    except Exception as error:
-      session.rollback()
-      print(error)
-'''
-
 def delete_news_subscriber(subsciber_telegram_id):
   with Session(engine) as session:
     try:
@@ -181,25 +168,7 @@ def delete_news_subscriber(subsciber_telegram_id):
       session.rollback()
       print(error)
 
-
 ####################### NEWS #######################
-'''
-def add_news(news_list):
-  with Session(engine) as session:
-    try:
-      for news in news_list:
-        existing_news = session.query(News).filter_by(url=news["url"]).first()
-        if not existing_news:
-          news = news.to_dict()
-          del news['db_id']
-          session.add(News(**news))
-      session.commit()
-    except Exception as error:
-      session.rollback()
-      raise error
-'''
-
-
 @news_to_article_converter
 def get_news_by_date_range(start_dt, end_dt):
   with Session(engine) as session:
