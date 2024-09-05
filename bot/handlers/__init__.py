@@ -38,6 +38,8 @@ logger = logging.getLogger(__name__)
 
 async def updates_handler(update, context):
   try:
+    logger.info(update.message)
+    logger.info(update.message.entities)
     show_obj = {
       'user': update.message.from_user,
       'chat': update.message.chat,

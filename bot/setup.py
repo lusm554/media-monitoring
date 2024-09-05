@@ -69,6 +69,7 @@ def shedule_regular_bot_tasks(telegram_app):
     time=regular_releases_time,
   )
   # Test senders
+  '''
   telegram_app.job_queue.run_once(
     callback=cfa_news_sender,
     when=7, # run 7 seconds since from now
@@ -77,4 +78,5 @@ def shedule_regular_bot_tasks(telegram_app):
     callback=cfa_releases_sender,
     when=7, # run 7 seconds since from now
   )
+  '''
 

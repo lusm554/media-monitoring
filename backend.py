@@ -2,6 +2,12 @@ import bot
 import storage
 import os
 
+import locale
+locale.setlocale(
+  category=locale.LC_ALL,
+  locale='ru_RU',
+)
+
 import datetime
 import logging
 logging.basicConfig(

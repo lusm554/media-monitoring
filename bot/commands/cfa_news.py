@@ -2,8 +2,9 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 from telegram import Update
 from telegram.ext import CallbackContext
-import scraper_lib as scraper
 import storage
+import scraper_lib as scraper
+import nlp
 import logging
 
 RIGHT_ARROW_SYMBOL = chr(8594) # →
@@ -59,16 +60,22 @@ class Post:
   def items_count_on_page(self):
     return self._items_count_on_page
 
+'''
+1. Split pages by max length 4096
+2. Summarize article text up to 500 symbols
+'''
+
 def get_cfa_last_news_post_markup(post):
   msg = '\n\n'.join(
     f'{n}. <a href="{article.url}"> {article.title} </a>\n'
-    f'<b>Источник:</b> {article.publisher_name}.\n'
-    f'<b>Опубликовано:</b> {article.publish_time}.\n'
-    f'<b>Взято из:</b> {article.scraper}.'
+    f'<b>Источник:</b> {article.scraper.capitalize()}/{article.publisher_name}.\n'
+    f'<b>Опубликовано:</b> {article.publish_time.strftime("%a, %d %b в %H:%M")}.\n'
+    f'<blockquote expandable>{nlp.lsa_summarizer(article.body_text, sentences=2)}</blockquote>'
     for n, article in enumerate(
       post.current_page(),
       start=(post.current_page_number - 1) * post.items_count_on_page + 1
     )
+    # 4096
   )
   internal_post_id = post.post_id
   callback_id = CFA_LAST_NEWS_CALLBACK_ID
@@ -103,7 +110,7 @@ async def cfa_news(context, target_chat_id):
       text='Новости ЦФА не найдены.',
     )
     return
-  post = Post(post_items=articles)
+  post = Post(post_items=articles, page_items_cnt=3)
   # Save post to cache
   #context.bot_data['post_cache'][post.post_id] = post # bot cache
   storage.redis_client.set_complex_obj(post.post_id, post) # redis cache
@@ -134,7 +141,7 @@ async def cfa_last_news_button_callback(update, context):
         text='По некоторым причинам кеш этого поста не найден, поэтому действие недоступно.'
       )
       return
-    post = Post(post_items=post_articles, post_id=post_id)
+    post = Post(post_items=post_articles, post_id=post_id, page_items_cnt=3)
   if post.pages_count == 1:
     return
   match keyboard_action:

@@ -8,11 +8,15 @@ def get_russian_stopwords():
     data = f.read()
   return frozenset(w.rstrip() for w in data.splitlines() if w)
 
-def lsa_summarizer(text):
-  LANGUAGE = "russian"
-  SENTENCES_COUNT = 3
-  parser = PlaintextParser.from_string(text, Tokenizer(LANGUAGE))
-  summarizer = Summarizer(Stemmer(LANGUAGE))
-  summarizer.stop_words = get_russian_stopwords()
-  summirized = '\n'.join(str(sen) for sen in summarizer(parser.document, SENTENCES_COUNT))
-  return summirized
+def lsa_summarizer(text, sentences=3):
+  try:
+    LANGUAGE = "russian"
+    SENTENCES_COUNT = sentences
+    parser = PlaintextParser.from_string(text, Tokenizer(LANGUAGE))
+    summarizer = Summarizer(Stemmer(LANGUAGE))
+    summarizer.stop_words = get_russian_stopwords()
+    summirized = '\n'.join(str(sen) for sen in summarizer(parser.document, SENTENCES_COUNT))
+    return summirized
+  except Exception as error:
+    print(error)
+    return ''
