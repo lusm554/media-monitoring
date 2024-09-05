@@ -63,6 +63,18 @@ def news_to_article_converter(func):
     return news
   return wrapper
 
+'''
+def rows_to_releases_converter(func):
+  def rename_db_row_keys_to_article(dbrow):
+    dbrow['db_id'] = dbrow.pop('id')
+    return dbrow
+  def wrapper(*args, **kwargs):
+    news = func(*args, **kwargs)
+    news = [Article.from_dict(rename_db_row_keys_to_article(n.__dict__)) for n in news]
+    return news
+  return wrapper
+'''
+
 def get_n_rows_factory(table, result_convertor=None):
   def selector(n=100):
     with Session(engine) as session:
@@ -170,6 +182,7 @@ def delete_news_subscriber(subsciber_telegram_id):
       print(error)
 
 ####################### NEWS #######################
+'''
 @news_to_article_converter
 def get_news_by_date_range(start_dt, end_dt):
   with Session(engine) as session:
@@ -187,3 +200,29 @@ def get_last_24h_news():
   end_dt = datetime.datetime.now()
   news = get_news_by_date_range(start_dt, end_dt)
   return news
+'''
+
+def get_rows_by_date_range_factory(table, table_dt_col, delta_in_hours, result_convertor=None):
+  def selector():
+    with Session(engine) as session:
+      try:
+        start_dt = datetime.datetime.now() - datetime.timedelta(hours=delta_in_hours)
+        end_dt = datetime.datetime.now()
+        return session.query(table).filter(
+          getattr(table, table_dt_col) >= start_dt,
+          getattr(table, table_dt_col) <= end_dt,
+        ).all()
+      except Exception as error:
+        print(error)
+        return list()
+  if result_convertor:
+    selector = result_convertor(selector)
+  return selector
+
+get_last_24h_news = get_rows_by_date_range_factory(
+  table=News, table_dt_col='publish_time', delta_in_hours=24, result_convertor=news_to_article_converter
+)
+
+get_last_24h_releases = get_rows_by_date_range_factory(
+  table=Releases, table_dt_col='release_time', delta_in_hours=24, result_convertor=db_row_to_dict_converter
+)

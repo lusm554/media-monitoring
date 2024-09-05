@@ -10,7 +10,7 @@ from telegram.ext import (
   filters,
 )
 import datetime
-from bot.regular_tasks import cfa_news_sender, cfa_news_scraper
+from bot.regular_tasks import cfa_news_sender, cfa_news_scraper, cfa_releases_scraper
 import asyncio
 import zoneinfo
 
@@ -44,12 +44,18 @@ def setup_button_handlers(telegram_app, cfa_last_news_button_callback, cfa_last_
   telegram_app.add_handler(CallbackQueryHandler(cfa_last_releases_button_callback, pattern='cfa_last_releases*'))
 
 def shedule_regular_bot_tasks(telegram_app):
-  scraper_job_interval = datetime.timedelta(minutes=10)
+  scraper_news_job_interval = datetime.timedelta(minutes=10)
+  scraper_releases_job_interval = datetime.timedelta(minutes=60)
   newsletter_time = datetime.time(hour=9, tzinfo=zoneinfo.ZoneInfo("Europe/Moscow"))
   telegram_app.job_queue.run_repeating(
     callback=cfa_news_scraper,
-    interval=scraper_job_interval,
+    interval=scraper_news_job_interval,
     first=datetime.timedelta(seconds=1),
+  )
+  telegram_app.job_queue.run_repeating(
+    callback=cfa_releases_scraper,
+    interval=scraper_releases_job_interval,
+    first=datetime.timedelta(seconds=2),
   )
   telegram_app.job_queue.run_once(
     callback=cfa_news_sender,
