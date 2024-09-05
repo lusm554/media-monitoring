@@ -1,10 +1,5 @@
-from sumy.parsers.plaintext import PlaintextParser
-from sumy.nlp.tokenizers import Tokenizer
-from sumy.summarizers.lsa import LsaSummarizer as Summarizer
-from sumy.nlp.stemmers import Stemmer
-from sumy.utils import get_stop_words
-
-s = """
+# Текст для суммаризации
+text = """
 ВТБ прогнозирует объем рынка ЦФА по итогам года около 400 млрд рублей
 
 По итогам 2024 года объем рынка цифровых финансовых активов (ЦФА) в России приблизится к 400 млрд рублей. Об этом в рамках ВЭФ-2024 в эфире телеканала РБК ТВ заявил член правления ВТБ Виталий Сергейчук.
@@ -16,33 +11,20 @@ s = """
 Напомним, что в этом году ВТБ первым в России предложил частным инвесторам цифровые финансовые активы, привязанные к стоимости физического квадратного метра в строящемся жилом комплексе hideOUT. Этот инструмент радикально снизил для розничных инвесторов порог входа на рынок инвестиций в премиальную недвижимость. Доходность и защита капитала инвесторов аналогичны приобретению физического метра жилья в этом ЖК.
 """
 
-def get_russian_stopwords():
-  with open('nlp/russian_stop_words.txt', 'rt') as f:
-    data = f.read()
-  return frozenset(w.rstrip() for w in data.splitlines() if w)
+from transformers import T5ForConditionalGeneration, T5Tokenizer
 
-def summarizer(text):
-  LANGUAGE = "russian"
-  SENTENCES_COUNT = 3
-  parser = PlaintextParser.from_string(text, Tokenizer(LANGUAGE))
-  summarizer = Summarizer(Stemmer(LANGUAGE))
-  summarizer.stop_words = get_russian_stopwords()
-  summirized = '\n'.join(str(sen) for sen in summarizer(parser.document, SENTENCES_COUNT))
-  return summirized
+model_name = "cointegrated/rut5-base-multitask"  # Русская T5-модель
+model = T5ForConditionalGeneration.from_pretrained(model_name)
+tokenizer = T5Tokenizer.from_pretrained(model_name)
+
+# Подготовка входных данных для модели
+inputs = tokenizer("Суммаризируй до 2-3 предложений: " + text, return_tensors="pt", max_length=512, truncation=True)
+
+# Генерация суммаризации
+summary_ids = model.generate(inputs["input_ids"], max_length=50, min_length=20, length_penalty=2.0, num_beams=4, early_stopping=True)
+summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
 
 import sys; sys.path.insert(0, '.')
 import scraper_lib
 
 articles = scraper_lib.CfaAllNewsScraper(error='raise').fetch_and_parse(scraper_lib.Periods.LAST_24_HOURS)
-for a in articles:
-  print('*'*10, 'BODY', '*'*10)
-  print(a.body_text)
-  print()
-  print('*'*10, 'SUM', '*'*10)
-  print(summarizer(a.body_text))
-  print('*'*10, 'END', '*'*10)
-  print()
-  print()
-  print()
-
-
