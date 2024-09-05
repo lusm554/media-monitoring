@@ -10,7 +10,7 @@ from telegram.ext import (
   filters,
 )
 import datetime
-from bot.regular_tasks import cfa_news_sender, cfa_news_scraper, cfa_releases_scraper
+from bot.regular_tasks import cfa_news_sender, cfa_news_scraper, cfa_releases_scraper, cfa_releases_sender 
 import asyncio
 import zoneinfo
 
@@ -46,7 +46,9 @@ def setup_button_handlers(telegram_app, cfa_last_news_button_callback, cfa_last_
 def shedule_regular_bot_tasks(telegram_app):
   scraper_news_job_interval = datetime.timedelta(minutes=10)
   scraper_releases_job_interval = datetime.timedelta(minutes=60)
-  newsletter_time = datetime.time(hour=9, tzinfo=zoneinfo.ZoneInfo("Europe/Moscow"))
+  regular_news_time = datetime.time(hour=9, tzinfo=zoneinfo.ZoneInfo("Europe/Moscow"))
+  regular_releases_time = datetime.time(hour=19, tzinfo=zoneinfo.ZoneInfo("Europe/Moscow"))
+  # Scrapers
   telegram_app.job_queue.run_repeating(
     callback=cfa_news_scraper,
     interval=scraper_news_job_interval,
@@ -55,13 +57,24 @@ def shedule_regular_bot_tasks(telegram_app):
   telegram_app.job_queue.run_repeating(
     callback=cfa_releases_scraper,
     interval=scraper_releases_job_interval,
-    first=datetime.timedelta(seconds=2),
+    #first=datetime.timedelta(seconds=2),
   )
+  # Senders
+  telegram_app.job_queue.run_daily(
+    callback=cfa_news_sender,
+    time=regular_news_time,
+  )
+  telegram_app.job_queue.run_daily(
+    callback=cfa_releases_sender,
+    time=regular_releases_time,
+  )
+  # Test senders
   telegram_app.job_queue.run_once(
     callback=cfa_news_sender,
     when=7, # run 7 seconds since from now
   )
-  telegram_app.job_queue.run_daily(
-    callback=cfa_news_sender,
-    time=newsletter_time,
+  telegram_app.job_queue.run_once(
+    callback=cfa_releases_sender,
+    when=7, # run 7 seconds since from now
   )
+
