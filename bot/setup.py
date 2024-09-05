@@ -49,7 +49,7 @@ def shedule_regular_bot_tasks(telegram_app):
   telegram_app.job_queue.run_repeating(
     callback=cfa_news_scraper,
     interval=scraper_job_interval,
-    #first=datetime.timedelta(seconds=1),
+    first=datetime.timedelta(seconds=1),
   )
   telegram_app.job_queue.run_once(
     callback=cfa_news_sender,

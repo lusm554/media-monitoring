@@ -108,7 +108,7 @@ async def cfa_news(context, target_chat_id):
   #context.bot_data['post_cache'][post.post_id] = post # bot cache
   storage.redis_client.set_complex_obj(post.post_id, post) # redis cache
   # Save post to db
-  storage.add_news_post([{'bot_post_id': post.post_id, 'news_id': art.db_id} for art in articles])
+  storage.add_news_posts([{'bot_post_id': post.post_id, 'news_id': art.db_id} for art in articles])
   msg_text, keyboard = get_cfa_last_news_post_markup(post)
   await context.bot.send_message(
     chat_id=effective_chat_id,

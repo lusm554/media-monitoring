@@ -94,6 +94,7 @@ def add_rows_factory(table, filter_existing_rows_key=None, filter_row_keys=None)
       try:
         if not isinstance(rows, Iterable) or isinstance(rows, dict):
           rows = [rows]
+        rows = [r.to_dict() if isinstance(r, Article) else r for r in rows]
         if filter_row_keys:
           rows = [{k:v for k,v in row.items() if not k in filter_row_keys} for row in rows]
         if filter_existing_rows_key:
@@ -114,7 +115,7 @@ def add_rows_factory(table, filter_existing_rows_key=None, filter_row_keys=None)
         print(error)
   return add_rows
 
-add_users = add_rows_factory(Users, filter_existing_rows_key='telegram_user_id')
+add_user = add_rows_factory(Users, filter_existing_rows_key='telegram_user_id')
 add_news = add_rows_factory(News, filter_existing_rows_key='url', filter_row_keys=['db_id'])
 add_news_posts = add_rows_factory(NewsPosts, filter_existing_rows_key='bot_post_id')
 add_news_subscriber = add_rows_factory(RegularNewsSubscribers, filter_existing_rows_key='telegram_user_id')

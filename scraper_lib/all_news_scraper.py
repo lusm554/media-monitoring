@@ -41,7 +41,7 @@ class CfaAllNewsScraper(NewsBaseScraper):
     ]
     return [
       art for art in articles
-      if any(kw in art.title for kw in cfa_keys_words)
+      if any(kw in str(art.title).lower() for kw in cfa_keys_words)
     ]
 
   def fetch_and_parse(self, period):
