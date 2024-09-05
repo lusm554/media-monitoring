@@ -3,12 +3,34 @@ class Release:
   Представление выпуска ЦФА.
   Описывает характеристики выпуска - платформа выпуска, заголовок, ссылка на выпуск источника, время.
   '''
-  __slots__ = ('platform_name', 'url', 'release_time', 'title')
-  def __init__(self, platform_name, url, release_time, title):
+  __slots__ = ('platform_name', 'url', 'release_time', 'title', 'db_id')
+  def __init__(self, platform_name, url, release_time, title, db_id=None):
     self.platform_name = platform_name
     self.url = url
     self.release_time = release_time
     self.title = title
+    self.db_id = db_id
+
+  @classmethod
+  def from_dict(cls, dct):
+    '''
+    Constructor from dict
+    '''
+    self = cls(
+      title=dct['title'],
+      url=dct['url'],
+      release_time=dct['release_time'],
+      platform_name=dct['platform_name'],
+      db_id=dct.get('db_id'),
+    )
+    return self
+
+  def to_dict(self):
+    '''
+    Convert class example to dict
+    '''
+    dct = {attr: getattr(self, attr) for attr in self.__slots__}
+    return dct
 
   def __eq__(self, other):
     '''

@@ -6,6 +6,9 @@ async def cfa_news_scraper(context):
   storage.add_news(articles)
 
 async def cfa_releases_scraper(context):
-  releases = scraper.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_24_HOURS)
+  #releases = scraper_lib.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper_lib.Periods.LAST_24_HOURS)
+  releases = scraper_lib.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper_lib.Periods.LAST_WEEK)
+  print(releases)
   storage.add_releases(releases)
+  print(storage.get_n_releases())
 

@@ -95,7 +95,9 @@ def cfa_command_dispetcher(func):
 @cfa_command_dispetcher
 async def cfa_releases(context, target_chat_id):
   effective_chat_id = target_chat_id
-  releases = storage.get_last_24h_releases()
+  #releases = storage.get_last_24h_releases()
+  releases = storage.get_n_releases()
+  print(releases)
   #releases = scraper.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_24_HOURS)
   #releases = scraper.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_WEEK)
   if len(releases) == 0:

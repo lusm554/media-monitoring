@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, text, select as _select
 from sqlalchemy.orm import Session
 import datetime
-from scraper_lib import Article
+from scraper_lib import Article, Release
 from collections.abc import Iterable
 from storage.postgres_datamap import (
   Base,
@@ -63,17 +63,15 @@ def news_to_article_converter(func):
     return news
   return wrapper
 
-'''
 def rows_to_releases_converter(func):
   def rename_db_row_keys_to_article(dbrow):
     dbrow['db_id'] = dbrow.pop('id')
     return dbrow
   def wrapper(*args, **kwargs):
-    news = func(*args, **kwargs)
-    news = [Article.from_dict(rename_db_row_keys_to_article(n.__dict__)) for n in news]
-    return news
+    releases = func(*args, **kwargs)
+    releases = [Release.from_dict(rename_db_row_keys_to_article(n.__dict__)) for n in releases]
+    return releases
   return wrapper
-'''
 
 def get_n_rows_factory(table, result_convertor=None):
   def selector(n=100):
@@ -88,7 +86,8 @@ def get_n_rows_factory(table, result_convertor=None):
   return selector
 
 get_n_releases_posts = get_n_rows_factory(ReleasesPosts, db_row_to_dict_converter)
-get_n_releases = get_n_rows_factory(Releases, db_row_to_dict_converter)
+#get_n_releases = get_n_rows_factory(Releases, db_row_to_dict_converter)
+get_n_releases = get_n_rows_factory(Releases, rows_to_releases_converter)
 get_n_news_posts = get_n_rows_factory(NewsPosts, db_row_to_dict_converter)
 get_n_users = get_n_rows_factory(Users, db_row_to_dict_converter)
 get_n_news_subscribers = get_n_rows_factory(RegularNewsSubscribers, db_row_to_dict_converter)
@@ -106,7 +105,7 @@ def add_rows_factory(table, filter_existing_rows_key=None, filter_row_keys=None)
       try:
         if not isinstance(rows, Iterable) or isinstance(rows, dict):
           rows = [rows]
-        rows = [r.to_dict() if isinstance(r, Article) else r for r in rows]
+        rows = [r.to_dict() if isinstance(r, Article) or isinstance(r, Release) else r for r in rows]
         if filter_row_keys:
           rows = [{k:v for k,v in row.items() if not k in filter_row_keys} for row in rows]
         if filter_existing_rows_key:
@@ -131,7 +130,7 @@ add_user = add_rows_factory(Users, filter_existing_rows_key='telegram_user_id')
 add_news = add_rows_factory(News, filter_existing_rows_key='url', filter_row_keys=['db_id'])
 add_news_posts = add_rows_factory(NewsPosts, filter_existing_rows_key='bot_post_id')
 add_news_subscriber = add_rows_factory(RegularNewsSubscribers, filter_existing_rows_key='telegram_user_id')
-add_releases = add_rows_factory(Releases, filter_existing_rows_key='url')
+add_releases = add_rows_factory(Releases, filter_existing_rows_key='url', filter_row_keys=['db_id'])
 add_releases_posts = add_rows_factory(ReleasesPosts, filter_existing_rows_key='bot_post_id')
 
 ##############################################
@@ -224,5 +223,5 @@ get_last_24h_news = get_rows_by_date_range_factory(
 )
 
 get_last_24h_releases = get_rows_by_date_range_factory(
-  table=Releases, table_dt_col='release_time', delta_in_hours=24, result_convertor=db_row_to_dict_converter
+  table=Releases, table_dt_col='release_time', delta_in_hours=24, result_convertor=rows_to_releases_converter
 )

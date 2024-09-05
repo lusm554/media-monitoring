@@ -5,6 +5,6 @@ from storage.postgres_client import (
   get_n_users, add_user,
   add_news_subscriber, get_n_news_subscribers, delete_news_subscriber,
   get_n_news_posts, get_news_post, get_articles_by_news_post, add_news_posts,
-  add_releases, add_releases_posts, get_n_releases_posts, get_n_releases
+  add_releases, add_releases_posts, get_n_releases_posts, get_n_releases, get_last_24h_releases
 )
 from storage import redis_client

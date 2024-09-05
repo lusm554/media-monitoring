@@ -22,8 +22,12 @@ storage.create_tables_if_not_exists()
 '''
 from pprint import pprint
 import scraper_lib
+releases = scraper_lib.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper_lib.Periods.LAST_WEEK)
+print(releases)
+storage.add_releases(releases)
+print(storage.get_n_releases())
+
 articles = scraper_lib.CfaAllNewsScraper(error='ignore').fetch_and_parse(period=scraper_lib.Periods.LAST_24_HOURS)
-print(articles)
 storage.add_news(articles)
 articles = storage.get_n_news()
 pprint(articles)
