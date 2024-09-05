@@ -166,6 +166,22 @@ def get_articles_by_news_post(post_id):
       print(error)
       return list()
 
+@news_to_article_converter
+def get_releases_by_release_post(post_id):
+  with Session(engine) as session:
+    try:
+        articles = (
+          session
+            .query(Releases)
+            .filter(ReleasesPosts.bot_post_id == post_id)
+            .filter(ReleasesPosts.release_id == Releases.id)
+            .all()
+        )
+        return articles
+    except Exception as error:
+      print(error)
+      return list()
+
 ####################### NEWS SUBSCRIBER #######################
 def delete_news_subscriber(subsciber_telegram_id):
   with Session(engine) as session:
