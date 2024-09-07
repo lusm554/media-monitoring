@@ -5,10 +5,11 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common import NoSuchElementException, ElementNotInteractableException
 from selenium.webdriver.support import expected_conditions as EC
 import time 
+import os
 
 url = 'https://цфа.рф/reshenie/CFAHAB/bRaund3'
 options = ChromeOptions()
-#options.add_argument("--headless")
+options.add_argument("--headless")
 options.page_load_strategy = 'eager' # normal
 options.add_experimental_option("prefs", {
   "download.default_directory": '/Users/lusm/fromgit/media_monitoring_bot/pdfs',
@@ -28,29 +29,29 @@ def check_element_disappear(driver):
   except NoSuchElementException:
     return True
 
+class Checkfiledownload:
+  def __init__(self, filepath):
+    self.filepath = filepath
+  def __call__(self, _):
+    if os.path.isfile(self.filepath):
+      return True
+    return False
+
 try:
-  #time.sleep(60*5)
-  print(1)
   WebDriverWait(driver, timeout=15).until(check_element_disappear)
-  print(2)
   btn = WebDriverWait(driver, timeout=30).until(
     EC.element_to_be_clickable(
       (By.XPATH, '//button[(@aria-label="Download") and (@class="svg-button icon group2")]')
     )
   )
   driver.execute_script("arguments[0].click();", btn);
-  print(3)
-  #ActionChains(driver).click(btn).perform()
-  #driver.implicitly_wait(60*5)
   btn = WebDriverWait(driver, timeout=10).until(
     EC.element_to_be_clickable((By.XPATH, '//a[@class="download-full-button"]'))
   )
   driver.execute_script("arguments[0].setAttribute('download',arguments[1])", btn, 'cfa_234.pdf')
-  print(4)
-  #ActionChains(driver).click(btn).perform()
   driver.execute_script("arguments[0].click();", btn);
-  time.sleep(3)
-  print(5)
+  f = '/Users/lusm/fromgit/media_monitoring_bot/pdfs/cfa_234.pdf'
+  WebDriverWait(driver, timeout=15).until(Checkfiledownload(filepath=f))
 finally:
   driver.quit()
 
