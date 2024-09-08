@@ -46,6 +46,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common import NoSuchElementException, ElementNotInteractableException
 from selenium.webdriver.support import expected_conditions as EC
 import time 
+import uuid
 import os
 
 class CfaReleasePDF2TextScraper:
