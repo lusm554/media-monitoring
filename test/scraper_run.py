@@ -20,14 +20,16 @@ def str2time():
       print()
   pprint(res)
 
-
 def cfa_emits():
   emits = scraper.CfaReleasesScraper(error='raise').fetch_and_parse(period=scraper.Periods.ALL_AVAILABLE_TIME)
-  pprint(emits)
-#cfa_emits()
+  urls = {e.url for e in emits}
+  dot_pdfs = [u for u in urls if u.endswith('.pdf')]
+  print(len(urls))
+  print(len(dot_pdfs))
+cfa_emits()
 
 def cfa_news():
   news = scraper.CfaAllNewsScraper(error='raise').fetch_and_parse(period=scraper.Periods.LAST_24_HOURS)
   #news = scraper.CfaDzenNewsScraper(error='raise').fetch_and_parse(period=scraper.Periods.LAST_24_HOURS)
   pprint(news)
-cfa_news()
+#cfa_news()
