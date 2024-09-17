@@ -178,9 +178,10 @@ class CfaReleasesScraper(BaseScraper):
   def add_pdf_text(self, release):
     if release.url.endswith('.pdf'):
       return release
-    release_dict = release.to_dict()
-    release_dict['pdf_text'] = self.pdf2text_scraper.fetch_and_parse(release.url)
-    release = Release.from_dict(release_dict)
+    #release_dict = release.to_dict()
+    #release_dict['pdf_text'] = self.pdf2text_scraper.fetch_and_parse(release.url)
+    #release = Release.from_dict(release_dict)
+    release.pdf_text = self.pdf2text_scraper.fetch_and_parse(release.url)
     return release
 
   def fetch_and_parse(self, period, add_pdf_text=False):
