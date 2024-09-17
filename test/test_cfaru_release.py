@@ -6,8 +6,6 @@ print(len(releases))
 for r in releases:
   if r.pdf_text:
     print(len(r.pdf_text))
-    if len(r.pdf_text) < 100:
-      print(r.pdf_text)
   else:
     print(None)
 
