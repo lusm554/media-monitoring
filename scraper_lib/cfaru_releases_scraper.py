@@ -54,7 +54,6 @@ class CfaReleasePDF2TextScraper:
     text = extract_text(pdf_filepath)
     text = re.sub(r'\s+', ' ', text)
     text = re.sub(r'[^\w\s.,!?-]', '', text)
-    print(len(text))
     return text
 
   def fetch_and_parse(self, cfa_url):
