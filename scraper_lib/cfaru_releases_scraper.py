@@ -10,6 +10,79 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+from selenium import webdriver
+from selenium.webdriver import ChromeOptions, ActionChains
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.common import NoSuchElementException, ElementNotInteractableException
+from selenium.webdriver.support import expected_conditions as EC
+import time
+import uuid
+import os
+
+class CfaReleasePDF2TextScraper:
+  def __init__(self):
+    options = ChromeOptions()
+    options.add_argument("--headless")
+    options.page_load_strategy = 'eager' # normal
+    options.add_experimental_option("prefs", {
+      "download.default_directory": '/Users/lusm/fromgit/media_monitoring_bot/pdfs',
+      "download.directory_upgrade": True,
+      "download.prompt_for_download": False,
+      "download.directory_upgrade": True,
+      "plugins.always_open_pdf_externally": True,
+      "safebrowsing.disable_download_protection": True,
+    })
+    driver = webdriver.Chrome(options=options)
+    self.driver = driver
+
+  def __check_element_disappear__(self, driver):
+    try:
+      driver.find_element(By.XPATH, '//div[@id="preloader"]')
+      return False
+    except NoSuchElementException:
+      return True
+
+  def __check_file_downloaded__(self, filepath):
+    filepath = '/Users/lusm/fromgit/media_monitoring_bot/pdfs/' + filepath
+    return lambda _: os.path.isfile(filepath)
+
+  def parse_pdf_to_text(self, pdf_filepath):
+    from pdfminer.high_level import extract_text
+    import re
+    pdf_filepath = '/Users/lusm/fromgit/media_monitoring_bot/pdfs/' + pdf_filepath
+    text = extract_text(pdf_filepath)
+    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r'[^\w\s.,!?-]', '', text)
+    print(len(text))
+    return text
+
+  def fetch_and_parse(self, cfa_url):
+    try:
+      driver = self.driver
+      driver.get(cfa_url)
+      WebDriverWait(driver, timeout=15).until(self.__check_element_disappear__)
+      btn = WebDriverWait(driver, timeout=30).until(
+        EC.element_to_be_clickable(
+          (By.XPATH, '//button[(@aria-label="Download") and (@class="svg-button icon group2")]')
+        )
+      )
+      driver.execute_script("arguments[0].click();", btn);
+      btn = WebDriverWait(driver, timeout=10).until(
+        EC.element_to_be_clickable((By.XPATH, '//a[@class="download-full-button"]'))
+      )
+      filepath = '_'.join([str(uuid.uuid4()), *cfa_url.split('/')[-2:]]).lower() + '.pdf'
+      driver.execute_script("arguments[0].setAttribute('download',arguments[1])", btn, filepath)
+      driver.execute_script("arguments[0].click();", btn);
+      WebDriverWait(driver, timeout=15, ).until(self.__check_file_downloaded__(filepath))
+      pdf_text = self.parse_pdf_to_text(filepath)
+      return pdf_text
+    except:
+      raise ValueError('Cannot get pdfs from url.')
+
+  def driver_quite(self):
+    self.driver.quit()
+
 class CfaReleasesScraper(BaseScraper):
   '''
   Парсер выпусков ЦФА с сайта цфа.рф.
@@ -19,6 +92,7 @@ class CfaReleasesScraper(BaseScraper):
     super().__init__(*args, **kwargs)
     if self.error == 'ignore':
       logger.warning(f'Error handler set to {self.error!r}')
+    self.pdf2text_scraper = CfaReleasePDF2TextScraper()
 
   def page_fetcher(self):
     '''
@@ -101,7 +175,15 @@ class CfaReleasesScraper(BaseScraper):
       releases.update(platform_releases)
     return releases
 
-  def fetch_and_parse(self, period):
+  def add_pdf_text(self, release):
+    if release.url.endswith('.pdf'):
+      return release
+    release_dict = release.to_dict()
+    release_dict['pdf_text'] = self.pdf2text_scraper.fetch_and_parse(release.url)
+    release = Release.from_dict(release_dict)
+    return release
+
+  def fetch_and_parse(self, period, add_pdf_text=False):
     '''
     Собирает методы вместе, запрашивает код страницы затем парсит ее в экземпляры Release.
     '''
@@ -115,6 +197,8 @@ class CfaReleasesScraper(BaseScraper):
         for release in cfa_releases
         if release.release_time >= releases_start_time
       ]
+      if add_pdf_text:
+        cfa_releases = [self.add_pdf_text(release) for release in cfa_releases]
       logger.info(f'Found {len(cfa_releases)} releases for {period}')
       return cfa_releases
     except Exception as error:
@@ -123,77 +207,5 @@ class CfaReleasesScraper(BaseScraper):
       logger.error(error)
       return cfa_releases
 
-from selenium import webdriver
-from selenium.webdriver import ChromeOptions, ActionChains
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.common import NoSuchElementException, ElementNotInteractableException
-from selenium.webdriver.support import expected_conditions as EC
-import time
-import uuid
-import os
-
-class CfaReleasePDF2TextScraper:
-  def __init__(self):
-    options = ChromeOptions()
-    options.add_argument("--headless")
-    options.page_load_strategy = 'eager' # normal
-    options.add_experimental_option("prefs", {
-      "download.default_directory": '/Users/lusm/fromgit/media_monitoring_bot/pdfs',
-      "download.directory_upgrade": True,
-      "download.prompt_for_download": False,
-      "download.directory_upgrade": True,
-      "plugins.always_open_pdf_externally": True,
-      "safebrowsing.disable_download_protection": True,
-    })
-    driver = webdriver.Chrome(options=options)
-    self.driver = driver
-
-  def __check_element_disappear__(self, driver):
-    try:
-      driver.find_element(By.XPATH, '//div[@id="preloader"]')
-      return False
-    except NoSuchElementException:
-      return True
-
-  def __check_file_downloaded__(self, filepath):
-    filepath = '/Users/lusm/fromgit/media_monitoring_bot/pdfs/' + filepath
-    return lambda _: os.path.isfile(filepath)
-
-  def parse_pdf_to_text(self, pdf_filepath):
-    from pdfminer.high_level import extract_text
-    import re
-    pdf_filepath = '/Users/lusm/fromgit/media_monitoring_bot/pdfs/' + pdf_filepath
-    text = extract_text(pdf_filepath)
-    text = re.sub(r'\s+', ' ', text)
-    text = re.sub(r'[^\w\s.,!?-]', '', text)
-    print(len(text))
-    return text
-
-  def fetch_and_parse(self, cfa_url):
-    try:
-      driver = self.driver
-      driver.get(cfa_url)
-      WebDriverWait(driver, timeout=15).until(self.__check_element_disappear__)
-      btn = WebDriverWait(driver, timeout=30).until(
-        EC.element_to_be_clickable(
-          (By.XPATH, '//button[(@aria-label="Download") and (@class="svg-button icon group2")]')
-        )
-      )
-      driver.execute_script("arguments[0].click();", btn);
-      btn = WebDriverWait(driver, timeout=10).until(
-        EC.element_to_be_clickable((By.XPATH, '//a[@class="download-full-button"]'))
-      )
-      filepath = '_'.join([str(uuid.uuid4()), *cfa_url.split('/')[-2:]]).lower() + '.pdf'
-      driver.execute_script("arguments[0].setAttribute('download',arguments[1])", btn, filepath)
-      driver.execute_script("arguments[0].click();", btn);
-      WebDriverWait(driver, timeout=15, ).until(self.__check_file_downloaded__(filepath))
-      pdf_text = self.parse_pdf_to_text(filepath)
-      return pdf_text
-    except:
-      raise ValueError('Cannot get pdfs from url.')
-
-  def driver_quite(self):
-    self.driver.quit()
 
 
