@@ -63,10 +63,11 @@ class Post:
 '''
 1. Split pages by max length 4096
 2. Summarize article text up to 500 symbols
-'''
 import pickle
 with open('sumnews.pickle', 'rb') as f:
   summm = pickle.load(f)
+'''
+summm = dict()
 
 def get_cfa_last_news_post_markup(post):
   msg = '\n\n'.join(

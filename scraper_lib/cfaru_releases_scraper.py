@@ -100,7 +100,7 @@ class CfaReleasesScraper(BaseScraper):
     '''
     response = requests.get(
       f'https://цфа.рф/cfa-vypusk.html',
-      timeout=2, # seconds
+      timeout=5, # seconds
     )
     response.encoding = 'utf-8'
     logger.info(f'Fetched in {response.elapsed.total_seconds():.2f}, {response.request.method} {response.status_code} {response.url!r}')

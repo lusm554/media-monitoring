@@ -57,7 +57,7 @@ def shedule_regular_bot_tasks(telegram_app):
   telegram_app.job_queue.run_repeating(
     callback=cfa_releases_scraper,
     interval=scraper_releases_job_interval,
-    #first=datetime.timedelta(seconds=2),
+    first=datetime.timedelta(seconds=2),
   )
   # Senders
   telegram_app.job_queue.run_daily(
@@ -76,7 +76,7 @@ def shedule_regular_bot_tasks(telegram_app):
   )
   telegram_app.job_queue.run_once(
     callback=cfa_releases_sender,
-    when=7, # run 7 seconds since from now
+    when=3, # run 7 seconds since from now
   )
   '''
 

@@ -11,8 +11,6 @@ RIGHT_ARROW_SYMBOL = chr(8594) # →
 LEFT_ARROW_SYMBOL = chr(8592) # ←
 CFA_LAST_RELEASES_CALLBACK_ID = 'cfa_last_releases'
 
-_RBODY = {'https://цфа.рф/reshenie/Masterchain/VTB4': {'cfa_count': '199000', 'cfa_price': '100000.00 руб', 'coupon_period': '', 'date_time_placement_start': '02.09.2024 00:00 МСК', 'date_time_placement_end': '02.09.2024 00:00 МСК', 'cfa_repayment_date_time': '13.09.2024 00:00 МСК', 'cfa_repayment_method': 'Прямые расчеты без обращения к Оператору.'}, 'https://цфа.рф/reshenie/Masterchain/VTB6': {'cfa_count': '1000', 'cfa_price': '100000.00 руб', 'coupon_period': 'каждые 1 год', 'date_time_placement_start': '02.09.2024 00:00 МСК', 'date_time_placement_end': '02.09.2024 23:59 МСК', 'cfa_repayment_date_time': '13.09.2024 00:00 МСК', 'cfa_repayment_method': 'Оплата денежными средствами на счёт аналитического учёта.'}, 'https://цфа.рф/reshenie/CFAHAB/bRaund3': {'cfa_count': '15', 'cfa_price': '1000000.00 руб', 'coupon_period': 'каждые 15 календарных дней', 'date_time_placement_start': '02.09.2024 13:00 МСК', 'date_time_placement_end': '02.09.2024 22:00 МСК', 'cfa_repayment_date_time': '17.09.2024 13:00 МСК', 'cfa_repayment_method': 'Оплата денежными средствами.'}, 'https://цфа.рф/reshenie/A-Token/AlfaBank7': {'cfa_count': '10000', 'cfa_price': '737.00 руб', 'coupon_period': '', 'date_time_placement_start': '02.09.2024 17:00 МСК', 'date_time_placement_end': '03.09.2024 15:30 МСК', 'cfa_repayment_date_time': '05.03.2025 18:00 МСК', 'cfa_repayment_method': 'Выплата по ЦФА осуществляется единовременным платежом в российских рублях.'}, 'https://цфа.рф/reshenie/Tokeon/PS': {'cfa_count': '50', 'cfa_price': '1000.00 руб', 'coupon_period': 'каждые 6 месяцев', 'date_time_placement_start': '04.09.2024 09:00 МСК', 'date_time_placement_end': '05.09.2024 18:00 МСК', 'cfa_repayment_date_time': '31.10.2024 16:00 МСК', 'cfa_repayment_method': 'Погашение путем выплаты на счета Обладателей ЦФА.'}}
-
 import datetime
 from uuid import uuid4
 
@@ -63,7 +61,8 @@ class Post:
     return self._items_count_on_page
 
 def get_releases_post_markup(post):
-  def tostr(d):
+  def release_ner_markup(d):
+    d = d.to_dict()
     start = d.get("date_time_placement_start").replace('МСК','')
     end = d.get("date_time_placement_end").replace('МСК','')
     bod = d.get("cfa_repayment_date_time").replace('МСК','')
@@ -75,13 +74,11 @@ def get_releases_post_markup(post):
         f'<b>Период выплаты купонов:</b> {d.get("coupon_period")}\n'
         f'<b>Способ погошения:</b> {d.get("cfa_repayment_method")}')
     return r
-  get_r_desc = lambda url: tostr(_RBODY.get(url, dict()))
   msg_text = '\n\n'.join(
     f'{n}. <a href="{release.url}"> {release.title} </a>\n'
     f'<b>Платформа:</b> {release.platform_name}.\n'
     f'<b>Опубликовано:</b> {release.release_time.strftime("%Y-%m-%d")}.\n'
-    f'{get_r_desc(release.url)}'
-    #f'<blockquote expandable>{get_r_desc(release.url)}</blockquote>'
+    f'{release_ner_markup(release)}'
     for n, release in enumerate(
       post.current_page(),
       start=(post.current_page_number - 1) * post.items_count_on_page + 1
@@ -117,14 +114,6 @@ async def cfa_releases(context, target_chat_id):
   #releases = scraper.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_24_HOURS)
   #releases = scraper.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_WEEK)
   releases = storage.get_n_releases()
-  '''
-  _test = scraper.CfaReleasePDF2TextScraper()
-  for r in releases:
-    text = _test.fetch_and_parse(r.url)
-    text = nlp.release_text_to_desc(text)
-    _RBODY[r.url] = text
-  print(_RBODY)
-  '''
   if len(releases) == 0:
     await context.bot.send_message(
       chat_id=effective_chat_id,

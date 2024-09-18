@@ -26,35 +26,6 @@ storage.create_tables_if_not_exists()
 #storage.recreate_tables()
 
 '''
-release_ner = {
-  "cfa_count": "10000",
-  "cfa_price": "1000.00 руб",
-  "coupon_period": "каждые 1 месяц",
-  "date_time_placement_start": "12.09.2024 10:00 МСК",
-  "date_time_placement_end": "21.10.2024 23:00 МСК",
-  "cfa_repayment_date_time": "21.10.2026 16:00 МСК",
-  "cfa_repayment_method": "Погашение по окончании срока."
-}
-
-from pprint import pprint
-import scraper_lib
-import nlp
-releases_scraper = scraper_lib.CfaReleasesScraper(error='ignore')
-releases = releases_scraper.fetch_and_parse(scraper_lib.Periods.ALL_AVAILABLE_TIME) # 1. main release
-releases = releases[:1]
-releases = [releases_scraper.add_pdf_text(r) for r in releases] # 2. get pdf, convert to text
-print(len(releases[0].pdf_text))
-for r in releases:
-  #desc = nlp.release_text_to_desc(r.pdf_text) # 3. pdf text ner
-  desc = release_ner
-  for k,v in desc.items():
-    setattr(r, k, v)
-  #print(r)
-
-storage.add_releases(releases)
-'''
-#print(storage.get_n_releases())
-
 import scraper_lib
 import nlp
 releases_scraper = scraper_lib.CfaReleasesScraper(error='ignore')
@@ -80,8 +51,9 @@ storage.add_releases(releases) # 4. Save releases to db
 
 print(len(storage.get_n_releases()))
 print((storage.get_n_releases()))
-
 exit()
+'''
+
 '''
 from pprint import pprint
 import scraper_lib
