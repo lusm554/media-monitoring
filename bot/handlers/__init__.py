@@ -1,15 +1,15 @@
-async def unknown_command_handler(update, context):
-  await context.bot.send_message(
-    chat_id=update.effective_chat.id,
-    text='Эта команда мне не знакома.'
-  )
-
 import traceback, json, html
 from telegram import Update
 from telegram.constants import ParseMode
 import logging
 
 logger = logging.getLogger(__name__)
+
+async def unknown_command_handler(update, context):
+  await context.bot.send_message(
+    chat_id=update.effective_chat.id,
+    text='Эта команда мне не знакома.'
+  )
 
 async def error_handler(update, context):
   logger.error("Exception while handling an update:", exc_info=context.error)
@@ -32,10 +32,7 @@ async def error_handler(update, context):
     parse_mode=ParseMode.HTML,
   )
 
-import logging
-
-logger = logging.getLogger(__name__)
-
+from telegram.ext import ApplicationHandlerStop
 async def updates_handler(update, context):
   try:
     #logger.info(update.message)
@@ -48,3 +45,8 @@ async def updates_handler(update, context):
     logger.info(f'Update: {show_obj!r}')
   except:
     logger.info(f'Update id: {update.update_id!r}')
+
+  # filter blacklist users
+  if str(update.message.from_user.id) in context.bot_data.get('users_blacklist'):
+    logger.info(f'Block command for user: {update.message.from_user.id!r}')
+    raise ApplicationHandlerStop()

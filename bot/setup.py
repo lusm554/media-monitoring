@@ -14,9 +14,10 @@ from bot.regular_tasks import cfa_news_sender, cfa_news_scraper, cfa_releases_sc
 import asyncio
 import zoneinfo
 
-def setup_bot_data_variables(telegram_app, commands):
+def setup_bot_data_variables(telegram_app, commands, users_blacklist):
   #telegram_app.bot_data['post_cache'] = dict()
   telegram_app.bot_data['bot_commands'] = commands
+  telegram_app.bot_data['users_blacklist'] = users_blacklist
 
 def setup_bot_commands(telegram_app, commands):
   for command in commands:

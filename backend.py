@@ -26,5 +26,6 @@ storage.create_tables_if_not_exists()
 #storage.recreate_tables()
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
+USERS_BLACKLIST = os.getenv('BOT_USERS_BLACKLIST', '').split(',')
 assert BOT_TOKEN
-bot.start(BOT_TOKEN)
+bot.start(BOT_TOKEN, USERS_BLACKLIST)
