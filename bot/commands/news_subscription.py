@@ -5,7 +5,7 @@ async def subscribe_news(update, context):
   msg = (
     f'Новости ЦФА будут приходить в 09:00.\n'
     f'Выпуски ЦФА будут приходить в 19:00.\n'
-    f'Чтобы отменить - /cancel_subscribe_news.'
+    f'Отменить - /cancel_news_subscription.'
   )
   user = update.message.from_user
   storage.add_news_subscriber({

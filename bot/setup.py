@@ -15,7 +15,8 @@ import asyncio
 import zoneinfo
 
 def setup_bot_data_variables(telegram_app, commands):
-  telegram_app.bot_data['post_cache'] = dict()
+  #telegram_app.bot_data['post_cache'] = dict()
+  telegram_app.bot_data['bot_commands'] = commands
 
 def setup_bot_commands(telegram_app, commands):
   for command in commands:
@@ -57,7 +58,7 @@ def shedule_regular_bot_tasks(telegram_app):
   telegram_app.job_queue.run_repeating(
     callback=cfa_releases_scraper,
     interval=scraper_releases_job_interval,
-    first=datetime.timedelta(seconds=2),
+    #first=datetime.timedelta(seconds=2),
   )
   # Senders
   telegram_app.job_queue.run_daily(

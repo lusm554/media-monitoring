@@ -110,14 +110,14 @@ def cfa_command_dispetcher(func):
 @cfa_command_dispetcher
 async def cfa_releases(context, target_chat_id):
   effective_chat_id = target_chat_id
-  #releases = storage.get_last_24h_releases()
+  releases = storage.get_last_24h_releases()
   #releases = scraper.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_24_HOURS)
   #releases = scraper.CfaReleasesScraper(error='ignore').fetch_and_parse(scraper.Periods.LAST_WEEK)
-  releases = storage.get_n_releases()
+  #releases = storage.get_n_releases()
   if len(releases) == 0:
     await context.bot.send_message(
       chat_id=effective_chat_id,
-      text='Выпуски ЦФА не найдены.',
+      text='Выпуски ЦФА за сутки не найдены.',
     )
     return
   post = Post(

@@ -9,7 +9,8 @@ async def cfa_news_scraper(context):
     scraper_news_not_in_db = [r for r in scraper_news if r.url not in scraper_news_in_db_urls]
     return scraper_news_not_in_db
 
-  articles = scraper_lib.CfaAllNewsScraper(error='ignore').fetch_and_parse(period=scraper_lib.Periods.LAST_WEEK)
+  #articles = scraper_lib.CfaAllNewsScraper(error='ignore').fetch_and_parse(period=scraper_lib.Periods.LAST_WEEK)
+  articles = scraper_lib.CfaAllNewsScraper(error='ignore').fetch_and_parse(period=scraper_lib.Periods.LAST_24_HOURS)
   print('scraper news', len(articles))
   acticles_not_in_db = get_news_not_in_db(articles) # 1. Get news not in db
   print('news no in db', len(acticles_not_in_db))
@@ -28,8 +29,8 @@ async def cfa_releases_scraper(context):
     return scraper_releases_not_in_db
 
   releases_scraper = scraper_lib.CfaReleasesScraper(error='ignore')
-  releases = releases_scraper.fetch_and_parse(scraper_lib.Periods.LAST_WEEK) # scraper_lib.Periods.LAST_24_HOURS
-  #releases = sorted(releases, key=lambda x: x.url)[:1]
+  #releases = releases_scraper.fetch_and_parse(scraper_lib.Periods.LAST_WEEK) # scraper_lib.Periods.LAST_24_HOURS
+  releases = releases_scraper.fetch_and_parse(scraper_lib.Periods.LAST_24_HOURS)
   print('scraper releases', len(releases))
   releases = get_releases_not_in_db(releases) # 1. Get releases not in db
   print('not in db releases', len(releases))
