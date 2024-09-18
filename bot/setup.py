@@ -54,12 +54,12 @@ def shedule_regular_bot_tasks(telegram_app):
   telegram_app.job_queue.run_repeating(
     callback=cfa_news_scraper,
     interval=scraper_news_job_interval,
-    #first=datetime.timedelta(seconds=1),
+    first=datetime.timedelta(seconds=1),
   )
   telegram_app.job_queue.run_repeating(
     callback=cfa_releases_scraper,
     interval=scraper_releases_job_interval,
-    first=datetime.timedelta(seconds=2),
+    first=datetime.timedelta(seconds=20),
   )
   # Senders
   telegram_app.job_queue.run_daily(

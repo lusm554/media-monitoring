@@ -48,7 +48,7 @@ def release_text_to_desc(release_text):
   response = response_big.choices[0].message.content
   if response:
     response = response.replace("```json", "").replace("```", "")
-  print('raw', response)
+  #print('raw', response)
   try:
     import json
     response = json.loads(response)

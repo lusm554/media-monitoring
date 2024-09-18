@@ -46,7 +46,10 @@ async def updates_handler(update, context):
   except:
     logger.info(f'Update id: {update.update_id!r}')
 
-  # filter blacklist users
-  if str(update.message.from_user.id) in context.bot_data.get('users_blacklist'):
-    logger.info(f'Block command for user: {update.message.from_user.id!r}')
-    raise ApplicationHandlerStop()
+  try:
+    # filter blacklist users
+    if str(update.message.from_user.id) in context.bot_data.get('users_blacklist'):
+      logger.info(f'Block command for user: {update.message.from_user.id!r}')
+      raise ApplicationHandlerStop()
+  except:
+    pass
