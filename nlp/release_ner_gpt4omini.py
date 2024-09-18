@@ -54,7 +54,7 @@ def release_text_to_desc(release_text):
     response = json.loads(response)
   except Exception as error:
     print(error)
-    response = None
+    response = dict()
   return response
 
 

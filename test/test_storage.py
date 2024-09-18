@@ -41,7 +41,7 @@ test_add_postgres(
     }
     for i in range(5)
   ],
-  testing_add=storage.add_users,
+  testing_add=storage.add_user,
   testing_get_n_rows=storage.get_n_users,
 )
 
