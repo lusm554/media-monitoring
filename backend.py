@@ -25,6 +25,12 @@ logger = logging.getLogger(__name__)
 storage.create_tables_if_not_exists()
 #storage.recreate_tables()
 
+if os.getenv('BOT_NEWS_SUBSCRIBERS', ''):
+  env_subscribers = [u for u in os.getenv('BOT_NEWS_SUBSCRIBERS', '').split(',') if u]
+  logger.info(f'Added news subscribers from env: {env_subscribers}')
+  now = datetime.datetime.now()
+  storage.add_news_subscriber([{'add_time': now, 'telegram_user_id': uid} for uid in env_subscribers])
+
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 USERS_BLACKLIST = os.getenv('BOT_USERS_BLACKLIST', '').split(',')
 assert BOT_TOKEN
