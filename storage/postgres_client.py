@@ -152,6 +152,7 @@ def get_rows_by_col(table, key, result_convertor=None):
 
 get_news_post = get_rows_by_col(table=NewsPosts, key='bot_post_id', result_convertor=db_row_to_dict_converter)
 get_releases = get_rows_by_col(table=Releases, key='url', result_convertor=db_row_to_dict_converter)
+get_news = get_rows_by_col(table=News, key='url', result_convertor=db_row_to_dict_converter)
 
 ####################### NEWS POST #######################
 

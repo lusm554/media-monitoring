@@ -21,6 +21,7 @@ class News(Base):
   #publish_time: Mapped[str] = mapped_column(index=True)
   publisher_name: Mapped[str]
   body_text: Mapped[str] = mapped_column(nullable=True) 
+  summarized_body_text: Mapped[str] = mapped_column(nullable=True) 
   scraper: Mapped[str]
 
   def __repr__(self) -> str:

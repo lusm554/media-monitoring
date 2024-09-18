@@ -25,6 +25,38 @@ logger = logging.getLogger(__name__)
 storage.create_tables_if_not_exists()
 #storage.recreate_tables()
 
+import scraper_lib
+import nlp
+
+'''
+articles = scraper_lib.CfaAllNewsScraper(error='ignore').fetch_and_parse(period=scraper_lib.Periods.LAST_24_HOURS)
+articles = sorted([a for a in articles if a.body_text is not None], key=lambda x: x.url)
+articles = articles[:1]
+print(len(articles))
+'''
+
+def get_news_not_in_db(scraper_news):
+  scraper_news_in_db = storage.get_news([c.url for c in scraper_news])
+  scraper_news_in_db_urls = {t['url'] for t in scraper_news_in_db}
+  scraper_news_not_in_db = [r for r in scraper_news if r.url not in scraper_news_in_db_urls]
+  return scraper_news_not_in_db
+
+articles = scraper_lib.CfaAllNewsScraper(error='ignore').fetch_and_parse(period=scraper_lib.Periods.LAST_24_HOURS)
+print('scraper news', len(articles))
+acticles_not_in_db = get_news_not_in_db(articles) # 1. Get news not in db
+print('news no in db', len(acticles_not_in_db))
+
+for a in acticles_not_in_db:
+  if a.body_text is None: continue
+  news_sum = nlp.news_text_summarization(a.body_text)
+  setattr(a, 'summarized_body_text', news_sum)
+
+storage.add_news(acticles_not_in_db)
+
+print(storage.get_n_news())
+
+exit()
+
 '''
 import scraper_lib
 import nlp
@@ -68,6 +100,7 @@ articles = storage.get_n_news()
 pprint(articles)
 exit()
 '''
+
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 assert BOT_TOKEN
