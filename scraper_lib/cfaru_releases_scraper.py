@@ -26,7 +26,7 @@ class CfaReleasePDF2TextScraper:
     options.add_argument("--headless")
     options.page_load_strategy = 'eager' # normal
     options.add_experimental_option("prefs", {
-      "download.default_directory": '/Users/lusm/fromgit/media_monitoring_bot/pdfs',
+      "download.default_directory": '/tmp/',
       "download.directory_upgrade": True,
       "download.prompt_for_download": False,
       "download.directory_upgrade": True,
@@ -44,13 +44,13 @@ class CfaReleasePDF2TextScraper:
       return True
 
   def __check_file_downloaded__(self, filepath):
-    filepath = '/Users/lusm/fromgit/media_monitoring_bot/pdfs/' + filepath
+    filepath = '/tmp/' + filepath
     return lambda _: os.path.isfile(filepath)
 
   def parse_pdf_to_text(self, pdf_filepath):
     from pdfminer.high_level import extract_text
     import re
-    pdf_filepath = '/Users/lusm/fromgit/media_monitoring_bot/pdfs/' + pdf_filepath
+    pdf_filepath = '/tmp/' + pdf_filepath
     text = extract_text(pdf_filepath)
     text = re.sub(r'\s+', ' ', text)
     text = re.sub(r'[^\w\s.,!?-]', '', text)
