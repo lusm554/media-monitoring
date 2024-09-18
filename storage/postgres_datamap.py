@@ -35,6 +35,14 @@ class Releases(Base):
   url: Mapped[str] = mapped_column(unique=True)
   release_time: Mapped[datetime]
   title: Mapped[str]
+  pdf_text: Mapped[str]
+  cfa_count: Mapped[str]
+  cfa_price: Mapped[str]
+  coupon_period: Mapped[str]
+  date_time_placement_start: Mapped[str]
+  date_time_placement_end: Mapped[str]
+  cfa_repayment_date_time: Mapped[str]
+  cfa_repayment_method: Mapped[str]
 
   def __repr__(self) -> str:
     cls_level_attrs = get_type_hints(self).keys()

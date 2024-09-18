@@ -66,6 +66,7 @@ def news_to_article_converter(func):
 def rows_to_releases_converter(func):
   def rename_db_row_keys_to_article(dbrow):
     dbrow['db_id'] = dbrow.pop('id')
+    del dbrow['_sa_instance_state']
     return dbrow
   def wrapper(*args, **kwargs):
     releases = func(*args, **kwargs)
@@ -138,7 +139,10 @@ def get_rows_by_col(table, key, result_convertor=None):
   def selector(col_val):
     with Session(engine) as session:
       try:
-        return session.query(table).filter(getattr(table, key) == col_val).all()
+        if not isinstance(col_val, Iterable) or isinstance(col_val, str):
+          col_val = [col_val] 
+        #return session.query(table).filter(getattr(table, key) == col_val).all()
+        return session.query(table).filter(getattr(table, key).in_(col_val)).all()
       except Exception as error:
         print(error)
         return list()
@@ -147,6 +151,7 @@ def get_rows_by_col(table, key, result_convertor=None):
   return selector
 
 get_news_post = get_rows_by_col(table=NewsPosts, key='bot_post_id', result_convertor=db_row_to_dict_converter)
+get_releases = get_rows_by_col(table=Releases, key='url', result_convertor=db_row_to_dict_converter)
 
 ####################### NEWS POST #######################
 
