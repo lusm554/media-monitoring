@@ -25,16 +25,17 @@ logger = logging.getLogger(__name__)
 storage.create_tables_if_not_exists()
 #storage.recreate_tables()
 
+'''
 import scraper_lib
 import nlp
 
-'''
 articles = scraper_lib.CfaAllNewsScraper(error='ignore').fetch_and_parse(period=scraper_lib.Periods.LAST_24_HOURS)
 articles = sorted([a for a in articles if a.body_text is not None], key=lambda x: x.url)
 articles = articles[:1]
 print(len(articles))
 '''
 
+'''
 def get_news_not_in_db(scraper_news):
   scraper_news_in_db = storage.get_news([c.url for c in scraper_news])
   scraper_news_in_db_urls = {t['url'] for t in scraper_news_in_db}
@@ -56,6 +57,7 @@ storage.add_news(acticles_not_in_db)
 print(storage.get_n_news())
 
 exit()
+'''
 
 '''
 import scraper_lib

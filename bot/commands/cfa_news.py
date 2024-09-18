@@ -60,22 +60,12 @@ class Post:
   def items_count_on_page(self):
     return self._items_count_on_page
 
-'''
-1. Split pages by max length 4096
-2. Summarize article text up to 500 symbols
-import pickle
-with open('sumnews.pickle', 'rb') as f:
-  summm = pickle.load(f)
-'''
-summm = dict()
-
 def get_cfa_last_news_post_markup(post):
   msg = '\n\n'.join(
     f'{n}. <a href="{article.url}"> {article.title} </a>\n'
     f'<b>Источник:</b> {article.scraper.capitalize()}/{article.publisher_name}.\n'
     f'<b>Опубликовано:</b> {article.publish_time.strftime("%a, %d %b в %H:%M")}.\n'
-    #f'<blockquote expandable>{nlp.lsa_summarizer(article.body_text, sentences=2)}</blockquote>'
-    f'<blockquote expandable>{summm.get(article.url)}</blockquote>'
+    f'<blockquote expandable>{article.summarized_body_text or "Текст не найден."}</blockquote>'
     for n, article in enumerate(
       post.current_page(),
       start=(post.current_page_number - 1) * post.items_count_on_page + 1
@@ -108,10 +98,8 @@ def cfa_command_dispetcher(func):
 @cfa_command_dispetcher
 async def cfa_news(context, target_chat_id):
   effective_chat_id = target_chat_id
-  #articles = storage.get_last_24h_news()
-  articles = storage.get_n_news(n=15)
-  _r = [{a.url: a.body_text} for a in articles]
-  print(_r)
+  articles = storage.get_last_24h_news()
+  #articles = storage.get_n_news(n=15)
   if len(articles) == 0:
     await context.bot.send_message(
       chat_id=effective_chat_id,
