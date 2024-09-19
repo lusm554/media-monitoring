@@ -70,9 +70,9 @@ def get_releases_post_markup(post):
         f'<b>Цена:</b> {d.get("cfa_price")}\n'
         f'<b>Начало размещения:</b> {start}\n'
         f'<b>Окончаниe размещения:</b> {end}\n'
-        f'<b>Погошениe тела:</b> {bod}\n'
+        f'<b>Погашение тела:</b> {bod}\n'
         f'<b>Период выплаты купонов:</b> {d.get("coupon_period")}\n'
-        f'<b>Способ погошения:</b> {d.get("cfa_repayment_method")}')
+        f'<b>Способ погашения:</b> {d.get("cfa_repayment_method")}')
     return r
   msg_text = '\n\n'.join(
     f'{n}. <a href="{release.url}"> {release.title} </a>\n'
