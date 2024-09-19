@@ -38,6 +38,7 @@ class CfaAllNewsScraper(NewsBaseScraper):
       'цифровым финансовым активам',
       'цифровыми финансовыми активами',
       'цифровых финансовых активах',
+      'цифровые активы',
     ]
     return [
       art for art in articles
