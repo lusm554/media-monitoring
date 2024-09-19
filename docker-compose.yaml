@@ -5,8 +5,6 @@ services:
       context: .
       dockerfile: Dockerfile
     command: ['python3', 'backend.py']
-    #environment:
-       #- 
     env_file: ".env"
     depends_on:
       chrome:
@@ -19,16 +17,18 @@ services:
 
   chrome:
     image: selenium/standalone-chromium:latest
-    shm_size: 1gb
-    mem_limit: 1g
-    cpus: 2
+    #shm_size: 1gb
+    #cpus: 2
+    mem_limit: 512m
+    memswap_limit: 1g
     environment:
       - SE_ROUTER_USERNAME=admin
       - SE_ROUTER_PASSWORD=admin
       - SE_VNC_PASSWORD=admin
       - SE_ENABLE_TRACING=false
       - SE_SUB_PATH=/selenium
-      # turn off vnc 
+      - SE_START_XVFB=false # for Headless mode
+      - SE_START_VNC=false # for Headless mode
     volumes:
       - ./shared/chrome:/tmp/pdfs/
     ports:

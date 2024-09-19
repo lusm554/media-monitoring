@@ -26,14 +26,22 @@ class CfaReleasePDF2TextScraper:
     self.local_filepath = '/shared/chrome/'
 
     options = ChromeOptions()
-    #options.add_argument("--headless")
+    options.add_argument("--headless")
     options.add_argument("--start-maximized")
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--disable-extensions')
     options.add_argument('--disable-software-rasterizer')
     options.add_argument('--disable-gpu')
-    options.page_load_strategy = 'normal' # eager
+    options.add_argument("--disable-background-networking")
+    options.add_argument("--disable-sync")
+    options.add_argument("--disable-translate")
+    options.add_argument("--disable-notifications")
+    options.add_argument("--disable-default-apps")
+    options.add_argument("--disable-web-security")
+    options.add_argument("--disable-devtools")
+    options.add_argument("--log-level=3")
+    options.page_load_strategy = 'eager' # normal
     options.add_experimental_option("prefs", {
       "download.default_directory": self.chrome_filepath, #'/tmp/',
       "download.directory_upgrade": True,
@@ -42,20 +50,13 @@ class CfaReleasePDF2TextScraper:
       "plugins.always_open_pdf_externally": True,
       "safebrowsing.disable_download_protection": True,
     })
-    #from webdriver_manager.chrome import ChromeDriverManager
-    #service = Service(ChromeDriverManager().install())
-    from selenium.webdriver.chrome.service import Service
-    #options.binary_location = "/opt/chrome/chrome-linux64/chrome"
-    #service = Service(executable_path="/opt/chromedriver/chromedriver-linux64/chromedriver")
-    service = Service()
+    # local driver pc 
+    #driver = webdriver.Chrome(options=options)
 
-    #host = 'http://chrome:4444'
+    # remove driver
     host = 'http://admin:admin@chrome:4444'
     driver = webdriver.Remote(command_executor=host, options=options)
-    #driver = webdriver.Chrome(service=service, options=options)
-    driver.set_page_load_timeout(60)
     self.driver = driver
-
 
   def __check_element_disappear__(self, driver):
     try:
@@ -80,7 +81,7 @@ class CfaReleasePDF2TextScraper:
   def fetch_and_parse(self, cfa_url):
     try:
       logger.info(f'Pdf URL: {cfa_url}')
-      timeout_seconds = 60
+      timeout_seconds = 30
       driver = self.driver
       driver.get(cfa_url)
       WebDriverWait(driver, timeout=timeout_seconds).until(self.__check_element_disappear__)
@@ -104,7 +105,7 @@ class CfaReleasePDF2TextScraper:
       logger.error(error)
       raise ValueError('Cannot get pdfs from url.')
 
-  def driver_quite(self):
+  def driver_quit(self):
     self.driver.quit()
 
 class CfaReleasesScraper(BaseScraper):

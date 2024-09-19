@@ -1,6 +1,6 @@
 SQLAlchemy
 openai
-pdfminer
+pdfminer.six
 goose3
 sumy
 selenium

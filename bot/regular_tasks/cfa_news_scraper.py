@@ -29,9 +29,9 @@ async def cfa_releases_scraper(context):
     return scraper_releases_not_in_db
 
   releases_scraper = scraper_lib.CfaReleasesScraper(error='ignore')
-  releases = releases_scraper.fetch_and_parse(scraper_lib.Periods.LAST_WEEK) # scraper_lib.Periods.LAST_24_HOURS
-  releases = releases[:1]
-  #releases = releases_scraper.fetch_and_parse(scraper_lib.Periods.LAST_24_HOURS)
+  #releases = releases_scraper.fetch_and_parse(scraper_lib.Periods.LAST_WEEK) # scraper_lib.Periods.LAST_24_HOURS
+  #releases = releases[:1]
+  releases = releases_scraper.fetch_and_parse(scraper_lib.Periods.LAST_24_HOURS)
   #print('scraper releases', len(releases))
   releases = get_releases_not_in_db(releases) # 1. Get releases not in db
   #print('not in db releases', len(releases))
@@ -41,4 +41,5 @@ async def cfa_releases_scraper(context):
     for k,v in desc.items():
       setattr(r, k, v)
   storage.add_releases(releases)
+  releases_scraper.pdf2text_scraper.driver_quit()
 
