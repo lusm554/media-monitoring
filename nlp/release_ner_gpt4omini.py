@@ -40,7 +40,7 @@ def release_text_to_desc(release_text):
   response_big = client.chat.completions.create(
       model="openai/gpt-4o-mini", # id модели из списка моделей - можно использовать OpenAI, Anthropic и пр. меняя только этот параметр
       messages=messages,
-      temperature=1,
+      temperature=0,
       n=1,
       max_tokens=3000, # максимальное число ВЫХОДНЫХ токенов. Для большинства моделей не должно превышать 4096
       #extra_headers={ "X-Title": "My App" }, # опционально - передача информация об источнике API-вызова
