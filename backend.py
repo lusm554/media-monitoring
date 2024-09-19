@@ -33,5 +33,6 @@ if os.getenv('BOT_NEWS_SUBSCRIBERS', ''):
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 USERS_BLACKLIST = os.getenv('BOT_USERS_BLACKLIST', '').split(',')
+logger.info(f'USERS_BLACKLIST {USERS_BLACKLIST}')
 assert BOT_TOKEN
 bot.start(BOT_TOKEN, USERS_BLACKLIST)
