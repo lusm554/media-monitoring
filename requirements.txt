@@ -1,4 +1,8 @@
 SQLAlchemy
+openai
+goose3
+sumy
+selenium
 psycopg2
 redis==5.0.8
 anyio==4.2.0
