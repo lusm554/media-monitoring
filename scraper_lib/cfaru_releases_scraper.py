@@ -22,19 +22,40 @@ import os
 
 class CfaReleasePDF2TextScraper:
   def __init__(self):
+    self.chrome_filepath = '/tmp/pdfs/'
+    self.local_filepath = '/shared/chrome/'
+
     options = ChromeOptions()
-    options.add_argument("--headless")
-    options.page_load_strategy = 'eager' # normal
+    #options.add_argument("--headless")
+    options.add_argument("--start-maximized")
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--disable-extensions')
+    options.add_argument('--disable-software-rasterizer')
+    options.add_argument('--disable-gpu')
+    options.page_load_strategy = 'normal' # eager
     options.add_experimental_option("prefs", {
-      "download.default_directory": '/tmp/',
+      "download.default_directory": self.chrome_filepath, #'/tmp/',
       "download.directory_upgrade": True,
       "download.prompt_for_download": False,
       "download.directory_upgrade": True,
       "plugins.always_open_pdf_externally": True,
       "safebrowsing.disable_download_protection": True,
     })
-    driver = webdriver.Chrome(options=options)
+    #from webdriver_manager.chrome import ChromeDriverManager
+    #service = Service(ChromeDriverManager().install())
+    from selenium.webdriver.chrome.service import Service
+    #options.binary_location = "/opt/chrome/chrome-linux64/chrome"
+    #service = Service(executable_path="/opt/chromedriver/chromedriver-linux64/chromedriver")
+    service = Service()
+
+    #host = 'http://chrome:4444'
+    host = 'http://admin:admin@chrome:4444'
+    driver = webdriver.Remote(command_executor=host, options=options)
+    #driver = webdriver.Chrome(service=service, options=options)
+    driver.set_page_load_timeout(60)
     self.driver = driver
+
 
   def __check_element_disappear__(self, driver):
     try:
@@ -44,13 +65,13 @@ class CfaReleasePDF2TextScraper:
       return True
 
   def __check_file_downloaded__(self, filepath):
-    filepath = '/tmp/' + filepath
+    filepath = self.local_filepath + filepath
     return lambda _: os.path.isfile(filepath)
 
   def parse_pdf_to_text(self, pdf_filepath):
     from pdfminer.high_level import extract_text
     import re
-    pdf_filepath = '/tmp/' + pdf_filepath
+    pdf_filepath = self.local_filepath + pdf_filepath
     text = extract_text(pdf_filepath)
     text = re.sub(r'\s+', ' ', text)
     text = re.sub(r'[^\w\s.,!?-]', '', text)
@@ -58,25 +79,29 @@ class CfaReleasePDF2TextScraper:
 
   def fetch_and_parse(self, cfa_url):
     try:
+      logger.info(f'Pdf URL: {cfa_url}')
+      timeout_seconds = 60
       driver = self.driver
       driver.get(cfa_url)
-      WebDriverWait(driver, timeout=15).until(self.__check_element_disappear__)
-      btn = WebDriverWait(driver, timeout=30).until(
+      WebDriverWait(driver, timeout=timeout_seconds).until(self.__check_element_disappear__)
+      btn = WebDriverWait(driver, timeout=timeout_seconds).until(
         EC.element_to_be_clickable(
           (By.XPATH, '//button[(@aria-label="Download") and (@class="svg-button icon group2")]')
         )
       )
       driver.execute_script("arguments[0].click();", btn);
-      btn = WebDriverWait(driver, timeout=10).until(
+      btn = WebDriverWait(driver, timeout=timeout_seconds).until(
         EC.element_to_be_clickable((By.XPATH, '//a[@class="download-full-button"]'))
       )
       filepath = '_'.join([str(uuid.uuid4()), *cfa_url.split('/')[-2:]]).lower() + '.pdf'
       driver.execute_script("arguments[0].setAttribute('download',arguments[1])", btn, filepath)
       driver.execute_script("arguments[0].click();", btn);
-      WebDriverWait(driver, timeout=15, ).until(self.__check_file_downloaded__(filepath))
+      WebDriverWait(driver, timeout=timeout_seconds).until(self.__check_file_downloaded__(filepath))
       pdf_text = self.parse_pdf_to_text(filepath)
+      logger.info(f'Done URL: {cfa_url}')
       return pdf_text
-    except:
+    except Exception as error:
+      logger.error(error)
       raise ValueError('Cannot get pdfs from url.')
 
   def driver_quite(self):

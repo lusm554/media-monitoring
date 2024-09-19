@@ -13,7 +13,8 @@ from storage.postgres_datamap import (
   Releases,
 )
 
-HOST, PORT = 'localhost', '5432' # db
+HOST, PORT = 'db', '5432' # db
+#HOST, PORT = 'localhost', '5432'
 USER, PWD = 'postgres', ''
 DATABASE = 'test'
 URL = f'postgresql+psycopg2://{USER}:{PWD}@{HOST}:{PORT}/{DATABASE}'
@@ -28,15 +29,6 @@ def create_tables_if_not_exists():
 def recreate_tables():
   Base.metadata.drop_all(engine)
   Base.metadata.create_all(engine)
-
-'''
-1. Converter from row to Article, Release instance
-2. Converter from row to dict
-3. Select n items
-4. Select items by id
-5. Select items by period
-6. Save items, with unique option
-'''
 
 def db_row_to_dict_converter(func):
   from collections.abc import Iterable

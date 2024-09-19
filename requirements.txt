@@ -1,5 +1,6 @@
 SQLAlchemy
 openai
+pdfminer
 goose3
 sumy
 selenium

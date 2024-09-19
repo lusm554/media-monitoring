@@ -5,7 +5,7 @@ import os
 import locale
 locale.setlocale(
   category=locale.LC_ALL,
-  locale='ru_RU',
+  locale='ru_RU.UTF-8',
 )
 
 import datetime

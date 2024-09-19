@@ -1,17 +1,39 @@
 services:
   backend:
+    platform: linux/amd64
     build:
       context: .
       dockerfile: Dockerfile
     command: ['python3', 'backend.py']
-    environment:
-      - BOT_TOKEN=1
+    #environment:
+       #- 
+    env_file: ".env"
     depends_on:
+      chrome:
+        condition: service_started
       db:
         condition:
           service_healthy
     volumes:
       - ./shared:/shared
+
+  chrome:
+    image: selenium/standalone-chromium:latest
+    shm_size: 1gb
+    mem_limit: 1g
+    cpus: 2
+    environment:
+      - SE_ROUTER_USERNAME=admin
+      - SE_ROUTER_PASSWORD=admin
+      - SE_VNC_PASSWORD=admin
+      - SE_ENABLE_TRACING=false
+      - SE_SUB_PATH=/selenium
+      # turn off vnc 
+    volumes:
+      - ./shared/chrome:/tmp/pdfs/
+    ports:
+      - "4444:4444" # webdriver
+      - "5900:5900" # VNC
 
   redis:
     image: redis

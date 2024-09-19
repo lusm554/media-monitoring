@@ -18,30 +18,30 @@ RUN apt-get update && \
 ENV LANG ru_RU.UTF-8
 ENV LC_ALL ru_RU.UTF-8
 
-RUN apt-get install -y chromium
-RUN apt-get install -y chromium-browser
-#RUN apt-get install -y chromium-chromedriver
+#RUN apt-get update -y && apt-get install -y wget xvfb unzip jq curl wget
+#RUN apt-get install -y libxss1 libappindicator1 libgconf-2-4 \
+#  fonts-liberation libasound2 libnspr4 libnss3 libx11-xcb1 libxtst6 lsb-release xdg-utils \
+#  libgbm1 libnss3 libatk-bridge2.0-0 libgtk-3-0 libx11-xcb1 libxcb-dri3-0
+#
+#RUN curl --tlsv1 -s https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json > /tmp/versions.json
+#
+#RUN CHROME_URL=$(jq -r '.channels.Stable.downloads.chrome[] | select(.platform=="linux64") | .url' /tmp/versions.json) && \
+#  wget -q --continue -O /tmp/chrome-linux64.zip $CHROME_URL && \
+#  unzip /tmp/chrome-linux64.zip -d /opt/chrome
+#
+#RUN chmod +x /opt/chrome/chrome-linux64/chrome
+#
+#RUN CHROMEDRIVER_URL=$(jq -r '.channels.Stable.downloads.chromedriver[] | select(.platform=="linux64") | .url' /tmp/versions.json) && \
+#  wget -q --continue -O /tmp/chromedriver-linux64.zip $CHROMEDRIVER_URL && \
+#  unzip /tmp/chromedriver-linux64.zip -d /opt/chromedriver && \
+#  chmod +x /opt/chromedriver/chromedriver-linux64/chromedriver
+#
+#ENV CHROMEDRIVER_DIR /opt/chromedriver
+#ENV PATH $CHROMEDRIVER_DIR:$PATH
+#
+#RUN rm /tmp/chrome-linux64.zip /tmp/chromedriver-linux64.zip /tmp/versions.json
 
-#RUN pip3 install --no-cache-dir webdriver-manager
-#COPY install_chrome.py . 
-#RUN python3 install_chrome.py
-
-#RUN apt-get install -y gnupg2
-#RUN apt-get install -y curl wget
-
-# install google chrome
-#RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
-#RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-#RUN apt-get -y update
-#RUN apt-get install -y google-chrome-stable
-
-# install chromedriver
-#RUN apt-get install -yqq unzip
-#RUN wget -O /tmp/chromedriver.zip http://chromedriver.storage.googleapis.com/`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE`/chromedriver_linux64.zip
-#RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
-
-# set display port to avoid crash
-#ENV DISPLAY=:99
+RUN pip3 install --no-cache-dir pdfminer.six
 
 COPY backend.py .
 COPY bot ./bot
