@@ -16,6 +16,7 @@ class CfaAllNewsScraper(NewsBaseScraper):
     super().__init__(*args, **kwargs)
     if self.error == 'ignore':
       logger.warning(f'Error handler set to {self.error!r}')
+    logger.warning(f'Scraper timezone {self.timezone!r}')
     self.NEWS_SCRAPERS = [
       CfaDzenNewsScraper,
       CfaRssNewsScraper,
