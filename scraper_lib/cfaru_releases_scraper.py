@@ -175,6 +175,7 @@ class CfaReleasesScraper(BaseScraper):
           emit_name = tag_a.get_text()
           emit_href = urllib.parse.urljoin(site_url, tag_a.get('href'))
           emit_date = datetime.datetime(year=2000, month=1, day=1) if last_date is None else datetime.datetime.strptime(last_date, "%d.%m.%Y")
+          emit_date = emit_date.astimezone(self.timezone)
           if last_span_header:
             emit_name = f'{last_span_header} {emit_name}'
           release = Release(
@@ -221,7 +222,7 @@ class CfaReleasesScraper(BaseScraper):
     try:
       page_html = self.page_fetcher()
       cfa_releases = self.page_parser(page_html)
-      releases_start_time = datetime.datetime.now() - period
+      releases_start_time = datetime.datetime.now(tz=self.timezone) - period
       cfa_releases = [
         release
         for release in cfa_releases
