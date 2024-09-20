@@ -1,6 +1,7 @@
 services:
   backend:
     mem_limit: 1gb
+    memswap_limit: 3gb
     platform: linux/amd64
     build:
       context: .
