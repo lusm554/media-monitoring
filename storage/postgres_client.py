@@ -30,6 +30,16 @@ def recreate_tables():
   Base.metadata.drop_all(engine)
   Base.metadata.create_all(engine)
 
+def recreate_only_news_releases_related_tables():
+  tables = [
+    News.__table__,
+    Releases.__table__, 
+    NewsPosts.__table__,
+    ReleasesPosts.__table__,
+  ]
+  Base.metadata.drop_all(engine, tables=tables)
+  Base.metadata.create_all(engine, tables=tables)
+
 def db_row_to_dict_converter(func):
   from collections.abc import Iterable
   def filter_alchemy_attrs(dct):
@@ -195,32 +205,15 @@ def delete_news_subscriber(subsciber_telegram_id):
       print(error)
 
 ####################### NEWS #######################
-'''
-@news_to_article_converter
-def get_news_by_date_range(start_dt, end_dt):
-  with Session(engine) as session:
-    try:
-      return session.query(News).filter(
-        News.publish_time >= start_dt,
-        News.publish_time <= end_dt,
-      ).all()
-    except Exception as error:
-      print(error)
-      return list()
-
-def get_last_24h_news():
-  start_dt = datetime.datetime.now() - datetime.timedelta(hours=24)
-  end_dt = datetime.datetime.now()
-  news = get_news_by_date_range(start_dt, end_dt)
-  return news
-'''
-
 def get_rows_by_date_range_factory(table, table_dt_col, delta_in_hours, result_convertor=None):
   def selector():
     with Session(engine) as session:
       try:
-        start_dt = datetime.datetime.now() - datetime.timedelta(hours=delta_in_hours)
-        end_dt = datetime.datetime.now()
+        # hard fix
+        import zoneinfo # add since Python 3.9
+        time_zone_moscow = zoneinfo.ZoneInfo("Europe/Moscow")
+        start_dt = datetime.datetime.now(tz=time_zone_moscow) - datetime.timedelta(hours=delta_in_hours)
+        end_dt = datetime.datetime.now(tz=time_zone_moscow)
         return session.query(table).filter(
           getattr(table, table_dt_col) >= start_dt,
           getattr(table, table_dt_col) <= end_dt,

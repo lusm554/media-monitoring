@@ -24,6 +24,10 @@ logger = logging.getLogger(__name__)
 
 storage.create_tables_if_not_exists()
 #storage.recreate_tables()
+#storage.recreate_only_news_releases_related_tables()
+
+logger.info(f'Users count {len(storage.get_n_users())}')
+logger.info(f'Subs count {len(storage.get_n_news_subscribers())}')
 
 if os.getenv('BOT_NEWS_SUBSCRIBERS', ''):
   env_subscribers = [u for u in os.getenv('BOT_NEWS_SUBSCRIBERS', '').split(',') if u]

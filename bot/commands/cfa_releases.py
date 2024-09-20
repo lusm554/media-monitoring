@@ -11,6 +11,8 @@ RIGHT_ARROW_SYMBOL = chr(8594) # →
 LEFT_ARROW_SYMBOL = chr(8592) # ←
 CFA_LAST_RELEASES_CALLBACK_ID = 'cfa_last_releases'
 
+logger = logging.getLogger(__name__)
+
 import datetime
 from uuid import uuid4
 
@@ -111,7 +113,9 @@ def cfa_command_dispetcher(func):
 async def cfa_releases(context, target_chat_id):
   effective_chat_id = target_chat_id
   releases = storage.get_last_24h_releases()
+  logger.info(f'releases cnt in cmd {len(releases)}')
   #releases = storage.get_n_releases()
+  releases = sorted(releases, key=lambda a: a.release_time, reverse=True)
   if len(releases) == 0:
     await context.bot.send_message(
       chat_id=effective_chat_id,

@@ -11,6 +11,8 @@ RIGHT_ARROW_SYMBOL = chr(8594) # →
 LEFT_ARROW_SYMBOL = chr(8592) # ←
 CFA_LAST_NEWS_CALLBACK_ID = 'cfa_last_news'
 
+logger = logging.getLogger(__name__)
+
 import datetime
 from uuid import uuid4
 
@@ -100,6 +102,7 @@ async def cfa_news(context, target_chat_id):
   effective_chat_id = target_chat_id
   articles = storage.get_last_24h_news()
   #articles = storage.get_n_news(n=15)
+  articles = sorted(articles, key=lambda a: a.publish_time, reverse=True)
   if len(articles) == 0:
     await context.bot.send_message(
       chat_id=effective_chat_id,
