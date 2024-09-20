@@ -22,8 +22,13 @@ import os
 
 class CfaReleasePDF2TextScraper:
   def __init__(self):
-    self.chrome_filepath = '/tmp/pdfs/'
-    self.local_filepath = '/shared/chrome/'
+    # host
+    #self.chrome_filepath = '/tmp/pdfs/'
+    #self.local_filepath = '/shared/chrome/'
+
+    # local
+    self.chrome_filepath = '/tmp/'
+    self.local_filepath = '/tmp/'
 
     options = ChromeOptions()
     options.add_argument("--headless")
@@ -53,11 +58,11 @@ class CfaReleasePDF2TextScraper:
       "safebrowsing.disable_download_protection": True,
     })
     # local driver pc 
-    #driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(options=options)
 
     # remove driver
-    host = 'http://admin:admin@chrome:4444'
-    driver = webdriver.Remote(command_executor=host, options=options)
+    #host = 'http://admin:admin@chrome:4444'
+    #driver = webdriver.Remote(command_executor=host, options=options)
     self.driver = driver
 
   def __check_element_disappear__(self, driver):
@@ -205,9 +210,6 @@ class CfaReleasesScraper(BaseScraper):
   def add_pdf_text(self, release):
     if release.url.endswith('.pdf'):
       return release
-    #release_dict = release.to_dict()
-    #release_dict['pdf_text'] = self.pdf2text_scraper.fetch_and_parse(release.url)
-    #release = Release.from_dict(release_dict)
     release.pdf_text = self.pdf2text_scraper.fetch_and_parse(release.url)
     return release
 

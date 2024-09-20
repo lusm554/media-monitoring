@@ -88,7 +88,7 @@ class CfaRssNewsScraper(NewsBaseScraper):
       article = Article(
         title=article_title,
         url=article_url,
-        publish_time=datetime.datetime.fromtimestamp(time.mktime(article_publish_time)),
+        publish_time=datetime.datetime.fromtimestamp(time.mktime(article_publish_time)).astimezone(self.timezone),
         publisher_name=article_publisher_name,
         scraper='rss',
       )
@@ -118,7 +118,7 @@ class CfaRssNewsScraper(NewsBaseScraper):
         for done_job in concurrent.futures.as_completed(process_feed_jobs):
           cfa_articles = done_job.result()
           result_cfa_articles.extend(cfa_articles)
-      news_start_time = datetime.datetime.now() - period
+      news_start_time = datetime.datetime.now(tz=self.timezone) - period
       result_cfa_articles = [
         article
         for article in result_cfa_articles

@@ -3,6 +3,7 @@ from .base_scraper import NewsBaseScraper
 from .dzen_news_scraper import CfaDzenNewsScraper
 from .rss_news_scraper import CfaRssNewsScraper
 from .google_news_scraper import CfaGoogleNewsScraper
+import datetime
 import logging
 
 logger = logging.getLogger(__name__)
@@ -45,6 +46,14 @@ class CfaAllNewsScraper(NewsBaseScraper):
       if any(kw in str(art.title).lower() for kw in cfa_keys_words)
     ]
 
+  def convert_datetimes_timezone(self, articles):
+    result = list()
+    for a in articles:
+      if isinstance(a.publish_time, datetime.datetime):
+        a.publish_time = a.publish_time.astimezone(self.timezone)
+      result.append(a)
+    return result
+
   def fetch_and_parse(self, period):
     '''
     Забирает новости по каждому парсеру, вызывая метод fetch_and_parse у каждого парсера.
@@ -57,6 +66,7 @@ class CfaAllNewsScraper(NewsBaseScraper):
         all_scrapers_articles.extend(scraper_articles)
       all_scrapers_articles = self.filter_by_blacklist(all_scrapers_articles)
       all_scrapers_articles = self.filter_no_cfa_news(all_scrapers_articles)
+      all_scrapers_articles = self.convert_datetimes_timezone(all_scrapers_articles)
       all_scrapers_articles = list(set(all_scrapers_articles))
       logger.info(f'Found {len(all_scrapers_articles)} releases for {period}')
       logger.info(f'Run {len(self.NEWS_SCRAPERS)} scrapers')

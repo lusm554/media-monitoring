@@ -50,7 +50,7 @@ class CfaDzenNewsScraper(NewsBaseScraper):
     Запрашивает HTML или JSON страницу новостей по теме 'ЦФА' из Дзенa.
     Запрос передается с фильтром на период новостей.
     '''
-    current_time = datetime.datetime.now()
+    current_time = datetime.datetime.now(tz=self.timezone)
     #current_time = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     if for_period <= datetime.timedelta(hours=24): # особенность дзена, для новостей за сутки нужно указывать один день
       news_start_time = current_time

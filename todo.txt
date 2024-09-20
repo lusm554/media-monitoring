@@ -6,7 +6,7 @@ Lib:
 2. [done] Простая суммаризация текста
 3. [done] Парсинг pdf выпуска в текст
 4. Настроить логирование
-5. Добавить timezone для datetime
+5. [done] Добавить timezone для datetime
 N. Глянуть либу PyGoogleNews вместо ручного парсинга
 
 NLP:

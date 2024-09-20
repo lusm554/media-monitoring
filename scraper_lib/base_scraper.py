@@ -2,6 +2,7 @@ from abc import abstractmethod
 import datetime
 import concurrent.futures
 import goose3
+import zoneinfo
 
 class Periods:
   '''
@@ -16,10 +17,11 @@ class BaseScraper:
   Базовый класс для всех скреперов.
   Содержит общие методы для всех скреперов. 
   '''
-  def __init__(self, error='raise'):
+  def __init__(self, error='raise', timezone=zoneinfo.ZoneInfo("Europe/Moscow")):
     if not error in ('raise', 'ignore'):
       raise ValueError(f"error argument should be 'raise' or 'ignore'")
     self.error = error
+    self.timezone = timezone
 
   def filter_by_period(self):
     raise NotImplemented()
