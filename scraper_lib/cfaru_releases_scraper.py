@@ -41,6 +41,8 @@ class CfaReleasePDF2TextScraper:
     options.add_argument("--disable-web-security")
     options.add_argument("--disable-devtools")
     options.add_argument("--log-level=3")
+    options.add_argument("--process-per-site")
+    options.add_argument("--renderer-process-limit=1") # 2
     options.page_load_strategy = 'eager' # normal
     options.add_experimental_option("prefs", {
       "download.default_directory": self.chrome_filepath, #'/tmp/',
