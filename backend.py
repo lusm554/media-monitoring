@@ -15,7 +15,7 @@ logging.basicConfig(
   format='[%(asctime)s] %(levelname)s [%(name)s] %(message)s',
   datefmt='%Y-%m-%d %H:%M:%S %Z',
   handlers=[
-    #logging.FileHandler(datetime.datetime.now().strftime('shared/logs/log_%Y-%m-%d_%H-%M-%S.log')),
+    logging.FileHandler(datetime.datetime.now().strftime('/shared/logs/log_%Y-%m-%d_%H-%M-%S.log')),
     logging.StreamHandler(),
   ],
 )

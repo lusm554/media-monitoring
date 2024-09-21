@@ -17,6 +17,7 @@ services:
           service_healthy
     volumes:
       - ./shared:/shared
+      - ./shared/logs:/shared/logs
 
   chrome:
     image: selenium/standalone-chromium:latest
