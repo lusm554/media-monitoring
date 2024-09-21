@@ -23,12 +23,12 @@ import os
 class CfaReleasePDF2TextScraper:
   def __init__(self):
     # host
-    #self.chrome_filepath = '/tmp/pdfs/'
-    #self.local_filepath = '/shared/chrome/'
+    self.chrome_filepath = '/tmp/pdfs/'
+    self.local_filepath = '/shared/chrome/'
 
     # local
-    self.chrome_filepath = '/tmp/'
-    self.local_filepath = '/tmp/'
+    #self.chrome_filepath = '/tmp/'
+    #self.local_filepath = '/tmp/'
 
     options = ChromeOptions()
     options.add_argument("--headless")
@@ -58,11 +58,11 @@ class CfaReleasePDF2TextScraper:
       "safebrowsing.disable_download_protection": True,
     })
     # local driver pc 
-    driver = webdriver.Chrome(options=options)
+    #driver = webdriver.Chrome(options=options)
 
     # remove driver
-    #host = 'http://admin:admin@chrome:4444'
-    #driver = webdriver.Remote(command_executor=host, options=options)
+    host = 'http://admin:admin@chrome:4444'
+    driver = webdriver.Remote(command_executor=host, options=options)
     self.driver = driver
 
   def __check_element_disappear__(self, driver):
