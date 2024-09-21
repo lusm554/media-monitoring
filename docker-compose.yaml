@@ -3,6 +3,7 @@ services:
     mem_limit: 1gb
     memswap_limit: 3gb
     platform: linux/amd64
+    restart: always
     build:
       context: .
       dockerfile: Dockerfile
@@ -21,6 +22,7 @@ services:
     image: selenium/standalone-chromium:latest
     mem_limit: 512m
     memswap_limit: 1g
+    restart: always
     environment:
       - SE_ROUTER_USERNAME=admin
       - SE_ROUTER_PASSWORD=admin
