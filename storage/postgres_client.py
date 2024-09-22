@@ -13,6 +13,9 @@ from storage.postgres_datamap import (
   Releases,
 )
 
+import logging
+logger = logging.getLogger(__name__)
+
 HOST, PORT = 'db', '5432' # db
 #HOST, PORT = 'localhost', '5432'
 USER, PWD = 'postgres', ''
@@ -82,7 +85,7 @@ def get_n_rows_factory(table, result_convertor=None):
       try:
         return session.query(table).limit(n).all()
       except Exception as error:
-        print(error)
+        logger.error(error)
         return list()
   if result_convertor:
     selector = result_convertor(selector)
@@ -126,7 +129,7 @@ def add_rows_factory(table, filter_existing_rows_key=None, filter_row_keys=None)
         session.commit()
       except Exception as error:
         session.rollback()
-        print(error)
+        logger.error(error)
   return add_rows
 
 add_user = add_rows_factory(Users, filter_existing_rows_key='telegram_user_id')
@@ -146,7 +149,7 @@ def get_rows_by_col(table, key, result_convertor=None):
         #return session.query(table).filter(getattr(table, key) == col_val).all()
         return session.query(table).filter(getattr(table, key).in_(col_val)).all()
       except Exception as error:
-        print(error)
+        logger.error(error)
         return list()
   if result_convertor:
     selector = result_convertor(selector)
@@ -171,7 +174,7 @@ def get_articles_by_news_post(post_id):
         )
         return articles
     except Exception as error:
-      print(error)
+      logger.error(error)
       return list()
 
 @news_to_article_converter
@@ -187,7 +190,7 @@ def get_releases_by_release_post(post_id):
         )
         return articles
     except Exception as error:
-      print(error)
+      logger.error(error)
       return list()
 
 ####################### NEWS SUBSCRIBER #######################
@@ -202,7 +205,7 @@ def delete_news_subscriber(subsciber_telegram_id):
       session.commit()
     except Exception as error:
       session.rollback()
-      print(error)
+      logger.error(error)
 
 ####################### NEWS #######################
 def get_rows_by_date_range_factory(table, table_dt_col, delta_in_hours, result_convertor=None):
@@ -219,7 +222,7 @@ def get_rows_by_date_range_factory(table, table_dt_col, delta_in_hours, result_c
           getattr(table, table_dt_col) <= end_dt,
         ).all()
       except Exception as error:
-        print(error)
+        logger.error(error)
         return list()
   if result_convertor:
     selector = result_convertor(selector)
