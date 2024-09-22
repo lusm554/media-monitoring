@@ -4,6 +4,8 @@ services:
     memswap_limit: 3gb
     platform: linux/amd64
     restart: always
+    environment:
+      - TZ=Europe/Moscow
     build:
       context: .
       dockerfile: Dockerfile
@@ -25,6 +27,7 @@ services:
     memswap_limit: 1g
     restart: always
     environment:
+      - TZ=Europe/Moscow
       - SE_ROUTER_USERNAME=admin
       - SE_ROUTER_PASSWORD=admin
       - SE_VNC_PASSWORD=admin
@@ -42,6 +45,7 @@ services:
     image: redis
     restart: always
     environment:
+      - TZ=Europe/Moscow
       - ALLOW_EMPTY_PASSWORD=yes
     command: ["redis-server", "--appendonly", "no", "--maxmemory", "150mb", "--maxmemory-policy", "allkeys-lru"]
     volumes:
@@ -55,6 +59,7 @@ services:
     image: postgres
     restart: always
     environment:
+      - TZ=Europe/Moscow
       - POSTGRES_USER=postgres
       - POSTGRES_HOST_AUTH_METHOD=trust
       - POSTGRES_PASSWORD=
@@ -82,6 +87,7 @@ services:
     depends_on:
       - db
     environment:
+      - TZ=Europe/Moscow
       - POSTGRES_HOST=db
       - POSTGRES_DB=test
       - POSTGRES_USER=postgres
