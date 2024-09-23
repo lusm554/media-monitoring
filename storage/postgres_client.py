@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 HOST, PORT = 'db', '5432' # db
 #HOST, PORT = 'localhost', '5432'
-USER, PWD = 'postgres', ''
+USER, PWD = 'postgres', 'postgres'
 DATABASE = 'test'
 URL = f'postgresql+psycopg2://{USER}:{PWD}@{HOST}:{PORT}/{DATABASE}'
 engine = create_engine(URL)
