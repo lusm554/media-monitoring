@@ -66,6 +66,7 @@ class CfaAllNewsScraper(NewsBaseScraper):
         scraper_articles = scraper(error=self.error).fetch_and_parse(period=period)
         all_scrapers_articles.extend(scraper_articles)
       all_scrapers_articles = self.filter_by_blacklist(all_scrapers_articles)
+      logger.info(f'Found without cfa key words filter {len(all_scrapers_articles)} articles for {period}')
       all_scrapers_articles = self.filter_no_cfa_news(all_scrapers_articles)
       all_scrapers_articles = self.convert_datetimes_timezone(all_scrapers_articles)
       all_scrapers_articles = list(set(all_scrapers_articles))
