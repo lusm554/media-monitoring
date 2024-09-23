@@ -69,7 +69,7 @@ class CfaAllNewsScraper(NewsBaseScraper):
       all_scrapers_articles = self.filter_no_cfa_news(all_scrapers_articles)
       all_scrapers_articles = self.convert_datetimes_timezone(all_scrapers_articles)
       all_scrapers_articles = list(set(all_scrapers_articles))
-      logger.info(f'Found {len(all_scrapers_articles)} releases for {period}')
+      logger.info(f'Found {len(all_scrapers_articles)} articles for {period}')
       logger.info(f'Run {len(self.NEWS_SCRAPERS)} scrapers')
       return all_scrapers_articles
     except Exception as error:
