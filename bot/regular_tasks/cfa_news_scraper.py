@@ -39,9 +39,10 @@ async def cfa_releases_scraper(context):
   logger.info(f'Found releases not in db {len(releases)}')
   releases = [releases_scraper.add_pdf_text(r) for r in releases] # 2. Get pdf, convert to text
   for r in releases:
-    desc = nlp.release_text_to_desc(r.pdf_text) # 3. Pdf text ner
-    for k,v in desc.items():
-      setattr(r, k, v)
+    if r.pdf_text:
+      desc = nlp.release_text_to_desc(r.pdf_text) # 3. Pdf text ner
+      for k,v in desc.items():
+        setattr(r, k, v)
   storage.add_releases(releases)
   releases_scraper.pdf2text_scraper.driver_quit()
 
