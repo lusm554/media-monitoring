@@ -110,7 +110,8 @@ class CfaReleasePDF2TextScraper:
       return pdf_text
     except Exception as error:
       logger.error(error)
-      raise ValueError('Cannot get pdfs from url.')
+      return None
+      #raise ValueError('Cannot get pdfs from url.')
 
   def driver_quit(self):
     self.driver.quit()
@@ -237,6 +238,4 @@ class CfaReleasesScraper(BaseScraper):
         raise error
       logger.error(error)
       return cfa_releases
-
-
 
