@@ -20,7 +20,7 @@ class News(Base):
   publish_time: Mapped[datetime] = mapped_column(index=True)
   #publish_time: Mapped[str] = mapped_column(index=True)
   publisher_name: Mapped[str]
-  body_text: Mapped[str] = mapped_column(nullable=True) 
+  body_text: Mapped[str] = mapped_column(nullable=True)
   summarized_body_text: Mapped[str] = mapped_column(nullable=True) 
   scraper: Mapped[str]
 
@@ -36,14 +36,14 @@ class Releases(Base):
   url: Mapped[str] = mapped_column(unique=True)
   release_time: Mapped[datetime]
   title: Mapped[str]
-  pdf_text: Mapped[str]
-  cfa_count: Mapped[str]
-  cfa_price: Mapped[str]
-  coupon_period: Mapped[str]
-  date_time_placement_start: Mapped[str]
-  date_time_placement_end: Mapped[str]
-  cfa_repayment_date_time: Mapped[str]
-  cfa_repayment_method: Mapped[str]
+  pdf_text: Mapped[str] = mapped_column(nullable=True)
+  cfa_count: Mapped[str] = mapped_column(nullable=True)
+  cfa_price: Mapped[str] = mapped_column(nullable=True)
+  coupon_period: Mapped[str] = mapped_column(nullable=True)
+  date_time_placement_start: Mapped[str] = mapped_column(nullable=True)
+  date_time_placement_end: Mapped[str] = mapped_column(nullable=True)
+  cfa_repayment_date_time: Mapped[str] = mapped_column(nullable=True)
+  cfa_repayment_method: Mapped[str] = mapped_column(nullable=True)
 
   def __repr__(self) -> str:
     cls_level_attrs = get_type_hints(self).keys()

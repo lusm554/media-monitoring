@@ -65,6 +65,8 @@ class Post:
 def get_releases_post_markup(post):
   def release_ner_markup(d):
     d = d.to_dict()
+    if d['date_time_placement_start'] is None:
+      return 'Описание не найдено.'
     start = d.get("date_time_placement_start").replace('МСК','')
     end = d.get("date_time_placement_end").replace('МСК','')
     bod = d.get("cfa_repayment_date_time").replace('МСК','')
