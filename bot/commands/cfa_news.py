@@ -102,6 +102,7 @@ async def cfa_news(context, target_chat_id):
   effective_chat_id = target_chat_id
   articles = storage.get_last_24h_news()
   #articles = storage.get_n_news(n=15)
+  articles = list(set(articles)) # filter duplicates
   articles = sorted(articles, key=lambda a: a.publish_time, reverse=True)
   if len(articles) == 0:
     await context.bot.send_message(
