@@ -1,4 +1,4 @@
-from urllib.parse import urlparse
+from urllib.parse import urlsplit, urlunsplit
 
 class Article:
   '''
@@ -18,7 +18,7 @@ class Article:
     self.db_id = db_id
     self.body_text = body_text
     self.summarized_body_text = summarized_body_text
-    self._filter_url = urlparse(url).netloc
+    self._filter_url = urlunsplit(urlsplit(self.url)._replace(query="", fragment=""))
 
   @classmethod
   def from_dict(cls, dct):
