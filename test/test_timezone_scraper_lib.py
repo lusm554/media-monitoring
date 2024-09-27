@@ -14,12 +14,14 @@ logging.basicConfig(
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
+'''
 releases = scraper.CfaReleasesScraper().fetch_and_parse(scraper.Periods.LAST_WEEK, add_pdf_text=False)
 for r in releases:
   print(r.release_time, r.title)
+'''
 
-exit()
-news = scraper.CfaAllNewsScraper().fetch_and_parse(scraper.Periods.LAST_24_HOURS)
+#news = scraper.CfaAllNewsScraper().fetch_and_parse(scraper.Periods.LAST_24_HOURS)
+news = scraper.CfaAllNewsScraper().fetch_and_parse(scraper.Periods.LAST_WEEK)
 news = sorted(news, key=lambda n: n.publish_time, reverse=True)
 for n in news:
-	print(n.scraper, n.publish_time, n.title)
+	print(n.title)

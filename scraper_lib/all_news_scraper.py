@@ -33,8 +33,7 @@ class CfaAllNewsScraper(NewsBaseScraper):
     ]
 
   def filter_no_cfa_news(self, articles):
-    cfa_keys_words = [
-      'цфа',
+    cfa_keys_sentences = [
       'цифровые финансовые активы',
       'цифровых финансовых активов',
       'цифровым финансовым активам',
@@ -42,9 +41,13 @@ class CfaAllNewsScraper(NewsBaseScraper):
       'цифровых финансовых активах',
       'цифровые активы',
     ]
+    cfa_keys_words = [
+      'цфа',
+    ]
     return [
       art for art in articles
-      if any(kw in str(art.title).lower() for kw in cfa_keys_words)
+      if any(kw==token for token in map(str.strip, str(art.title).lower().split(' ')) for kw in cfa_keys_words)
+      or any(ks in str(art.title).lower() for ks in cfa_keys_sentences)
     ]
 
   def convert_datetimes_timezone(self, articles):
