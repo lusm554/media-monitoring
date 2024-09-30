@@ -73,6 +73,9 @@ class CfaAllNewsScraper(NewsBaseScraper):
       all_scrapers_articles = self.filter_no_cfa_news(all_scrapers_articles)
       all_scrapers_articles = self.convert_datetimes_timezone(all_scrapers_articles)
       all_scrapers_articles = list(set(all_scrapers_articles))
+      for a in all_scrapers_articles: a.set_hash_attr('title')
+      all_scrapers_articles = list(set(all_scrapers_articles))
+      for a in all_scrapers_articles: a.set_hash_attr('_filter_url') # default key
       logger.info(f'Found {len(all_scrapers_articles)} articles for {period}')
       logger.info(f'Run {len(self.NEWS_SCRAPERS)} scrapers')
       return all_scrapers_articles

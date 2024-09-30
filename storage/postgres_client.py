@@ -133,7 +133,7 @@ def add_rows_factory(table, filter_existing_rows_key=None, filter_row_keys=None)
   return add_rows
 
 add_user = add_rows_factory(Users, filter_existing_rows_key='telegram_user_id')
-add_news = add_rows_factory(News, filter_existing_rows_key='url', filter_row_keys=['db_id', '_filter_url'])
+add_news = add_rows_factory(News, filter_existing_rows_key='url', filter_row_keys=['db_id', '_filter_url', 'hash_attr'])
 add_news_posts = add_rows_factory(NewsPosts, filter_existing_rows_key='bot_post_id')
 add_news_subscriber = add_rows_factory(RegularNewsSubscribers, filter_existing_rows_key='telegram_user_id')
 add_releases = add_rows_factory(Releases, filter_existing_rows_key='url', filter_row_keys=['db_id'])
