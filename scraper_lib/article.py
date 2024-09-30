@@ -5,7 +5,7 @@ class Article:
   Класс представление новостной статьи.
   Описывает характеристики новости - заголовок, ссылка на новость источника, время, источник и парсер статьи.
   '''
-  __slots__ = ('title', 'url', 'publish_time', 'publisher_name', 'scraper', 'db_id', 'body_text', 'summarized_body_text', '_filter_url')
+  __slots__ = ('title', 'url', 'publish_time', 'publisher_name', 'scraper', 'db_id', 'body_text', 'summarized_body_text', '_filter_url', 'hash_attr')
   def __init__(
     self, title, url, publish_time, publisher_name, scraper,
     db_id=None, body_text=None, summarized_body_text=None
@@ -19,6 +19,7 @@ class Article:
     self.body_text = body_text
     self.summarized_body_text = summarized_body_text
     self._filter_url = urlunsplit(urlsplit(self.url)._replace(query="", fragment=""))
+    self.hash_attr = '_filter_url'
 
   @classmethod
   def from_dict(cls, dct):
@@ -36,6 +37,9 @@ class Article:
       summarized_body_text=dct.get('summarized_body_text'),
     )
     return self
+
+  def set_hash_attr(self, attr):
+    self.hash_attr = attr
 
   def to_dict(self):
     '''
@@ -63,8 +67,8 @@ class Article:
     '''
     if not isinstance(other, self.__class__):
       raise ValueError(f'Cannot compare instance {other!r} of different class') 
-    #return self.url == other.url
-    return self._filter_url == other._filter_url
+    #return self._filter_url == other._filter_url
+    return getattr(self, self.hash_attr) == getattr(other, self.hash_attr)
 
   def __ne__(self, other):
     '''
@@ -73,16 +77,16 @@ class Article:
     '''
     if not isinstance(other, self.__class__):
       raise ValueError(f'Cannot compare instance {other!r} of different class') 
-    #return self.url != other.url
-    return self._filter_url != other._filter_url
+    return not self.__eq__(other) 
 
   def __hash__(self):
     '''
     Метод хеша экземпляра класса. Возвращает хеш url'a статьи.
     Метод добавлен для удобного фильтра уникальных статей через set().
     '''
-    #return hash(self.url)
-    return hash(self._filter_url)
+    #return hash(self._filter_url)
+    print(getattr(self, self.hash_attr))
+    return hash(getattr(self, self.hash_attr))
 
   def __repr__(self):
     '''
