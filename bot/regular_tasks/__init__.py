@@ -1,0 +1,2 @@
+from bot.regular_tasks.cfa_news_sender import cfa_news_sender, cfa_releases_sender
+from bot.regular_tasks.cfa_news_scraper import cfa_news_scraper, cfa_releases_scraper

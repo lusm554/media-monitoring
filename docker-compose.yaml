@@ -1,0 +1,103 @@
+services:
+  backend:
+    mem_limit: 1gb
+    memswap_limit: 3gb
+    platform: linux/amd64
+    restart: always
+    environment:
+      - TZ=Europe/Moscow
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ['python3', 'backend.py']
+    env_file: ".env"
+    depends_on:
+      chrome:
+        condition: service_started
+      db:
+        condition:
+          service_healthy
+    volumes:
+      - ./shared:/shared
+      - ./shared/logs:/shared/logs
+
+  chrome:
+    image: selenium/standalone-chromium:latest
+    mem_limit: 512m
+    memswap_limit: 1g
+    restart: always
+    environment:
+      - TZ=Europe/Moscow
+      - SE_ROUTER_USERNAME=admin
+      - SE_ROUTER_PASSWORD=admin
+      - SE_VNC_PASSWORD=admin
+      - SE_ENABLE_TRACING=false
+      - SE_SUB_PATH=/selenium
+      - SE_START_XVFB=false # for Headless mode
+      - SE_START_VNC=false # for Headless mode
+    volumes:
+      - ./shared/chrome:/tmp/pdfs/
+    ports:
+      - "4444:4444" # webdriver
+      - "5900:5900" # VNC
+
+  redis:
+    image: redis
+    restart: always
+    environment:
+      - TZ=Europe/Moscow
+      - ALLOW_EMPTY_PASSWORD=yes
+    command: ["redis-server", "--appendonly", "no", "--maxmemory", "150mb", "--maxmemory-policy", "allkeys-lru"]
+    volumes:
+      - ./shared/redis:/data
+    ports:
+      - 6379:6379
+    expose:
+      - 6379
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - TZ=Europe/Moscow
+      - POSTGRES_USER=postgres
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=test
+    volumes:
+      - ./shared/postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    expose:
+      - 5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+
+  pgbackups:
+    image: prodrigestivill/postgres-backup-local
+    restart: always
+    user: postgres:postgres
+    volumes:
+      - ./shared/pgbackups:/backups
+    links:
+      - db
+    depends_on:
+      - db
+    environment:
+      - TZ=Europe/Moscow
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=test
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_EXTRA_OPTS=-Z1 --schema=public --blobs
+      - SCHEDULE=@every 1h00m00s
+      - BACKUP_KEEP_DAYS=7
+      - BACKUP_KEEP_WEEKS=4
+      - BACKUP_KEEP_MONTHS=6
+      - HEALTHCHECK_PORT=8080
+
+volumes:
+  shared:

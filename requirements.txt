@@ -1,3 +1,11 @@
+SQLAlchemy
+openai
+pdfminer.six
+goose3
+sumy
+selenium
+psycopg2
+redis==5.0.8
 anyio==4.2.0
 APScheduler==3.10.4
 beautifulsoup4==4.12.2
@@ -21,3 +29,4 @@ tornado==6.3.3
 typing_extensions==4.9.0
 tzlocal==5.2
 urllib3==2.1.0
+dateparser==1.2.0
